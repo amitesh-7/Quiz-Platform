@@ -37,3 +37,6 @@ process.on("uncaughtException", (err) => {
 });
 
 startServer();
+
+// Export for Vercel serverless
+module.exports = app;

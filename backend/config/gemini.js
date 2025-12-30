@@ -1,11 +1,73 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Initialize Gemini AI with API key from environment variables
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Multiple Gemini API keys for fallback
+const GEMINI_API_KEYS = [
+  process.env.GEMINI_API_KEY,
+  process.env.GEMINI_API_KEY_2,
+  process.env.GEMINI_API_KEY_3,
+].filter(Boolean); // Remove undefined/null keys
 
-// Get the Gemini model
-const getGeminiModel = () => {
-  return genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+let currentKeyIndex = 0;
+
+// Get Gemini AI instance with current key
+const getGeminiAI = () => {
+  if (GEMINI_API_KEYS.length === 0) {
+    throw new Error("No Gemini API keys configured");
+  }
+  return new GoogleGenerativeAI(GEMINI_API_KEYS[currentKeyIndex]);
+};
+
+// Rotate to next API key
+const rotateApiKey = () => {
+  currentKeyIndex = (currentKeyIndex + 1) % GEMINI_API_KEYS.length;
+  console.log(
+    `Rotating to Gemini API key ${currentKeyIndex + 1}/${
+      GEMINI_API_KEYS.length
+    }`
+  );
+};
+
+// Get the Gemini model with retry logic
+const getGeminiModel = async (modelName = "gemini-3-flash-preview") => {
+  const genAI = getGeminiAI();
+  return genAI.getGenerativeModel({ model: modelName });
+};
+
+// Execute Gemini request with fallback
+const executeWithFallback = async (operation) => {
+  const maxRetries = GEMINI_API_KEYS.length;
+  let lastError;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      console.error(
+        `Gemini API error with key ${currentKeyIndex + 1}:`,
+        error.message
+      );
+
+      // Check if error is quota/rate limit related
+      const isQuotaError =
+        error.message?.includes("quota") ||
+        error.message?.includes("rate limit") ||
+        error.message?.includes("429");
+
+      if (isQuotaError && attempt < maxRetries - 1) {
+        rotateApiKey();
+        console.log(
+          `Retrying with next API key (attempt ${attempt + 2}/${maxRetries})...`
+        );
+        continue;
+      }
+
+      // If not quota error or last attempt, throw
+      throw error;
+    }
+  }
+
+  throw lastError;
 };
 
 // Generate quiz questions using Gemini
@@ -16,55 +78,56 @@ const generateQuestions = async (
   language = "english",
   questionTypes = ["mcq"]
 ) => {
-  const model = getGeminiModel();
+  return await executeWithFallback(async () => {
+    const model = await getGeminiModel();
 
-  // Language-specific instructions
-  const languageInstructions = {
-    english: "",
-    hindi:
-      "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Hindi language (हिंदी में). Use Devanagari script.",
-    sanskrit:
-      "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Sanskrit language (संस्कृत में). Use Devanagari script.",
-  };
+    // Language-specific instructions
+    const languageInstructions = {
+      english: "",
+      hindi:
+        "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Hindi language (हिंदी में). Use Devanagari script.",
+      sanskrit:
+        "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Sanskrit language (संस्कृत में). Use Devanagari script.",
+    };
 
-  const languageNote = languageInstructions[language] || "";
+    const languageNote = languageInstructions[language] || "";
 
-  // Question type descriptions
-  const typeDescriptions = {
-    mcq: `MCQ Questions should have:
+    // Question type descriptions
+    const typeDescriptions = {
+      mcq: `MCQ Questions should have:
 - "questionType": "mcq"
 - "questionText": "The question text?"
 - "options": ["Option A", "Option B", "Option C", "Option D"]
 - "correctOption": 0 (index of correct answer, 0-3)
 - "marks": 1`,
-    written: `Written Answer Questions should have:
+      written: `Written Answer Questions should have:
 - "questionType": "written"
 - "questionText": "The question text?"
 - "correctAnswer": "Expected answer or key points"
 - "marks": 2`,
-    fillblank: `Fill in the Blanks Questions should have:
+      fillblank: `Fill in the Blanks Questions should have:
 - "questionType": "fillblank"
 - "questionText": "The question with _____ for each blank"
 - "blanks": ["answer1", "answer2"] (array of correct answers for each blank)
 - "marks": 1`,
-    matching: `Match the Following Questions should have:
+      matching: `Match the Following Questions should have:
 - "questionType": "matching"
 - "questionText": "Match the following:"
 - "matchPairs": [{"left": "Term 1", "right": "Definition 1"}, {"left": "Term 2", "right": "Definition 2"}]
 - "marks": 2`,
-    truefalse: `True/False Questions should have:
+      truefalse: `True/False Questions should have:
 - "questionType": "truefalse"
 - "questionText": "Statement to evaluate as true or false"
 - "correctOption": 0 (0 for True, 1 for False)
 - "options": ["True", "False"]
 - "marks": 1`,
-  };
+    };
 
-  const selectedTypes = questionTypes
-    .map((type) => typeDescriptions[type])
-    .join("\n\n");
+    const selectedTypes = questionTypes
+      .map((type) => typeDescriptions[type])
+      .join("\n\n");
 
-  const prompt = `Generate ${numberOfQuestions} quiz questions about "${topic}" at ${difficulty} difficulty level.${languageNote}
+    const prompt = `Generate ${numberOfQuestions} quiz questions about "${topic}" at ${difficulty} difficulty level.${languageNote}
 
 Generate a mix of these question types: ${questionTypes.join(", ")}
 
@@ -88,7 +151,6 @@ IMPORTANT: Return ONLY a valid JSON array with no additional text, markdown, or 
 
 Return ONLY the JSON array, nothing else.`;
 
-  try {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = response.text();
@@ -168,22 +230,19 @@ Return ONLY the JSON array, nothing else.`;
     });
 
     return questions;
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    throw new Error(`Failed to generate questions: ${error.message}`);
-  }
+  });
 };
 
 // OCR: Extract text from image using Gemini Vision
 const extractTextFromImage = async (imageBase64, mimeType = "image/jpeg") => {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  return await executeWithFallback(async () => {
+    const model = await getGeminiModel("gemini-3-flash-preview");
 
-  const prompt = `Extract and transcribe all handwritten or printed text from this image. 
+    const prompt = `Extract and transcribe all handwritten or printed text from this image. 
 Return ONLY the extracted text, preserving the original language and formatting. 
 If the text is in Hindi or Sanskrit (Devanagari script), transcribe it accurately.
 Do not add any explanations, just the extracted text.`;
 
-  try {
     const result = await model.generateContent([
       prompt,
       {
@@ -196,10 +255,7 @@ Do not add any explanations, just the extracted text.`;
 
     const response = await result.response;
     return response.text().trim();
-  } catch (error) {
-    console.error("OCR Error:", error);
-    throw new Error(`Failed to extract text from image: ${error.message}`);
-  }
+  });
 };
 
 // Evaluate written answer using semantic matching
@@ -209,9 +265,10 @@ const evaluateWrittenAnswer = async (
   maxMarks,
   threshold = 0.7
 ) => {
-  const model = getGeminiModel();
+  return await executeWithFallback(async () => {
+    const model = await getGeminiModel();
 
-  const prompt = `You are an answer evaluator. Compare the student's answer with the expected answer and evaluate it.
+    const prompt = `You are an answer evaluator. Compare the student's answer with the expected answer and evaluate it.
 
 Expected Answer: "${expectedAnswer}"
 
@@ -251,33 +308,34 @@ Return ONLY a JSON object with this structure:
 
 Return ONLY the JSON object, nothing else.`;
 
-  try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let text = response.text();
+    try {
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      let text = response.text();
 
-    // Clean up the response
-    text = text
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
+      // Clean up the response
+      text = text
+        .replace(/```json\n?/g, "")
+        .replace(/```\n?/g, "")
+        .trim();
 
-    const evaluation = JSON.parse(text);
+      const evaluation = JSON.parse(text);
 
-    return {
-      score: Math.min(Math.max(0, evaluation.score), maxMarks),
-      percentage: Math.min(Math.max(0, evaluation.percentage), 100),
-      feedback: evaluation.feedback || "Answer evaluated",
-    };
-  } catch (error) {
-    console.error("Evaluation Error:", error);
-    // Return 0 if evaluation fails
-    return {
-      score: 0,
-      percentage: 0,
-      feedback: "Could not evaluate answer automatically",
-    };
-  }
+      return {
+        score: Math.min(Math.max(0, evaluation.score), maxMarks),
+        percentage: Math.min(Math.max(0, evaluation.percentage), 100),
+        feedback: evaluation.feedback || "Answer evaluated",
+      };
+    } catch (error) {
+      console.error("Evaluation Error:", error);
+      // Return 0 if evaluation fails
+      return {
+        score: 0,
+        percentage: 0,
+        feedback: "Could not evaluate answer automatically",
+      };
+    }
+  });
 };
 
 // Extract questions from an uploaded image
@@ -289,18 +347,20 @@ const extractQuestionsFromImage = async (
   additionalInstructions = "",
   language = "english"
 ) => {
-  const model = getGeminiModel();
+  return await executeWithFallback(async () => {
+    const model = await getGeminiModel("gemini-3-flash-preview");
 
-  const languageInstructions = {
-    english: "",
-    hindi: "\n\nGenerate ALL content in Hindi (हिंदी). Use Devanagari script.",
-    sanskrit:
-      "\n\nGenerate ALL content in Sanskrit (संस्कृत). Use Devanagari script.",
-  };
+    const languageInstructions = {
+      english: "",
+      hindi:
+        "\n\nGenerate ALL content in Hindi (हिंदी). Use Devanagari script.",
+      sanskrit:
+        "\n\nGenerate ALL content in Sanskrit (संस्कृत). Use Devanagari script.",
+    };
 
-  const languageNote = languageInstructions[language] || "";
+    const languageNote = languageInstructions[language] || "";
 
-  const prompt = `You are a quiz question extractor. Analyze this image and extract all questions visible in it.${languageNote}
+    const prompt = `You are a quiz question extractor. Analyze this image and extract all questions visible in it.${languageNote}
 
 MAXIMUM TOTAL MARKS: ${maxMarks}
 
@@ -341,7 +401,6 @@ RULES:
 
 IMPORTANT: Return ONLY the JSON array, no markdown, no explanation.`;
 
-  try {
     const result = await model.generateContent([
       prompt,
       {
@@ -390,10 +449,7 @@ IMPORTANT: Return ONLY the JSON array, no markdown, no explanation.`;
     });
 
     return questions;
-  } catch (error) {
-    console.error("Extract Questions from Image Error:", error);
-    throw new Error(`Failed to extract questions from image: ${error.message}`);
-  }
+  });
 };
 
 // Process raw questions and convert to proper quiz format
@@ -404,18 +460,20 @@ const processRawQuestions = async (
   language = "english",
   numberOfQuestions = null
 ) => {
-  const model = getGeminiModel();
+  return await executeWithFallback(async () => {
+    const model = await getGeminiModel();
 
-  const languageInstructions = {
-    english: "",
-    hindi: "\n\nGenerate ALL content in Hindi (हिंदी). Use Devanagari script.",
-    sanskrit:
-      "\n\nGenerate ALL content in Sanskrit (संस्कृत). Use Devanagari script.",
-  };
+    const languageInstructions = {
+      english: "",
+      hindi:
+        "\n\nGenerate ALL content in Hindi (हिंदी). Use Devanagari script.",
+      sanskrit:
+        "\n\nGenerate ALL content in Sanskrit (संस्कृत). Use Devanagari script.",
+    };
 
-  const languageNote = languageInstructions[language] || "";
+    const languageNote = languageInstructions[language] || "";
 
-  const prompt = `You are a quiz question processor. Convert the following raw questions/content into proper quiz questions.${languageNote}
+    const prompt = `You are a quiz question processor. Convert the following raw questions/content into proper quiz questions.${languageNote}
 
 RAW QUESTIONS/CONTENT:
 """
@@ -464,7 +522,6 @@ RULES:
 
 IMPORTANT: Return ONLY the JSON array, no markdown, no explanation.`;
 
-  try {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = response.text();
@@ -504,10 +561,7 @@ IMPORTANT: Return ONLY the JSON array, no markdown, no explanation.`;
     });
 
     return questions;
-  } catch (error) {
-    console.error("Process Raw Questions Error:", error);
-    throw new Error(`Failed to process questions: ${error.message}`);
-  }
+  });
 };
 
 module.exports = {

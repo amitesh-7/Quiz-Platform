@@ -22,6 +22,22 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Root route
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "🎓 Quiz Platform API v2.0",
+    version: "2.0.0",
+    status: "operational",
+    endpoints: {
+      health: "/health",
+      api: "/api",
+      docs: "https://github.com/yourusername/quiz-platform",
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Health check route
 app.get("/health", (req, res) => {
   res.status(200).json({
