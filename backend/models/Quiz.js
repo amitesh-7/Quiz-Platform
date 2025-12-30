@@ -20,6 +20,11 @@ const quizSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "Quiz creator is required"],
     },
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "Student assignment is required"],
+    },
     duration: {
       type: Number,
       required: [true, "Quiz duration is required"],
@@ -35,6 +40,38 @@ const quizSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    uniquePerStudent: {
+      type: Boolean,
+      default: true,
+    },
+    creationMode: {
+      type: String,
+      enum: ["manual", "ai"],
+      default: "manual",
+    },
+    language: {
+      type: String,
+      enum: ["english", "hindi", "sanskrit"],
+      default: "english",
+    },
+    subject: {
+      type: String,
+      trim: true,
+      maxlength: [100, "Subject cannot exceed 100 characters"],
+    },
+    chapters: {
+      type: String,
+      trim: true,
+      maxlength: [50, "Chapters cannot exceed 50 characters"],
+    },
+    aiSettings: {
+      topic: String,
+      numberOfQuestions: Number,
+      difficulty: {
+        type: String,
+        enum: ["easy", "medium", "hard"],
+      },
+    },
   },
   {
     timestamps: true,
@@ -43,6 +80,7 @@ const quizSchema = new mongoose.Schema(
 
 // Index for faster queries
 quizSchema.index({ createdBy: 1 });
+quizSchema.index({ assignedTo: 1 });
 quizSchema.index({ isActive: 1 });
 
 module.exports = mongoose.model("Quiz", quizSchema);

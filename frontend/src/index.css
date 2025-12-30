@@ -43,6 +43,11 @@ html.light .glass-input {
   -webkit-backdrop-filter: blur(16px);
 }
 
+html.light .glass-input option {
+  background: #ffffff;
+  color: #1e293b;
+}
+
 html.light .glass-input::placeholder {
   color: #64748b;
 }
@@ -211,6 +216,10 @@ html.light .border-white\/30 {
            placeholder:text-gray-400 text-white transition-all duration-300;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glass-input option {
+    @apply bg-gray-800 text-white;
   }
 
   .btn-primary {

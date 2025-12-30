@@ -22,6 +22,7 @@ import CreateQuiz from "./pages/teacher/CreateQuiz";
 import ManageQuiz from "./pages/teacher/ManageQuiz";
 import QuizSubmissions from "./pages/teacher/QuizSubmissions";
 import ManageStudents from "./pages/teacher/ManageStudents";
+import StudentQuizzes from "./pages/teacher/StudentQuizzes";
 
 // Student Pages
 import StudentDashboard from "./pages/student/Dashboard";
@@ -77,6 +78,10 @@ function App() {
               element={<QuizSubmissions />}
             />
             <Route path="students" element={<ManageStudents />} />
+            <Route
+              path="student/:studentId/quizzes"
+              element={<StudentQuizzes />}
+            />
           </Route>
 
           {/* Student Routes */}

@@ -12,11 +12,23 @@ const getGeminiModel = () => {
 const generateQuestions = async (
   topic,
   numberOfQuestions,
-  difficulty = "medium"
+  difficulty = "medium",
+  language = "english"
 ) => {
   const model = getGeminiModel();
 
-  const prompt = `Generate ${numberOfQuestions} multiple choice quiz questions about "${topic}" at ${difficulty} difficulty level.
+  // Language-specific instructions
+  const languageInstructions = {
+    english: "",
+    hindi:
+      "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Hindi language (हिंदी में). Use Devanagari script.",
+    sanskrit:
+      "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Sanskrit language (संस्कृत में). Use Devanagari script.",
+  };
+
+  const languageNote = languageInstructions[language] || "";
+
+  const prompt = `Generate ${numberOfQuestions} multiple choice quiz questions about "${topic}" at ${difficulty} difficulty level.${languageNote}
 
 IMPORTANT: Return ONLY a valid JSON array with no additional text, markdown, or formatting.
 
@@ -34,6 +46,11 @@ Rules:
 - marks should be 1 for easy, 2 for medium, 3 for hard questions
 - Questions should be clear and unambiguous
 - Options should be plausible but only one should be correct
+${
+  language !== "english"
+    ? "- ALL text must be in " + language + " language"
+    : ""
+}
 
 Return ONLY the JSON array, nothing else.`;
 

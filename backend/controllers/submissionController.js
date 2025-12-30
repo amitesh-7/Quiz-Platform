@@ -22,7 +22,7 @@ const submitValidation = [
 // @access  Private (Student only)
 const submitQuiz = async (req, res) => {
   try {
-    const { quizId, answers } = req.body;
+    const { quizId, answers, questionsData } = req.body;
 
     // Check if quiz exists
     const quiz = await Quiz.findById(quizId);
@@ -54,31 +54,47 @@ const submitQuiz = async (req, res) => {
       });
     }
 
-    // Get all questions for this quiz
-    const questions = await Question.find({ quizId });
+    let questions;
+    let questionMap = new Map();
 
-    if (questions.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "This quiz has no questions",
+    // If questionsData provided (unique per student), use it
+    if (questionsData && Array.isArray(questionsData)) {
+      questions = questionsData;
+      questions.forEach((q, index) => {
+        questionMap.set(`temp_${index}`, q);
+      });
+    } else {
+      // Otherwise, get stored questions for manual quizzes
+      questions = await Question.find({ quizId });
+
+      if (questions.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "This quiz has no questions",
+        });
+      }
+
+      questions.forEach((q) => {
+        questionMap.set(q._id.toString(), q);
       });
     }
-
-    // Create a map for quick lookup
-    const questionMap = new Map();
-    questions.forEach((q) => {
-      questionMap.set(q._id.toString(), q);
-    });
 
     // Calculate score
     let score = 0;
     const processedAnswers = [];
 
     for (const answer of answers) {
-      const question = questionMap.get(answer.questionId);
+      const questionKey = answer.questionId || answer.questionId;
+      const question = questionMap.get(questionKey);
+
       if (question) {
+        // Store complete question data in submission
         processedAnswers.push({
           questionId: answer.questionId,
+          questionText: question.questionText,
+          options: question.options,
+          correctOption: question.correctOption,
+          marks: question.marks,
           selectedOption: answer.selectedOption,
         });
 
@@ -87,6 +103,9 @@ const submitQuiz = async (req, res) => {
         }
       }
     }
+
+    // Calculate total marks
+    const totalMarks = processedAnswers.reduce((sum, a) => sum + a.marks, 0);
 
     // Create submission
     const submission = await Submission.create({
@@ -105,11 +124,9 @@ const submitQuiz = async (req, res) => {
           id: submission._id,
           quizId: submission.quizId,
           score: submission.score,
-          totalMarks: quiz.totalMarks,
+          totalMarks: totalMarks,
           percentage:
-            quiz.totalMarks > 0
-              ? Math.round((score / quiz.totalMarks) * 100)
-              : 0,
+            totalMarks > 0 ? Math.round((score / totalMarks) * 100) : 0,
           submittedAt: submission.submittedAt,
         },
       },

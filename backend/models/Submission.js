@@ -5,7 +5,18 @@ const answerSchema = new mongoose.Schema(
     questionId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Question",
-      required: true,
+    },
+    questionText: {
+      type: String,
+    },
+    options: {
+      type: [String],
+    },
+    correctOption: {
+      type: Number,
+    },
+    marks: {
+      type: Number,
     },
     selectedOption: {
       type: Number,

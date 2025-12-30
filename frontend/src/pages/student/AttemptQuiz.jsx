@@ -19,6 +19,7 @@ const AttemptQuiz = () => {
 
   const [quiz, setQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
+  const [questionsData, setQuestionsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [started, setStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -35,6 +36,7 @@ const AttemptQuiz = () => {
       const response = await quizAPI.getOne(quizId);
       setQuiz(response.data.data.quiz);
       setQuestions(response.data.data.questions);
+      setQuestionsData(response.data.data.questionsData || null);
       setTimeLeft(response.data.data.quiz.duration * 60);
     } catch (error) {
       if (error.response?.status === 400) {
@@ -63,10 +65,17 @@ const AttemptQuiz = () => {
       );
 
       try {
-        const response = await submissionAPI.submit({
+        const submitData = {
           quizId,
           answers: answersArray,
-        });
+        };
+
+        // Include questionsData if available (for unique per student quizzes)
+        if (questionsData) {
+          submitData.questionsData = questionsData;
+        }
+
+        const response = await submissionAPI.submit(submitData);
 
         if (isTimeout) {
           toast.success("Time's up! Quiz auto-submitted.");

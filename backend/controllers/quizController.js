@@ -2,6 +2,7 @@ const { body } = require("express-validator");
 const Quiz = require("../models/Quiz");
 const Question = require("../models/Question");
 const Submission = require("../models/Submission");
+const { generateQuestions } = require("../config/gemini");
 
 // Validation rules for creating a quiz
 const createQuizValidation = [
@@ -28,20 +29,95 @@ const createQuizValidation = [
 // @access  Private (Teacher only)
 const createQuiz = async (req, res) => {
   try {
-    const { title, description, duration } = req.body;
+    const {
+      title,
+      description,
+      duration,
+      creationMode,
+      language,
+      aiData,
+      assignedTo,
+      subject,
+      chapters,
+    } = req.body;
 
-    const quiz = await Quiz.create({
+    // Validate assignedTo
+    if (!assignedTo) {
+      return res.status(400).json({
+        success: false,
+        message: "Student assignment is required",
+      });
+    }
+
+    // Create the quiz with new fields
+    const quizData = {
       title,
       description: description || "",
       duration,
       createdBy: req.user._id,
+      assignedTo,
       totalMarks: 0,
       isActive: true,
-    });
+      uniquePerStudent: true,
+      creationMode: creationMode || "manual",
+      language: language || "english",
+      subject: subject || "",
+      chapters: chapters || "",
+      language: language || "english",
+    };
 
+    // Store AI settings if AI mode
+    if (creationMode === "ai" && aiData) {
+      quizData.aiSettings = {
+        topic: aiData.topic,
+        numberOfQuestions: aiData.numberOfQuestions,
+        difficulty: aiData.difficulty || "medium",
+      };
+    }
+
+    const quiz = await Quiz.create(quizData);
+
+    // If AI mode, generate sample questions for preview (optional)
+    if (creationMode === "ai" && aiData) {
+      const { topic, numberOfQuestions, difficulty } = aiData;
+
+      // Generate questions with Gemini API
+      const generatedQuestions = await generateQuestions(
+        topic,
+        numberOfQuestions,
+        difficulty,
+        language
+      );
+
+      // Create questions in database as templates (won't be used directly by students)
+      const questionsToCreate = generatedQuestions.map((q) => ({
+        quizId: quiz._id,
+        questionText: q.questionText,
+        options: q.options,
+        correctOption: q.correctOption,
+        marks: q.marks,
+      }));
+
+      await Question.insertMany(questionsToCreate);
+
+      // Update quiz total marks (average marks per question * number of questions)
+      const avgMarks =
+        generatedQuestions.reduce((sum, q) => sum + q.marks, 0) /
+        generatedQuestions.length;
+      quiz.totalMarks = Math.round(avgMarks * numberOfQuestions);
+      await quiz.save();
+
+      return res.status(201).json({
+        success: true,
+        message: `Quiz created! Each student will get ${aiData.numberOfQuestions} unique AI-generated questions`,
+        data: { quiz },
+      });
+    }
+
+    // Manual mode - just create empty quiz
     res.status(201).json({
       success: true,
-      message: "Quiz created successfully",
+      message: "Quiz created successfully. You can now add questions.",
       data: { quiz },
     });
   } catch (error) {
@@ -66,8 +142,9 @@ const getQuizzes = async (req, res) => {
       // Teachers see their own quizzes
       query.createdBy = req.user._id;
     } else {
-      // Students see only active quizzes
+      // Students see only active quizzes assigned to them
       query.isActive = true;
+      query.assignedTo = req.user._id;
       populate = "createdBy";
     }
 
@@ -143,8 +220,73 @@ const getQuiz = async (req, res) => {
       }
     }
 
-    // Get questions (hide correct answers for students)
-    let questions = await Question.find({ quizId: quiz._id });
+    let questions;
+
+    // Generate unique questions for each student if AI mode
+    if (
+      req.user.role === "student" &&
+      quiz.uniquePerStudent &&
+      quiz.creationMode === "ai" &&
+      quiz.aiSettings
+    ) {
+      try {
+        // Generate unique questions for this student using AI
+        const generatedQuestions = await generateQuestions(
+          quiz.aiSettings.topic,
+          quiz.aiSettings.numberOfQuestions,
+          quiz.aiSettings.difficulty,
+          quiz.language
+        );
+
+        // Format questions without exposing correct answers
+        questions = generatedQuestions.map((q) => ({
+          questionText: q.questionText,
+          options: q.options,
+          marks: q.marks,
+          correctOption: q.correctOption, // Store but don't send to frontend
+        }));
+
+        // Store questions in session or send them without IDs
+        questions = questions.map((q, index) => ({
+          _id: `temp_${index}`, // Temporary ID for frontend
+          questionText: q.questionText,
+          options: q.options,
+          marks: q.marks,
+          // Don't send correctOption to student
+        }));
+
+        // Also send the original questions data in a secure way for submission validation
+        const questionsData = generatedQuestions.map((q) => ({
+          questionText: q.questionText,
+          options: q.options,
+          correctOption: q.correctOption,
+          marks: q.marks,
+        }));
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            quiz: {
+              _id: quiz._id,
+              title: quiz.title,
+              description: quiz.description,
+              duration: quiz.duration,
+              totalMarks: quiz.totalMarks,
+              createdBy: quiz.createdBy,
+            },
+            questions,
+            questionsData: questionsData, // Send for submission validation
+          },
+        });
+      } catch (error) {
+        console.error("Error generating unique questions:", error);
+        // Fall back to stored questions if generation fails
+        questions = await Question.find({ quizId: quiz._id });
+      }
+    } else {
+      // Get stored questions for manual quizzes or teacher view
+      questions = await Question.find({ quizId: quiz._id });
+    }
 
     if (req.user.role === "student") {
       // Hide correct answers from students
