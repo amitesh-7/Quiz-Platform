@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const connectDB = require("./config/db");
 
 // Import routes
 const authRoutes = require("./routes/auth");
@@ -66,6 +67,20 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// MongoDB connection middleware for Vercel serverless
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    res.status(503).json({
+      success: false,
+      message: "Database connection failed. Please try again later.",
+    });
+  }
+});
 
 // Root route
 app.get("/", (req, res) => {
