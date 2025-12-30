@@ -42,6 +42,8 @@ const CreateQuiz = () => {
     numberOfQuestions: 10,
     difficulty: "medium",
     questionTypes: ["mcq"],
+    language: "english",
+    description: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -302,50 +304,69 @@ const CreateQuiz = () => {
                     AI will generate unique questions for this student
                   </p>
 
-                  {/* Topic & Questions Row */}
+                  {/* Topic & Language Row */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="form-group">
-                      <label className="input-label text-sm">Topic</label>
+                      <label className="input-label text-sm">Topic *</label>
                       <input
                         type="text"
                         name="topic"
                         value={aiData.topic}
                         onChange={handleAiChange}
                         className="glass-input py-2"
-                        placeholder="e.g., Algebra, History"
+                        placeholder="e.g., Algebra, World War 2"
                         required={creationMode === "ai"}
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="form-group">
-                        <label className="input-label text-sm">Questions</label>
-                        <input
-                          type="number"
-                          name="numberOfQuestions"
-                          value={aiData.numberOfQuestions}
-                          onChange={handleAiChange}
-                          className="glass-input py-2"
-                          min={5}
-                          max={50}
-                          required={creationMode === "ai"}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label className="input-label text-sm">
-                          Difficulty
-                        </label>
-                        <select
-                          name="difficulty"
-                          value={aiData.difficulty}
-                          onChange={handleAiChange}
-                          className="glass-input py-2"
-                        >
-                          <option value="easy">Easy</option>
-                          <option value="medium">Medium</option>
-                          <option value="hard">Hard</option>
-                        </select>
-                      </div>
+                    <div className="form-group">
+                      <label className="input-label flex items-center gap-1 text-sm">
+                        <FiGlobe className="w-3 h-3" />
+                        AI Language
+                      </label>
+                      <select
+                        name="language"
+                        value={aiData.language}
+                        onChange={handleAiChange}
+                        className="glass-input py-2"
+                      >
+                        <option value="english">English</option>
+                        <option value="hindi">हिंदी (Hindi)</option>
+                        <option value="sanskrit">संस्कृत (Sanskrit)</option>
+                        <option value="spanish">Español (Spanish)</option>
+                        <option value="french">Français (French)</option>
+                        <option value="german">Deutsch (German)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Questions, Difficulty Row */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="form-group">
+                      <label className="input-label text-sm">No. of Questions</label>
+                      <input
+                        type="number"
+                        name="numberOfQuestions"
+                        value={aiData.numberOfQuestions}
+                        onChange={handleAiChange}
+                        className="glass-input py-2"
+                        min={1}
+                        max={50}
+                        required={creationMode === "ai"}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="input-label text-sm">Difficulty</label>
+                      <select
+                        name="difficulty"
+                        value={aiData.difficulty}
+                        onChange={handleAiChange}
+                        className="glass-input py-2"
+                      >
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                      </select>
                     </div>
                   </div>
 
@@ -391,6 +412,24 @@ const CreateQuiz = () => {
                         </label>
                       ))}
                     </div>
+                  </div>
+
+                  {/* AI Description/Instructions */}
+                  <div className="form-group">
+                    <label className="input-label text-sm">
+                      Additional Instructions (Optional)
+                    </label>
+                    <textarea
+                      name="description"
+                      value={aiData.description}
+                      onChange={handleAiChange}
+                      className="glass-input py-2 h-20 resize-none"
+                      placeholder="e.g., Focus on chapter 5, include questions about key dates, avoid complex calculations..."
+                      maxLength={1000}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Give specific instructions to guide AI question generation
+                    </p>
                   </div>
                 </motion.div>
               )}

@@ -12,17 +12,34 @@ const generateValidation = [
     .trim()
     .notEmpty()
     .withMessage("Topic is required")
-    .isLength({ min: 2, max: 200 })
-    .withMessage("Topic must be 2-200 characters"),
+    .isLength({ min: 2, max: 500 })
+    .withMessage("Topic must be 2-500 characters"),
   body("numberOfQuestions")
     .notEmpty()
     .withMessage("Number of questions is required")
-    .isInt({ min: 1, max: 20 })
-    .withMessage("Number of questions must be 1-20"),
+    .isInt({ min: 1, max: 50 })
+    .withMessage("Number of questions must be 1-50"),
   body("difficulty")
     .optional()
     .isIn(["easy", "medium", "hard"])
     .withMessage("Difficulty must be easy, medium, or hard"),
+  body("language")
+    .optional()
+    .isIn(["english", "hindi", "sanskrit", "spanish", "french", "german"])
+    .withMessage("Invalid language selection"),
+  body("questionTypes")
+    .optional()
+    .isArray()
+    .withMessage("Question types must be an array"),
+  body("questionTypes.*")
+    .optional()
+    .isIn(["mcq", "written", "fillblank", "matching", "truefalse"])
+    .withMessage("Invalid question type"),
+  body("description")
+    .optional()
+    .trim()
+    .isLength({ max: 1000 })
+    .withMessage("Description cannot exceed 1000 characters"),
 ];
 
 // @desc    Generate questions using Gemini API
@@ -30,7 +47,14 @@ const generateValidation = [
 // @access  Private (Teacher only)
 const generateQuestionsController = async (req, res) => {
   try {
-    const { topic, numberOfQuestions, difficulty = "medium" } = req.body;
+    const {
+      topic,
+      numberOfQuestions,
+      difficulty = "medium",
+      language = "english",
+      questionTypes = ["mcq"],
+      description = "",
+    } = req.body;
 
     // Check if Gemini API key is configured
     if (!process.env.GEMINI_API_KEY) {
@@ -40,11 +64,14 @@ const generateQuestionsController = async (req, res) => {
       });
     }
 
-    // Generate questions using Gemini
+    // Generate questions using Gemini with all parameters
     const questions = await generateQuestions(
       topic,
       numberOfQuestions,
-      difficulty
+      difficulty,
+      language,
+      questionTypes,
+      description
     );
 
     res.status(200).json({

@@ -49,6 +49,9 @@ const ManageQuiz = () => {
     topic: "",
     numberOfQuestions: 5,
     difficulty: "medium",
+    language: "english",
+    questionTypes: ["mcq"],
+    description: "",
   });
   const [generating, setGenerating] = useState(false);
   const [generatedQuestions, setGeneratedQuestions] = useState([]);
@@ -250,6 +253,9 @@ const ManageQuiz = () => {
         topic: "",
         numberOfQuestions: 5,
         difficulty: "medium",
+        language: "english",
+        questionTypes: ["mcq"],
+        description: "",
       });
       toast.success("Questions added successfully");
     } catch (error) {
@@ -1091,8 +1097,9 @@ const ManageQuiz = () => {
 
                 {generatedQuestions.length === 0 ? (
                   <div className="space-y-4">
+                    {/* Topic */}
                     <div className="form-group">
-                      <label className="input-label">Topic</label>
+                      <label className="input-label">Topic *</label>
                       <input
                         type="text"
                         value={generateForm.topic}
@@ -1107,11 +1114,10 @@ const ManageQuiz = () => {
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Number, Difficulty, Language Row */}
+                    <div className="grid grid-cols-3 gap-4">
                       <div className="form-group">
-                        <label className="input-label">
-                          Number of Questions
-                        </label>
+                        <label className="input-label">No. of Questions</label>
                         <input
                           type="number"
                           value={generateForm.numberOfQuestions}
@@ -1123,7 +1129,7 @@ const ManageQuiz = () => {
                           }
                           className="glass-input"
                           min={1}
-                          max={20}
+                          max={50}
                         />
                       </div>
 
@@ -1144,6 +1150,88 @@ const ManageQuiz = () => {
                           <option value="hard">Hard</option>
                         </select>
                       </div>
+
+                      <div className="form-group">
+                        <label className="input-label">Language</label>
+                        <select
+                          value={generateForm.language || "english"}
+                          onChange={(e) =>
+                            setGenerateForm({
+                              ...generateForm,
+                              language: e.target.value,
+                            })
+                          }
+                          className="glass-input"
+                        >
+                          <option value="english">English</option>
+                          <option value="hindi">हिंदी (Hindi)</option>
+                          <option value="sanskrit">संस्कृत (Sanskrit)</option>
+                          <option value="spanish">Español (Spanish)</option>
+                          <option value="french">Français (French)</option>
+                          <option value="german">Deutsch (German)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Question Types */}
+                    <div className="form-group">
+                      <label className="input-label mb-2">Question Types</label>
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        {[
+                          { value: "mcq", label: "MCQ", icon: "📝" },
+                          { value: "written", label: "Written", icon: "✍️" },
+                          { value: "fillblank", label: "Fill Blanks", icon: "📄" },
+                          { value: "matching", label: "Matching", icon: "🔗" },
+                          { value: "truefalse", label: "True/False", icon: "✓✗" },
+                        ].map((type) => (
+                          <label
+                            key={type.value}
+                            className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors text-sm ${
+                              (generateForm.questionTypes || ["mcq"]).includes(type.value)
+                                ? "bg-yellow-500/30 border border-yellow-500"
+                                : "bg-white/5 border border-white/10 hover:bg-white/10"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={(generateForm.questionTypes || ["mcq"]).includes(type.value)}
+                              onChange={() => {
+                                const currentTypes = generateForm.questionTypes || ["mcq"];
+                                const newTypes = currentTypes.includes(type.value)
+                                  ? currentTypes.filter((t) => t !== type.value)
+                                  : [...currentTypes, type.value];
+                                setGenerateForm({
+                                  ...generateForm,
+                                  questionTypes: newTypes.length > 0 ? newTypes : ["mcq"],
+                                });
+                              }}
+                              className="hidden"
+                            />
+                            <span>{type.icon}</span>
+                            <span className="text-white">{type.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Additional Instructions */}
+                    <div className="form-group">
+                      <label className="input-label">Additional Instructions (Optional)</label>
+                      <textarea
+                        value={generateForm.description || ""}
+                        onChange={(e) =>
+                          setGenerateForm({
+                            ...generateForm,
+                            description: e.target.value,
+                          })
+                        }
+                        className="glass-input h-24 resize-none"
+                        placeholder="e.g., Focus on chapter 5, include questions about key dates, avoid complex calculations, make questions suitable for beginners..."
+                        maxLength={1000}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Give specific instructions to guide AI question generation
+                      </p>
                     </div>
 
                     <motion.button
@@ -1176,26 +1264,69 @@ const ManageQuiz = () => {
                     <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                       {generatedQuestions.map((question, index) => (
                         <div key={index} className="bg-white/5 rounded-lg p-4">
-                          <p className="text-white mb-2">
-                            <span className="text-blue-400 font-bold">
-                              Q{index + 1}.
-                            </span>{" "}
-                            {question.questionText}
-                          </p>
-                          <div className="grid grid-cols-2 gap-2 text-sm">
-                            {question.options.map((opt, optIdx) => (
-                              <div
-                                key={optIdx}
-                                className={`p-2 rounded ${
-                                  optIdx === question.correctOption
-                                    ? "bg-green-500/20 text-green-300"
-                                    : "bg-white/5 text-gray-400"
-                                }`}
-                              >
-                                {String.fromCharCode(65 + optIdx)}. {opt}
-                              </div>
-                            ))}
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-blue-400 font-bold">Q{index + 1}.</span>
+                            <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded-full">
+                              {question.questionType === "mcq" && "📝 MCQ"}
+                              {question.questionType === "written" && "✍️ Written"}
+                              {question.questionType === "fillblank" && "📄 Fill Blank"}
+                              {question.questionType === "matching" && "🔗 Matching"}
+                              {question.questionType === "truefalse" && "✓✗ True/False"}
+                            </span>
+                            <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full">
+                              {question.marks} mark{question.marks > 1 ? "s" : ""}
+                            </span>
                           </div>
+                          <p className="text-white mb-2">{question.questionText}</p>
+                          
+                          {/* MCQ/TrueFalse Options */}
+                          {(question.questionType === "mcq" || question.questionType === "truefalse") && question.options && (
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              {question.options.map((opt, optIdx) => (
+                                <div
+                                  key={optIdx}
+                                  className={`p-2 rounded ${
+                                    optIdx === question.correctOption
+                                      ? "bg-green-500/20 text-green-300"
+                                      : "bg-white/5 text-gray-400"
+                                  }`}
+                                >
+                                  {String.fromCharCode(65 + optIdx)}. {opt}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Written Answer */}
+                          {question.questionType === "written" && question.correctAnswer && (
+                            <div className="p-2 bg-green-500/10 border border-green-500/30 rounded text-green-300 text-sm">
+                              <span className="font-medium">Expected: </span>{question.correctAnswer}
+                            </div>
+                          )}
+
+                          {/* Fill Blanks */}
+                          {question.questionType === "fillblank" && question.blanks && (
+                            <div className="flex flex-wrap gap-2">
+                              {question.blanks.map((blank, idx) => (
+                                <span key={idx} className="px-2 py-1 bg-green-500/20 text-green-300 rounded text-sm">
+                                  Blank {idx + 1}: {blank}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Matching */}
+                          {question.questionType === "matching" && question.matchPairs && (
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              {question.matchPairs.map((pair, idx) => (
+                                <div key={idx} className="p-2 bg-white/5 rounded flex items-center gap-2">
+                                  <span className="text-blue-400">{pair.left}</span>
+                                  <span className="text-gray-500">→</span>
+                                  <span className="text-green-400">{pair.right}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

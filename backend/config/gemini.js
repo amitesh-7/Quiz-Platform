@@ -70,13 +70,58 @@ const executeWithFallback = async (operation) => {
   throw lastError;
 };
 
+// Normalize question type from various AI responses to standard types
+const normalizeQuestionType = (type) => {
+  if (!type) return null;
+  const normalized = type.toLowerCase().trim().replace(/[_\-\s]/g, "");
+  
+  const typeMap = {
+    // MCQ variations
+    mcq: "mcq",
+    multiplechoice: "mcq",
+    multiplechoicequestion: "mcq",
+    choice: "mcq",
+    objective: "mcq",
+    // Written variations
+    written: "written",
+    writtenanswer: "written",
+    descriptive: "written",
+    shortanswer: "written",
+    longanswer: "written",
+    essay: "written",
+    subjective: "written",
+    // Fill blank variations
+    fillblank: "fillblank",
+    fillintheblanks: "fillblank",
+    fillintheblank: "fillblank",
+    fillblanks: "fillblank",
+    blank: "fillblank",
+    blanks: "fillblank",
+    fib: "fillblank",
+    // Matching variations
+    matching: "matching",
+    matchthefollowing: "matching",
+    match: "matching",
+    matchpairs: "matching",
+    // True/False variations
+    truefalse: "truefalse",
+    trueorfalse: "truefalse",
+    tf: "truefalse",
+    boolean: "truefalse",
+    yesno: "truefalse",
+  };
+  
+  return typeMap[normalized] || null;
+};
+
 // Generate quiz questions using Gemini
 const generateQuestions = async (
   topic,
   numberOfQuestions,
   difficulty = "medium",
   language = "english",
-  questionTypes = ["mcq"]
+  questionTypes = ["mcq"],
+  description = ""
 ) => {
   return await executeWithFallback(async () => {
     const model = await getGeminiModel();
@@ -85,71 +130,92 @@ const generateQuestions = async (
     const languageInstructions = {
       english: "",
       hindi:
-        "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Hindi language (हिंदी में). Use Devanagari script.",
+        "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Hindi language (हिंदी में). Use Devanagari script for all text.",
       sanskrit:
-        "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Sanskrit language (संस्कृत में). Use Devanagari script.",
+        "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Sanskrit language (संस्कृत में). Use Devanagari script for all text.",
+      spanish:
+        "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Spanish language (en español).",
+      french:
+        "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in French language (en français).",
+      german:
+        "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in German language (auf Deutsch).",
     };
 
     const languageNote = languageInstructions[language] || "";
 
-    // Question type descriptions
+    // Question type descriptions with detailed examples
     const typeDescriptions = {
-      mcq: `MCQ Questions should have:
-- "questionType": "mcq"
-- "questionText": "The question text?"
-- "options": ["Option A", "Option B", "Option C", "Option D"]
-- "correctOption": 0 (index of correct answer, 0-3)
-- "marks": 1`,
-      written: `Written Answer Questions should have:
-- "questionType": "written"
-- "questionText": "The question text?"
-- "correctAnswer": "Expected answer or key points"
-- "marks": 2`,
-      fillblank: `Fill in the Blanks Questions should have:
-- "questionType": "fillblank"
-- "questionText": "The question with _____ for each blank"
-- "blanks": ["answer1", "answer2"] (array of correct answers for each blank)
-- "marks": 1`,
-      matching: `Match the Following Questions should have:
-- "questionType": "matching"
-- "questionText": "Match the following:"
-- "matchPairs": [{"left": "Term 1", "right": "Definition 1"}, {"left": "Term 2", "right": "Definition 2"}]
-- "marks": 2`,
-      truefalse: `True/False Questions should have:
-- "questionType": "truefalse"
-- "questionText": "Statement to evaluate as true or false"
-- "correctOption": 0 (0 for True, 1 for False)
-- "options": ["True", "False"]
-- "marks": 1`,
+      mcq: `MCQ (Multiple Choice Questions):
+- "questionType": "mcq" (MUST be exactly "mcq")
+- "questionText": "Clear question ending with ?"
+- "options": ["Option A", "Option B", "Option C", "Option D"] (exactly 4 options)
+- "correctOption": 0 (index 0-3 of correct answer)
+- "marks": 1-3 based on difficulty
+Example: {"questionType": "mcq", "questionText": "What is 2+2?", "options": ["3", "4", "5", "6"], "correctOption": 1, "marks": 1}`,
+
+      written: `Written Answer Questions:
+- "questionType": "written" (MUST be exactly "written")
+- "questionText": "Descriptive question requiring explanation"
+- "correctAnswer": "Detailed expected answer with key points"
+- "marks": 2-5 based on complexity
+Example: {"questionType": "written", "questionText": "Explain photosynthesis.", "correctAnswer": "Photosynthesis is the process by which plants convert sunlight, water, and CO2 into glucose and oxygen.", "marks": 3}`,
+
+      fillblank: `Fill in the Blanks:
+- "questionType": "fillblank" (MUST be exactly "fillblank")
+- "questionText": "Sentence with _____ for each blank"
+- "blanks": ["answer1", "answer2"] (array of correct answers in order)
+- "marks": 1-2 per blank
+Example: {"questionType": "fillblank", "questionText": "The capital of France is _____.", "blanks": ["Paris"], "marks": 1}`,
+
+      matching: `Match the Following:
+- "questionType": "matching" (MUST be exactly "matching")
+- "questionText": "Match the following items:"
+- "matchPairs": [{"left": "Term", "right": "Definition"}] (4-6 pairs)
+- "marks": 2-4 based on pairs
+Example: {"questionType": "matching", "questionText": "Match countries with capitals:", "matchPairs": [{"left": "India", "right": "New Delhi"}, {"left": "Japan", "right": "Tokyo"}], "marks": 2}`,
+
+      truefalse: `True/False Questions:
+- "questionType": "truefalse" (MUST be exactly "truefalse")
+- "questionText": "Statement to evaluate"
+- "options": ["True", "False"] (always these exact values)
+- "correctOption": 0 for True, 1 for False
+- "marks": 1
+Example: {"questionType": "truefalse", "questionText": "The Earth is flat.", "options": ["True", "False"], "correctOption": 1, "marks": 1}`,
     };
 
     const selectedTypes = questionTypes
       .map((type) => typeDescriptions[type])
+      .filter(Boolean)
       .join("\n\n");
 
-    const prompt = `Generate ${numberOfQuestions} quiz questions about "${topic}" at ${difficulty} difficulty level.${languageNote}
+    // Build description context if provided
+    const descriptionContext = description
+      ? `\n\nADDITIONAL CONTEXT/INSTRUCTIONS:\n${description}\n`
+      : "";
 
-Generate a mix of these question types: ${questionTypes.join(", ")}
+    const prompt = `Generate exactly ${numberOfQuestions} quiz questions about "${topic}" at ${difficulty} difficulty level.${languageNote}${descriptionContext}
 
+REQUIRED QUESTION TYPES (distribute evenly): ${questionTypes.join(", ")}
+
+FORMAT SPECIFICATIONS:
 ${selectedTypes}
 
-Rules:
-- Distribute questions across the selected types
-- marks should be 1 for easy, 2 for medium, 3 for hard questions
-- Questions should be clear and unambiguous
-- For MCQ: exactly 4 options, only one correct
-- For Written: provide comprehensive expected answer
-- For Fill Blank: use _____ for blanks, provide all correct answers
-- For Matching: provide 4-6 pairs, left items should match right items
-${
-  language !== "english"
-    ? "- ALL text must be in " + language + " language"
-    : ""
-}
+STRICT RULES:
+1. Generate EXACTLY ${numberOfQuestions} questions
+2. Distribute questions across selected types: ${questionTypes.join(", ")}
+3. Use ONLY these exact questionType values: "mcq", "written", "fillblank", "matching", "truefalse"
+4. DO NOT use variations like "multiple_choice", "true_false", "fill_in_blank" etc.
+5. Marks: 1 for easy, 2 for medium, 3 for hard questions
+6. MCQ must have exactly 4 options with correctOption 0-3
+7. True/False must have options ["True", "False"] with correctOption 0 or 1
+8. Written must have a comprehensive correctAnswer
+9. Fill blank must have blanks array matching _____ count
+10. Matching must have 4-6 pairs with left and right values
+${language !== "english" ? `11. ALL text MUST be in ${language} language` : ""}
 
-IMPORTANT: Return ONLY a valid JSON array with no additional text, markdown, or formatting.
+CRITICAL: Return ONLY a valid JSON array. No markdown, no explanation, no code blocks.
 
-Return ONLY the JSON array, nothing else.`;
+[{"questionType": "...", ...}, ...]`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -157,79 +223,145 @@ Return ONLY the JSON array, nothing else.`;
 
     // Clean up the response - remove markdown code blocks if present
     text = text
-      .replace(/```json\n?/g, "")
+      .replace(/```json\n?/gi, "")
       .replace(/```\n?/g, "")
       .trim();
 
+    // Extract JSON array if wrapped in other text
+    const jsonStart = text.indexOf("[");
+    const jsonEnd = text.lastIndexOf("]");
+    if (jsonStart !== -1 && jsonEnd !== -1) {
+      text = text.substring(jsonStart, jsonEnd + 1);
+    }
+
     // Parse the JSON response
-    const questions = JSON.parse(text);
+    let questions;
+    try {
+      questions = JSON.parse(text);
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError.message);
+      console.error("Raw text:", text.substring(0, 500));
+      throw new Error("Failed to parse AI response as JSON");
+    }
 
     // Validate the structure
     if (!Array.isArray(questions)) {
       throw new Error("Response is not an array");
     }
 
-    // Validate each question based on type
-    questions.forEach((q, index) => {
-      if (!q.questionText || !q.questionType) {
-        throw new Error(`Invalid question structure at index ${index}`);
+    // Validate and normalize each question based on type
+    const validatedQuestions = [];
+    
+    for (let index = 0; index < questions.length; index++) {
+      const q = questions[index];
+      
+      if (!q.questionText) {
+        console.warn(`Skipping question at index ${index}: missing questionText`);
+        continue;
       }
 
-      switch (q.questionType) {
-        case "mcq":
-          if (
-            !Array.isArray(q.options) ||
-            q.options.length !== 4 ||
-            typeof q.correctOption !== "number" ||
-            q.correctOption < 0 ||
-            q.correctOption > 3
-          ) {
-            throw new Error(`Invalid MCQ structure at index ${index}`);
-          }
-          break;
-        case "written":
-          if (!q.correctAnswer) {
-            throw new Error(
-              `Missing correctAnswer for written question at index ${index}`
-            );
-          }
-          break;
-        case "fillblank":
-          if (!Array.isArray(q.blanks) || q.blanks.length === 0) {
-            throw new Error(
-              `Invalid blanks array for fillblank question at index ${index}`
-            );
-          }
-          break;
-        case "matching":
-          if (
-            !Array.isArray(q.matchPairs) ||
-            q.matchPairs.length < 2 ||
-            !q.matchPairs.every((pair) => pair.left && pair.right)
-          ) {
-            throw new Error(
-              `Invalid matchPairs for matching question at index ${index}`
-            );
-          }
-          break;
-        case "truefalse":
-          if (
-            typeof q.correctOption !== "number" ||
-            (q.correctOption !== 0 && q.correctOption !== 1)
-          ) {
-            throw new Error(
-              `Invalid correctOption for truefalse question at index ${index}`
-            );
-          }
-          // Ensure options are set
-          q.options = ["True", "False"];
-          break;
-        default:
-          throw new Error(`Unknown question type at index ${index}`);
+      // Normalize the question type
+      const originalType = q.questionType;
+      q.questionType = normalizeQuestionType(q.questionType);
+      
+      if (!q.questionType) {
+        console.warn(`Skipping question at index ${index}: unknown type "${originalType}"`);
+        // Try to infer type from structure
+        if (q.options && q.options.length === 4 && typeof q.correctOption === "number") {
+          q.questionType = "mcq";
+        } else if (q.options && q.options.length === 2 && 
+                   (q.options[0].toLowerCase() === "true" || q.options[1].toLowerCase() === "false")) {
+          q.questionType = "truefalse";
+        } else if (q.correctAnswer) {
+          q.questionType = "written";
+        } else if (q.blanks) {
+          q.questionType = "fillblank";
+        } else if (q.matchPairs) {
+          q.questionType = "matching";
+        } else {
+          continue; // Skip if can't determine type
+        }
       }
-    });
 
-    return questions;
+      // Ensure marks is set
+      if (!q.marks || typeof q.marks !== "number") {
+        q.marks = difficulty === "easy" ? 1 : difficulty === "hard" ? 3 : 2;
+      }
+
+      // Validate and fix based on type
+      try {
+        switch (q.questionType) {
+          case "mcq":
+            if (!Array.isArray(q.options) || q.options.length < 4) {
+              // Try to pad options if less than 4
+              q.options = q.options || [];
+              while (q.options.length < 4) {
+                q.options.push(`Option ${q.options.length + 1}`);
+              }
+            }
+            if (q.options.length > 4) {
+              q.options = q.options.slice(0, 4);
+            }
+            if (typeof q.correctOption !== "number" || q.correctOption < 0 || q.correctOption > 3) {
+              q.correctOption = 0; // Default to first option
+            }
+            break;
+
+          case "written":
+            if (!q.correctAnswer) {
+              q.correctAnswer = "Answer not provided";
+            }
+            break;
+
+          case "fillblank":
+            if (!Array.isArray(q.blanks) || q.blanks.length === 0) {
+              // Try to extract from correctAnswer if available
+              if (q.correctAnswer) {
+                q.blanks = [q.correctAnswer];
+              } else {
+                q.blanks = ["answer"];
+              }
+            }
+            break;
+
+          case "matching":
+            if (!Array.isArray(q.matchPairs) || q.matchPairs.length < 2) {
+              console.warn(`Skipping matching question at index ${index}: insufficient pairs`);
+              continue;
+            }
+            // Ensure all pairs have left and right
+            q.matchPairs = q.matchPairs.filter(pair => pair.left && pair.right);
+            if (q.matchPairs.length < 2) {
+              continue;
+            }
+            break;
+
+          case "truefalse":
+            // Always set standard options
+            q.options = ["True", "False"];
+            if (typeof q.correctOption !== "number" || (q.correctOption !== 0 && q.correctOption !== 1)) {
+              // Try to infer from correctAnswer if available
+              if (q.correctAnswer) {
+                const answer = q.correctAnswer.toString().toLowerCase();
+                q.correctOption = answer === "true" || answer === "yes" ? 0 : 1;
+              } else {
+                q.correctOption = 0;
+              }
+            }
+            break;
+        }
+
+        validatedQuestions.push(q);
+      } catch (validationError) {
+        console.warn(`Skipping question at index ${index}: ${validationError.message}`);
+      }
+    }
+
+    if (validatedQuestions.length === 0) {
+      throw new Error("No valid questions could be generated. Please try again.");
+    }
+
+    return validatedQuestions;
   });
 };
 
