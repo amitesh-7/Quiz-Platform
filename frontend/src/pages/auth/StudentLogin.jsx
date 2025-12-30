@@ -69,7 +69,7 @@ const StudentLogin = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <motion.div
-            className="w-20 h-20 bg-gradient-to-r from-green-600 to-blue-600 rounded-2xl 
+            className="w-20 h-20 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl 
                        flex items-center justify-center mx-auto mb-4 shadow-lg"
             initial={{ rotate: 10 }}
             animate={{ rotate: 0 }}
@@ -86,7 +86,7 @@ const StudentLogin = () => {
           <Link to="/teacher-login">
             <motion.button
               type="button"
-              className="w-full glass-button py-3 flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center gap-2"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -120,7 +120,7 @@ const StudentLogin = () => {
 
           <motion.button
             type="submit"
-            className="btn-primary w-full flex items-center justify-center gap-2"
+            className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl w-full flex items-center justify-center gap-2"
             disabled={loading}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}

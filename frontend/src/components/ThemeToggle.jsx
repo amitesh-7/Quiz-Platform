@@ -23,23 +23,7 @@ const ThemeToggle = () => {
     document.documentElement.classList.toggle("light", newTheme === "light");
   };
 
-  return (
-    <motion.button
-      onClick={toggleTheme}
-      className="fixed top-6 right-6 z-50 glass-button p-3 rounded-full"
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      {isDark ? (
-        <FiSun className="w-6 h-6 text-yellow-400" />
-      ) : (
-        <FiMoon className="w-6 h-6 text-blue-600" />
-      )}
-    </motion.button>
-  );
+  return null;
 };
 
 export default ThemeToggle;

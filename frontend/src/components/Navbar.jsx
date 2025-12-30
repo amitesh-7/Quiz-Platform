@@ -1,11 +1,31 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FiLogOut, FiHome, FiUser } from "react-icons/fi";
+import { FiLogOut, FiHome, FiUser, FiSun, FiMoon } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
+import { useState, useEffect } from "react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setIsDark(savedTheme === "dark");
+      document.documentElement.classList.toggle(
+        "light",
+        savedTheme === "light"
+      );
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = isDark ? "light" : "dark";
+    setIsDark(!isDark);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("light", newTheme === "light");
+  };
 
   const handleLogout = () => {
     logout();
@@ -48,6 +68,19 @@ const Navbar = () => {
                 {user?.role}
               </span>
             </div>
+
+            <motion.button
+              onClick={toggleTheme}
+              className="p-2 glass rounded-lg hover:bg-white/30 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {isDark ? (
+                <FiSun className="w-5 h-5 text-yellow-400" />
+              ) : (
+                <FiMoon className="w-5 h-5 text-indigo-600" />
+              )}
+            </motion.button>
 
             <button
               onClick={handleLogout}
