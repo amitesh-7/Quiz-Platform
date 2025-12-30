@@ -15,15 +15,10 @@ const createQuestionValidation = [
     .withMessage("Question text is required")
     .isLength({ min: 5, max: 1000 })
     .withMessage("Question must be 5-1000 characters"),
-  body("options")
-    .isArray({ min: 4, max: 4 })
-    .withMessage("Exactly 4 options are required"),
-  body("options.*").trim().notEmpty().withMessage("All options must have text"),
-  body("correctOption")
-    .notEmpty()
-    .withMessage("Correct option is required")
-    .isInt({ min: 0, max: 3 })
-    .withMessage("Correct option must be 0-3"),
+  body("questionType")
+    .optional()
+    .isIn(["mcq", "written", "fillblank", "matching", "truefalse"])
+    .withMessage("Invalid question type"),
   body("marks")
     .optional()
     .isInt({ min: 1, max: 10 })
@@ -44,12 +39,10 @@ const bulkCreateValidation = [
     .trim()
     .notEmpty()
     .withMessage("Question text is required"),
-  body("questions.*.options")
-    .isArray({ min: 4, max: 4 })
-    .withMessage("Exactly 4 options are required"),
-  body("questions.*.correctOption")
-    .isInt({ min: 0, max: 3 })
-    .withMessage("Correct option must be 0-3"),
+  body("questions.*.questionType")
+    .optional()
+    .isIn(["mcq", "written", "fillblank", "matching", "truefalse"])
+    .withMessage("Invalid question type"),
   body("questions.*.marks")
     .optional()
     .isInt({ min: 1, max: 10 })

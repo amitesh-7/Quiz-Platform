@@ -1,5 +1,10 @@
 const { body } = require("express-validator");
-const { generateQuestions } = require("../config/gemini");
+const {
+  generateQuestions,
+  extractTextFromImage,
+  processRawQuestions,
+  extractQuestionsFromImage,
+} = require("../config/gemini");
 
 // Validation rules for generating questions
 const generateValidation = [
@@ -57,7 +62,177 @@ const generateQuestionsController = async (req, res) => {
   }
 };
 
+// @desc    Extract text from image using OCR
+// @route   POST /api/gemini/ocr
+// @access  Private (Student or Teacher)
+const ocrController = async (req, res) => {
+  try {
+    const { imageBase64, mimeType } = req.body;
+
+    if (!imageBase64) {
+      return res.status(400).json({
+        success: false,
+        message: "Image data is required",
+      });
+    }
+
+    // Check if Gemini API key is configured
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({
+        success: false,
+        message: "Gemini API is not configured. Please contact administrator.",
+      });
+    }
+
+    // Extract text from image
+    const extractedText = await extractTextFromImage(
+      imageBase64,
+      mimeType || "image/jpeg"
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Text extracted successfully",
+      data: { text: extractedText },
+    });
+  } catch (error) {
+    console.error("OCR error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to extract text from image. Please try again.",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+// @desc    Process raw questions and convert to quiz format
+// @route   POST /api/gemini/process-questions
+// @access  Private (Teacher only)
+const processQuestionsController = async (req, res) => {
+  try {
+    const {
+      rawQuestions,
+      maxMarks,
+      marksDistribution,
+      language,
+      numberOfQuestions,
+    } = req.body;
+
+    if (!rawQuestions || !rawQuestions.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Raw questions are required",
+      });
+    }
+
+    if (!maxMarks || maxMarks < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Maximum marks must be at least 1",
+      });
+    }
+
+    // Check if Gemini API key is configured
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({
+        success: false,
+        message: "Gemini API is not configured. Please contact administrator.",
+      });
+    }
+
+    // Process raw questions
+    const questions = await processRawQuestions(
+      rawQuestions,
+      maxMarks,
+      marksDistribution || "Distribute marks evenly across questions",
+      language || "english",
+      numberOfQuestions || null
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Processed ${questions.length} questions successfully`,
+      data: { questions },
+    });
+  } catch (error) {
+    console.error("Process questions error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to process questions. Please try again.",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+// @desc    Extract questions from uploaded image
+// @route   POST /api/gemini/extract-questions-from-image
+// @access  Private (Teacher only)
+const extractQuestionsFromImageController = async (req, res) => {
+  try {
+    const {
+      image,
+      maxMarks,
+      marksDistribution,
+      additionalInstructions,
+      language,
+    } = req.body;
+
+    if (!image) {
+      return res.status(400).json({
+        success: false,
+        message: "Image is required",
+      });
+    }
+
+    if (!maxMarks || maxMarks < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Maximum marks must be at least 1",
+      });
+    }
+
+    // Check if Gemini API key is configured
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({
+        success: false,
+        message: "Gemini API is not configured. Please contact administrator.",
+      });
+    }
+
+    // Parse image data
+    const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+    const mimeType =
+      image.match(/data:(image\/\w+);base64,/)?.[1] || "image/jpeg";
+
+    // Extract questions from image
+    const questions = await extractQuestionsFromImage(
+      base64Data,
+      mimeType,
+      maxMarks,
+      marksDistribution || "Distribute marks based on question difficulty",
+      additionalInstructions || "",
+      language || "english"
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Extracted ${questions.length} questions from image`,
+      data: { questions },
+    });
+  } catch (error) {
+    console.error("Extract questions from image error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to extract questions from image. Please try again.",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
 module.exports = {
   generateQuestionsController,
   generateValidation,
+  ocrController,
+  processQuestionsController,
+  extractQuestionsFromImageController,
 };

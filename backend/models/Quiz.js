@@ -71,6 +71,11 @@ const quizSchema = new mongoose.Schema(
         type: String,
         enum: ["easy", "medium", "hard"],
       },
+      questionTypes: {
+        type: [String],
+        enum: ["mcq", "written", "fillblank", "matching"],
+        default: ["mcq"],
+      },
     },
   },
   {

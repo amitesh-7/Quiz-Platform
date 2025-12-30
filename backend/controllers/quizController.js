@@ -79,24 +79,45 @@ const createQuiz = async (req, res) => {
 
     // If AI mode, generate sample questions for preview (optional)
     if (creationMode === "ai" && aiData) {
-      const { topic, numberOfQuestions, difficulty } = aiData;
+      const { topic, numberOfQuestions, difficulty, questionTypes } = aiData;
 
       // Generate questions with Gemini API
       const generatedQuestions = await generateQuestions(
         topic,
         numberOfQuestions,
         difficulty,
-        language
+        language,
+        questionTypes || ["mcq"]
       );
 
       // Create questions in database as templates (won't be used directly by students)
-      const questionsToCreate = generatedQuestions.map((q) => ({
-        quizId: quiz._id,
-        questionText: q.questionText,
-        options: q.options,
-        correctOption: q.correctOption,
-        marks: q.marks,
-      }));
+      const questionsToCreate = generatedQuestions.map((q) => {
+        const baseQuestion = {
+          quizId: quiz._id,
+          questionText: q.questionText,
+          questionType: q.questionType || "mcq",
+          marks: q.marks,
+        };
+
+        // Add type-specific fields
+        switch (q.questionType) {
+          case "mcq":
+            baseQuestion.options = q.options;
+            baseQuestion.correctOption = q.correctOption;
+            break;
+          case "written":
+            baseQuestion.correctAnswer = q.correctAnswer;
+            break;
+          case "fillblank":
+            baseQuestion.blanks = q.blanks;
+            break;
+          case "matching":
+            baseQuestion.matchPairs = q.matchPairs;
+            break;
+        }
+
+        return baseQuestion;
+      });
 
       await Question.insertMany(questionsToCreate);
 
@@ -235,33 +256,67 @@ const getQuiz = async (req, res) => {
           quiz.aiSettings.topic,
           quiz.aiSettings.numberOfQuestions,
           quiz.aiSettings.difficulty,
-          quiz.language
+          quiz.language,
+          quiz.aiSettings.questionTypes || ["mcq"]
         );
 
         // Format questions without exposing correct answers
-        questions = generatedQuestions.map((q) => ({
-          questionText: q.questionText,
-          options: q.options,
-          marks: q.marks,
-          correctOption: q.correctOption, // Store but don't send to frontend
-        }));
+        questions = generatedQuestions.map((q, index) => {
+          const baseQuestion = {
+            _id: `temp_${index}`, // Temporary ID for frontend
+            questionText: q.questionText,
+            questionType: q.questionType || "mcq",
+            marks: q.marks,
+          };
 
-        // Store questions in session or send them without IDs
-        questions = questions.map((q, index) => ({
-          _id: `temp_${index}`, // Temporary ID for frontend
-          questionText: q.questionText,
-          options: q.options,
-          marks: q.marks,
-          // Don't send correctOption to student
-        }));
+          // Add type-specific fields (but not answers)
+          switch (q.questionType) {
+            case "mcq":
+              baseQuestion.options = q.options;
+              break;
+            case "fillblank":
+              baseQuestion.blanksCount = q.blanks.length;
+              break;
+            case "matching":
+              // Shuffle right side for matching questions
+              const shuffledRights = [...q.matchPairs.map((p) => p.right)].sort(
+                () => Math.random() - 0.5
+              );
+              baseQuestion.leftItems = q.matchPairs.map((p) => p.left);
+              baseQuestion.rightItems = shuffledRights;
+              break;
+          }
+
+          return baseQuestion;
+        });
 
         // Also send the original questions data in a secure way for submission validation
-        const questionsData = generatedQuestions.map((q) => ({
-          questionText: q.questionText,
-          options: q.options,
-          correctOption: q.correctOption,
-          marks: q.marks,
-        }));
+        const questionsData = generatedQuestions.map((q) => {
+          const data = {
+            questionText: q.questionText,
+            questionType: q.questionType || "mcq",
+            marks: q.marks,
+          };
+
+          // Add type-specific answer fields
+          switch (q.questionType) {
+            case "mcq":
+              data.options = q.options;
+              data.correctOption = q.correctOption;
+              break;
+            case "written":
+              data.correctAnswer = q.correctAnswer;
+              break;
+            case "fillblank":
+              data.blanks = q.blanks;
+              break;
+            case "matching":
+              data.matchPairs = q.matchPairs;
+              break;
+          }
+
+          return data;
+        });
 
         return res.status(200).json({
           success: true,

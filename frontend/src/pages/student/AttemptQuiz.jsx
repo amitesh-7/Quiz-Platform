@@ -7,11 +7,13 @@ import {
   FiArrowRight,
   FiCheck,
   FiAlertTriangle,
+  FiUpload,
+  FiImage,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
 import Loading from "../../components/Loading";
-import { quizAPI, submissionAPI } from "../../services/api";
+import { quizAPI, submissionAPI, geminiAPI } from "../../services/api";
 
 const AttemptQuiz = () => {
   const { quizId } = useParams();
@@ -24,6 +26,8 @@ const AttemptQuiz = () => {
   const [started, setStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [answerImages, setAnswerImages] = useState({}); // Store image URLs
+  const [uploadingOCR, setUploadingOCR] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
@@ -56,11 +60,12 @@ const AttemptQuiz = () => {
       if (submitting) return;
       setSubmitting(true);
 
-      // Prepare answers array
+      // Prepare answers array with image URLs
       const answersArray = Object.entries(answers).map(
         ([questionId, selectedOption]) => ({
           questionId,
           selectedOption,
+          imageUrl: answerImages[questionId] || null,
         })
       );
 
@@ -123,6 +128,87 @@ const AttemptQuiz = () => {
       ...answers,
       [questionId]: optionIndex,
     });
+  };
+
+  const handleTextAnswer = (questionId, text) => {
+    setAnswers({
+      ...answers,
+      [questionId]: text,
+    });
+  };
+
+  const handleFillBlank = (questionId, blankIndex, value) => {
+    const currentBlanks = answers[questionId] || [];
+    const newBlanks = [...currentBlanks];
+    newBlanks[blankIndex] = value;
+    setAnswers({
+      ...answers,
+      [questionId]: newBlanks,
+    });
+  };
+
+  const handleMatching = (questionId, leftIndex, rightValue) => {
+    const currentMatches = answers[questionId] || {};
+    setAnswers({
+      ...answers,
+      [questionId]: {
+        ...currentMatches,
+        [leftIndex]: rightValue,
+      },
+    });
+  };
+
+  const handleImageUpload = async (questionId, file) => {
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must be less than 5MB");
+      return;
+    }
+
+    setUploadingOCR(true);
+
+    try {
+      // Convert image to base64
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = async () => {
+        const base64 = reader.result.split(",")[1];
+
+        // Call OCR API
+        const response = await geminiAPI.ocr(base64, file.type);
+        const extractedText = response.data.data.text;
+
+        // Set the extracted text as the answer
+        handleTextAnswer(questionId, extractedText);
+
+        // Store image URL for submission
+        setAnswerImages({
+          ...answerImages,
+          [questionId]: reader.result,
+        });
+
+        toast.success("Text extracted from image successfully!");
+      };
+
+      reader.onerror = () => {
+        toast.error("Failed to read image file");
+        setUploadingOCR(false);
+      };
+    } catch (error) {
+      console.error("OCR error:", error);
+      toast.error("Failed to extract text from image");
+    } finally {
+      setUploadingOCR(false);
+    }
   };
 
   const handleConfirmSubmit = () => {
@@ -341,35 +427,153 @@ const AttemptQuiz = () => {
 
               <p className="text-xl text-white mb-8">{question.questionText}</p>
 
-              <div className="space-y-3">
-                {question.options.map((option, index) => (
-                  <motion.button
-                    key={index}
-                    onClick={() => handleSelectOption(question._id, index)}
-                    className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${
-                      answers[question._id] === index
-                        ? "bg-blue-500/20 border-2 border-blue-500 text-white"
-                        : "bg-white/5 border-2 border-white/10 text-gray-300 hover:border-white/30 hover:bg-white/10"
-                    }`}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
-                  >
-                    <span
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${
+              {/* Render based on question type */}
+              {(question.questionType === "mcq" || !question.questionType) && (
+                <div className="space-y-3">
+                  {question.options.map((option, index) => (
+                    <motion.button
+                      key={index}
+                      onClick={() => handleSelectOption(question._id, index)}
+                      className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${
                         answers[question._id] === index
-                          ? "bg-blue-500 text-white"
-                          : "bg-white/10 text-gray-400"
+                          ? "bg-blue-500/20 border-2 border-blue-500 text-white"
+                          : "bg-white/5 border-2 border-white/10 text-gray-300 hover:border-white/30 hover:bg-white/10"
                       }`}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
                     >
-                      {String.fromCharCode(65 + index)}
-                    </span>
-                    <span className="flex-1">{option}</span>
-                    {answers[question._id] === index && (
-                      <FiCheck className="w-5 h-5 text-blue-400" />
+                      <span
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${
+                          answers[question._id] === index
+                            ? "bg-blue-500 text-white"
+                            : "bg-white/10 text-gray-400"
+                        }`}
+                      >
+                        {String.fromCharCode(65 + index)}
+                      </span>
+                      <span className="flex-1">{option}</span>
+                      {answers[question._id] === index && (
+                        <FiCheck className="w-5 h-5 text-blue-400" />
+                      )}
+                    </motion.button>
+                  ))}
+                </div>
+              )}
+
+              {/* Written Answer */}
+              {question.questionType === "written" && (
+                <div className="space-y-4">
+                  {/* Image Upload Section */}
+                  <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) handleImageUpload(question._id, file);
+                        }}
+                        className="hidden"
+                        disabled={uploadingOCR}
+                      />
+                      <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                        {uploadingOCR ? (
+                          <div className="w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <FiUpload className="w-6 h-6 text-blue-400" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-white font-medium">
+                          Upload Answer Image
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {uploadingOCR
+                            ? "Extracting text..."
+                            : "Take a photo of your handwritten answer"}
+                        </p>
+                      </div>
+                    </label>
+
+                    {answerImages[question._id] && (
+                      <div className="mt-3 pt-3 border-t border-blue-500/30">
+                        <div className="flex items-center gap-2 text-green-400">
+                          <FiImage className="w-4 h-4" />
+                          <span className="text-sm">Image uploaded</span>
+                        </div>
+                      </div>
                     )}
-                  </motion.button>
-                ))}
-              </div>
+                  </div>
+
+                  {/* Extracted/Edited Text */}
+                  <div>
+                    <label className="input-label mb-2">
+                      Your Answer (Extracted or Type Manually)
+                    </label>
+                    <textarea
+                      value={answers[question._id] || ""}
+                      onChange={(e) =>
+                        handleTextAnswer(question._id, e.target.value)
+                      }
+                      className="glass-input min-h-[200px] resize-y w-full font-mono"
+                      placeholder="Write your answer here or upload an image of your handwritten answer..."
+                    />
+                    <p className="text-sm text-gray-400 mt-2">
+                      Tip: Write your answer on paper, take a clear photo, and
+                      upload it. AI will extract and evaluate your answer.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Fill in the Blanks */}
+              {question.questionType === "fillblank" && (
+                <div className="space-y-4">
+                  {Array.from({ length: question.blanksCount || 1 }).map(
+                    (_, index) => (
+                      <div key={index}>
+                        <label className="text-sm text-gray-400 mb-2 block">
+                          Blank {index + 1}
+                        </label>
+                        <input
+                          type="text"
+                          value={(answers[question._id] || [])[index] || ""}
+                          onChange={(e) =>
+                            handleFillBlank(question._id, index, e.target.value)
+                          }
+                          className="glass-input w-full"
+                          placeholder={`Enter answer for blank ${index + 1}`}
+                        />
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
+
+              {/* Match the Following */}
+              {question.questionType === "matching" && (
+                <div className="space-y-4">
+                  {question.leftItems?.map((leftItem, index) => (
+                    <div key={index} className="glass p-4 rounded-xl">
+                      <p className="text-white mb-3">{leftItem}</p>
+                      <select
+                        value={(answers[question._id] || {})[index] || ""}
+                        onChange={(e) =>
+                          handleMatching(question._id, index, e.target.value)
+                        }
+                        className="glass-input w-full"
+                      >
+                        <option value="">Select match</option>
+                        {question.rightItems?.map((rightItem, rIndex) => (
+                          <option key={rIndex} value={rightItem}>
+                            {rightItem}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Navigation */}
               <div className="flex gap-4 mt-8 pt-6 border-t border-white/10">

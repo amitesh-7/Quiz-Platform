@@ -64,6 +64,11 @@ export const questionAPI = {
 
 export const geminiAPI = {
   generate: (data) => api.post("/gemini/generate", data),
+  ocr: (imageBase64, mimeType) =>
+    api.post("/gemini/ocr", { imageBase64, mimeType }),
+  processQuestions: (data) => api.post("/gemini/process-questions", data),
+  extractQuestionsFromImage: (data) =>
+    api.post("/gemini/extract-questions-from-image", data),
 };
 
 export const submissionAPI = {

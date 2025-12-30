@@ -7,6 +7,12 @@ const questionSchema = new mongoose.Schema(
       ref: "Quiz",
       required: [true, "Quiz ID is required"],
     },
+    questionType: {
+      type: String,
+      enum: ["mcq", "written", "fillblank", "matching", "truefalse"],
+      default: "mcq",
+      required: [true, "Question type is required"],
+    },
     questionText: {
       type: String,
       required: [true, "Question text is required"],
@@ -14,22 +20,49 @@ const questionSchema = new mongoose.Schema(
       minlength: [5, "Question must be at least 5 characters"],
       maxlength: [1000, "Question cannot exceed 1000 characters"],
     },
+    // For MCQ
     options: {
       type: [String],
-      required: [true, "Options are required"],
       validate: {
         validator: function (options) {
-          return options.length === 4;
+          if (this.questionType === "mcq") {
+            return options && options.length === 4;
+          }
+          return true;
         },
-        message: "Question must have exactly 4 options",
+        message: "MCQ must have exactly 4 options",
       },
     },
     correctOption: {
       type: Number,
-      required: [true, "Correct option is required"],
       min: [0, "Correct option must be between 0 and 3"],
       max: [3, "Correct option must be between 0 and 3"],
+      validate: {
+        validator: function (val) {
+          if (this.questionType === "mcq") {
+            return val !== undefined && val !== null;
+          }
+          return true;
+        },
+        message: "Correct option is required for MCQ",
+      },
     },
+    // For written answer
+    correctAnswer: {
+      type: String,
+      trim: true,
+    },
+    // For fill in the blanks (can have multiple blanks)
+    blanks: {
+      type: [String],
+    },
+    // For matching
+    matchPairs: [
+      {
+        left: String,
+        right: String,
+      },
+    ],
     marks: {
       type: Number,
       required: [true, "Marks are required"],

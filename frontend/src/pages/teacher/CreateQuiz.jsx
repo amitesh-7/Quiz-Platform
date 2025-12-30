@@ -41,6 +41,7 @@ const CreateQuiz = () => {
     topic: "",
     numberOfQuestions: 10,
     difficulty: "medium",
+    questionTypes: ["mcq"],
   });
   const [loading, setLoading] = useState(false);
 
@@ -57,6 +58,15 @@ const CreateQuiz = () => {
     setAiData({
       ...aiData,
       [name]: name === "numberOfQuestions" ? parseInt(value) || 0 : value,
+    });
+  };
+
+  const handleQuestionTypeToggle = (type) => {
+    setAiData((prev) => {
+      const types = prev.questionTypes.includes(type)
+        ? prev.questionTypes.filter((t) => t !== type)
+        : [...prev.questionTypes, type];
+      return { ...prev, questionTypes: types };
     });
   };
 
@@ -141,15 +151,15 @@ const CreateQuiz = () => {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Creation Mode Selection */}
               <div className="form-group">
-                <label className="input-label mb-3">Quiz Creation Method</label>
-                <div className="grid grid-cols-2 gap-4">
+                <label className="input-label mb-2">Quiz Creation Method</label>
+                <div className="grid grid-cols-2 gap-3">
                   <motion.button
                     type="button"
                     onClick={() => setCreationMode("manual")}
-                    className={`p-4 rounded-xl border-2 transition-all ${
+                    className={`p-3 rounded-xl border-2 transition-all ${
                       creationMode === "manual"
                         ? "border-blue-500 bg-blue-500/20"
                         : "border-white/20 bg-white/5 hover:border-white/40"
@@ -157,17 +167,14 @@ const CreateQuiz = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <FiEdit3 className="w-8 h-8 mx-auto mb-2 text-blue-400" />
-                    <div className="font-semibold text-white">Manual</div>
-                    <div className="text-sm text-gray-400 mt-1">
-                      Add questions manually
-                    </div>
+                    <FiEdit3 className="w-6 h-6 mx-auto mb-1 text-blue-400" />
+                    <div className="font-medium text-white text-sm">Manual</div>
                   </motion.button>
 
                   <motion.button
                     type="button"
                     onClick={() => setCreationMode("ai")}
-                    className={`p-4 rounded-xl border-2 transition-all ${
+                    className={`p-3 rounded-xl border-2 transition-all ${
                       creationMode === "ai"
                         ? "border-purple-500 bg-purple-500/20"
                         : "border-white/20 bg-white/5 hover:border-white/40"
@@ -175,124 +182,111 @@ const CreateQuiz = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <FiCpu className="w-8 h-8 mx-auto mb-2 text-purple-400" />
-                    <div className="font-semibold text-white">AI Generate</div>
-                    <div className="text-sm text-gray-400 mt-1">
-                      Auto-generate with AI
+                    <FiCpu className="w-6 h-6 mx-auto mb-1 text-purple-400" />
+                    <div className="font-medium text-white text-sm">
+                      AI Generate
                     </div>
                   </motion.button>
                 </div>
               </div>
 
-              {/* Language Selection */}
-              <div className="form-group">
-                <label className="input-label flex items-center gap-2">
-                  <FiGlobe className="w-4 h-4" />
-                  Quiz Language
-                </label>
-                <select
-                  name="language"
-                  value={formData.language}
-                  onChange={handleChange}
-                  className="glass-input"
-                  required
-                >
-                  <option value="english">English</option>
-                  <option value="hindi">हिंदी (Hindi)</option>
-                  <option value="sanskrit">संस्कृत (Sanskrit)</option>
-                </select>
+              {/* Row 1: Title & Language */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="form-group">
+                  <label className="input-label flex items-center gap-1 text-sm">
+                    <FiFileText className="w-3 h-3" />
+                    Quiz Title
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    className="glass-input py-2"
+                    placeholder="Enter quiz title"
+                    required
+                    maxLength={100}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="input-label flex items-center gap-1 text-sm">
+                    <FiGlobe className="w-3 h-3" />
+                    Language
+                  </label>
+                  <select
+                    name="language"
+                    value={formData.language}
+                    onChange={handleChange}
+                    className="glass-input py-2"
+                    required
+                  >
+                    <option value="english">English</option>
+                    <option value="hindi">हिंदी (Hindi)</option>
+                    <option value="sanskrit">संस्कृत (Sanskrit)</option>
+                  </select>
+                </div>
               </div>
 
-              {/* Subject */}
-              <div className="form-group">
-                <label className="input-label flex items-center gap-2">
-                  <FiFileText className="w-4 h-4" />
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  className="glass-input"
-                  placeholder="e.g., Mathematics, Science, History"
-                  maxLength={100}
-                />
+              {/* Row 2: Subject, Chapters, Duration */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="form-group">
+                  <label className="input-label text-sm">Subject</label>
+                  <input
+                    type="text"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    className="glass-input py-2"
+                    placeholder="e.g., Math"
+                    maxLength={50}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="input-label text-sm">Chapters</label>
+                  <input
+                    type="text"
+                    name="chapters"
+                    value={formData.chapters}
+                    onChange={handleChange}
+                    className="glass-input py-2"
+                    placeholder="e.g., 1-5"
+                    maxLength={20}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="input-label flex items-center gap-1 text-sm">
+                    <FiClock className="w-3 h-3" />
+                    Duration (min)
+                  </label>
+                  <input
+                    type="number"
+                    name="duration"
+                    value={formData.duration}
+                    onChange={handleChange}
+                    className="glass-input py-2"
+                    min={1}
+                    max={180}
+                    required
+                  />
+                </div>
               </div>
 
-              {/* Chapters */}
+              {/* Description - Compact */}
               <div className="form-group">
-                <label className="input-label flex items-center gap-2">
-                  <FiFileText className="w-4 h-4" />
-                  Chapters
+                <label className="input-label text-sm">
+                  Description (Optional)
                 </label>
-                <input
-                  type="text"
-                  name="chapters"
-                  value={formData.chapters}
-                  onChange={handleChange}
-                  className="glass-input"
-                  placeholder="e.g., 2,3 or 1-5 or 1-10"
-                  maxLength={50}
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Enter chapter numbers (e.g., 2,3 or 1-5 or 1-10)
-                </p>
-              </div>
-
-              {/* Title */}
-              <div className="form-group">
-                <label className="input-label flex items-center gap-2">
-                  <FiFileText className="w-4 h-4" />
-                  Quiz Title
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  className="glass-input"
-                  placeholder="Enter quiz title"
-                  required
-                  maxLength={100}
-                />
-              </div>
-
-              {/* Description */}
-              <div className="form-group">
-                <label className="input-label">Description (Optional)</label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  className="glass-input min-h-[120px] resize-y"
-                  placeholder="Enter quiz description..."
-                  maxLength={500}
+                  className="glass-input py-2 h-16 resize-none"
+                  placeholder="Brief quiz description..."
+                  maxLength={200}
                 />
-                <p className="text-sm text-gray-500 mt-1">
-                  {formData.description.length}/500 characters
-                </p>
-              </div>
-
-              {/* Duration */}
-              <div className="form-group">
-                <label className="input-label flex items-center gap-2">
-                  <FiClock className="w-4 h-4" />
-                  Duration (minutes)
-                </label>
-                <input
-                  type="number"
-                  name="duration"
-                  value={formData.duration}
-                  onChange={handleChange}
-                  className="glass-input"
-                  min={1}
-                  max={180}
-                  required
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Between 1 and 180 minutes
-                </p>
               </div>
 
               {/* AI-Specific Fields */}
@@ -301,73 +295,112 @@ const CreateQuiz = () => {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="space-y-6"
+                  className="space-y-3 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg"
                 >
-                  <div className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg">
-                    <p className="text-sm text-purple-300 flex items-center gap-2">
-                      <FiCpu className="w-4 h-4" />
-                      AI will generate questions based on your preferences
-                    </p>
+                  <p className="text-xs text-purple-300 flex items-center gap-2">
+                    <FiCpu className="w-3 h-3" />
+                    AI will generate unique questions for this student
+                  </p>
+
+                  {/* Topic & Questions Row */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="form-group">
+                      <label className="input-label text-sm">Topic</label>
+                      <input
+                        type="text"
+                        name="topic"
+                        value={aiData.topic}
+                        onChange={handleAiChange}
+                        className="glass-input py-2"
+                        placeholder="e.g., Algebra, History"
+                        required={creationMode === "ai"}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="form-group">
+                        <label className="input-label text-sm">Questions</label>
+                        <input
+                          type="number"
+                          name="numberOfQuestions"
+                          value={aiData.numberOfQuestions}
+                          onChange={handleAiChange}
+                          className="glass-input py-2"
+                          min={5}
+                          max={50}
+                          required={creationMode === "ai"}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="input-label text-sm">
+                          Difficulty
+                        </label>
+                        <select
+                          name="difficulty"
+                          value={aiData.difficulty}
+                          onChange={handleAiChange}
+                          className="glass-input py-2"
+                        >
+                          <option value="easy">Easy</option>
+                          <option value="medium">Medium</option>
+                          <option value="hard">Hard</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Topic */}
+                  {/* Question Types - Compact Grid */}
                   <div className="form-group">
-                    <label className="input-label">
-                      Topic for AI Generation
+                    <label className="input-label text-sm mb-2">
+                      Question Types
                     </label>
-                    <input
-                      type="text"
-                      name="topic"
-                      value={aiData.topic}
-                      onChange={handleAiChange}
-                      className="glass-input"
-                      placeholder="e.g., JavaScript Fundamentals, Indian History, Vedic Mathematics"
-                      required={creationMode === "ai"}
-                    />
-                  </div>
-
-                  {/* Number of Questions */}
-                  <div className="form-group">
-                    <label className="input-label">Number of Questions</label>
-                    <input
-                      type="number"
-                      name="numberOfQuestions"
-                      value={aiData.numberOfQuestions}
-                      onChange={handleAiChange}
-                      className="glass-input"
-                      min={5}
-                      max={50}
-                      required={creationMode === "ai"}
-                    />
-                    <p className="text-sm text-gray-500 mt-1">
-                      Between 5 and 50 questions
-                    </p>
-                  </div>
-
-                  {/* Difficulty Level */}
-                  <div className="form-group">
-                    <label className="input-label">Difficulty Level</label>
-                    <select
-                      name="difficulty"
-                      value={aiData.difficulty}
-                      onChange={handleAiChange}
-                      className="glass-input"
-                      required={creationMode === "ai"}
-                    >
-                      <option value="easy">Easy</option>
-                      <option value="medium">Medium</option>
-                      <option value="hard">Hard</option>
-                    </select>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {[
+                        { value: "mcq", label: "MCQ", icon: "📝" },
+                        { value: "written", label: "Written", icon: "✍️" },
+                        {
+                          value: "fillblank",
+                          label: "Fill Blanks",
+                          icon: "📄",
+                        },
+                        { value: "matching", label: "Matching", icon: "🔗" },
+                        {
+                          value: "truefalse",
+                          label: "True/False",
+                          icon: "✓✗",
+                        },
+                      ].map((type) => (
+                        <label
+                          key={type.value}
+                          className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors text-sm ${
+                            aiData.questionTypes.includes(type.value)
+                              ? "bg-purple-500/30 border border-purple-500"
+                              : "bg-white/5 border border-white/10 hover:bg-white/10"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={aiData.questionTypes.includes(type.value)}
+                            onChange={() =>
+                              handleQuestionTypeToggle(type.value)
+                            }
+                            className="hidden"
+                          />
+                          <span>{type.icon}</span>
+                          <span>{type.label}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
                 </motion.div>
               )}
 
               {/* Submit */}
-              <div className="flex gap-4">
+              <div className="flex gap-3 pt-2">
                 <motion.button
                   type="button"
                   onClick={() => navigate("/teacher")}
-                  className="btn-secondary flex-1"
+                  className="btn-secondary flex-1 py-2"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -376,7 +409,7 @@ const CreateQuiz = () => {
 
                 <motion.button
                   type="submit"
-                  className="btn-primary flex-1 flex items-center justify-center gap-2"
+                  className="btn-primary flex-1 flex items-center justify-center gap-2 py-2"
                   disabled={loading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}

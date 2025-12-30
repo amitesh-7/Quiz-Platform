@@ -9,20 +9,50 @@ const answerSchema = new mongoose.Schema(
     questionText: {
       type: String,
     },
+    questionType: {
+      type: String,
+      enum: ["mcq", "written", "fillblank", "matching"],
+      default: "mcq",
+    },
+    // MCQ fields
     options: {
       type: [String],
     },
     correctOption: {
       type: Number,
     },
+    // Written answer fields
+    correctAnswer: {
+      type: String,
+    },
+    // Fill in blanks fields
+    blanks: {
+      type: [String],
+    },
+    // Matching fields
+    matchPairs: [
+      {
+        left: String,
+        right: String,
+      },
+    ],
     marks: {
       type: Number,
     },
-    selectedOption: {
+    earnedMarks: {
       type: Number,
-      required: true,
-      min: 0,
-      max: 3,
+      default: 0,
+    },
+    selectedOption: {
+      type: mongoose.Schema.Types.Mixed, // Can be number, string, array, or object
+    },
+    feedback: {
+      type: String,
+      default: "",
+    },
+    imageUrl: {
+      type: String,
+      default: null,
     },
   },
   { _id: false }

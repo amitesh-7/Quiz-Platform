@@ -2,6 +2,7 @@ const { body } = require("express-validator");
 const Submission = require("../models/Submission");
 const Quiz = require("../models/Quiz");
 const Question = require("../models/Question");
+const { evaluateWrittenAnswer } = require("../config/gemini");
 
 // Validation rules for submitting a quiz
 const submitValidation = [
@@ -11,10 +12,6 @@ const submitValidation = [
     .isMongoId()
     .withMessage("Invalid Quiz ID"),
   body("answers").isArray().withMessage("Answers must be an array"),
-  body("answers.*.questionId").isMongoId().withMessage("Invalid Question ID"),
-  body("answers.*.selectedOption")
-    .isInt({ min: 0, max: 3 })
-    .withMessage("Selected option must be 0-3"),
 ];
 
 // @desc    Submit a quiz
@@ -88,19 +85,98 @@ const submitQuiz = async (req, res) => {
       const question = questionMap.get(questionKey);
 
       if (question) {
+        let isCorrect = false;
+        let earnedMarks = 0;
+        let feedback = "";
+        const questionType = question.questionType || "mcq";
+
+        // Check answer based on question type
+        switch (questionType) {
+          case "mcq":
+            isCorrect = answer.selectedOption === question.correctOption;
+            earnedMarks = isCorrect ? question.marks : 0;
+            break;
+
+          case "written":
+            // For written answers, use AI semantic matching
+            if (answer.selectedOption && question.correctAnswer) {
+              try {
+                const threshold = answer.threshold || 0.7;
+                const evaluation = await evaluateWrittenAnswer(
+                  answer.selectedOption,
+                  question.correctAnswer,
+                  question.marks,
+                  threshold
+                );
+                earnedMarks = evaluation.score;
+                feedback = evaluation.feedback;
+                isCorrect = evaluation.percentage >= threshold * 100;
+              } catch (error) {
+                console.error("Written answer evaluation error:", error);
+                earnedMarks = 0;
+                feedback = "Answer pending manual review";
+              }
+            }
+            break;
+
+          case "fillblank":
+            // Check if all blanks are filled correctly (case-insensitive)
+            if (
+              Array.isArray(answer.selectedOption) &&
+              Array.isArray(question.blanks)
+            ) {
+              isCorrect = question.blanks.every((blank, idx) => {
+                const studentAnswer = (answer.selectedOption[idx] || "")
+                  .trim()
+                  .toLowerCase();
+                const correctAnswer = blank.trim().toLowerCase();
+                return studentAnswer === correctAnswer;
+              });
+              earnedMarks = isCorrect ? question.marks : 0;
+            }
+            break;
+
+          case "matching":
+            // Check if all matches are correct
+            if (
+              typeof answer.selectedOption === "object" &&
+              Array.isArray(question.matchPairs)
+            ) {
+              const studentMatches = answer.selectedOption;
+              isCorrect = question.matchPairs.every((pair, idx) => {
+                return studentMatches[idx] === pair.right;
+              });
+              earnedMarks = isCorrect ? question.marks : 0;
+            }
+            break;
+        }
+
         // Store complete question data in submission
-        processedAnswers.push({
+        const answerData = {
           questionId: answer.questionId,
           questionText: question.questionText,
-          options: question.options,
-          correctOption: question.correctOption,
+          questionType: questionType,
           marks: question.marks,
+          earnedMarks: earnedMarks,
           selectedOption: answer.selectedOption,
-        });
+          feedback: feedback,
+          imageUrl: answer.imageUrl || null,
+        };
 
-        if (answer.selectedOption === question.correctOption) {
-          score += question.marks;
+        // Add type-specific fields
+        if (questionType === "mcq") {
+          answerData.options = question.options;
+          answerData.correctOption = question.correctOption;
+        } else if (questionType === "written") {
+          answerData.correctAnswer = question.correctAnswer;
+        } else if (questionType === "fillblank") {
+          answerData.blanks = question.blanks;
+        } else if (questionType === "matching") {
+          answerData.matchPairs = question.matchPairs;
         }
+
+        processedAnswers.push(answerData);
+        score += earnedMarks;
       }
     }
 
