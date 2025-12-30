@@ -21,6 +21,11 @@ const submitQuiz = async (req, res) => {
   try {
     const { quizId, answers, questionsData } = req.body;
 
+    console.log("=== SUBMISSION DEBUG ===");
+    console.log("QuizId:", quizId);
+    console.log("Answers count:", answers?.length);
+    console.log("QuestionsData:", questionsData ? `${questionsData.length} items` : "null (manual mode)");
+
     // Check if quiz exists
     const quiz = await Quiz.findById(quizId);
     if (!quiz) {
@@ -49,14 +54,18 @@ const submitQuiz = async (req, res) => {
 
     // If questionsData provided (unique per student), use it
     if (questionsData && Array.isArray(questionsData) && questionsData.length > 0) {
+      console.log("Using questionsData (AI mode)");
       questions = questionsData;
       questions.forEach((q, index) => {
         // Map by temp_index for AI-generated questions
         questionMap.set(`temp_${index}`, q);
+        console.log(`Mapped temp_${index}:`, q.questionText?.substring(0, 50));
       });
     } else {
       // Otherwise, get stored questions for manual quizzes
+      console.log("Using stored questions (manual mode)");
       questions = await Question.find({ quizId });
+      console.log("Found questions:", questions.length);
 
       if (questions.length === 0) {
         return res.status(400).json({
@@ -67,6 +76,7 @@ const submitQuiz = async (req, res) => {
 
       questions.forEach((q) => {
         questionMap.set(q._id.toString(), q);
+        console.log(`Mapped ${q._id.toString()}:`, q.questionText?.substring(0, 50));
       });
     }
 
@@ -78,6 +88,8 @@ const submitQuiz = async (req, res) => {
     for (let i = 0; i < answers.length; i++) {
       const answer = answers[i];
       let question = null;
+      
+      console.log(`Processing answer ${i}: questionId=${answer.questionId}`);
       
       // Try to find question by questionId first
       if (answer.questionId) {
@@ -93,13 +105,16 @@ const submitQuiz = async (req, res) => {
       if (!question && questionsData && questionsData.length > 0) {
         // Extract index from temp_X format or use loop index
         let idx = i;
-        if (answer.questionId && answer.questionId.startsWith('temp_')) {
+        if (answer.questionId && answer.questionId.startsWith && answer.questionId.startsWith('temp_')) {
           idx = parseInt(answer.questionId.replace('temp_', ''));
         }
         if (questionsData[idx]) {
           question = questionsData[idx];
+          console.log(`Found by index ${idx}`);
         }
       }
+      
+      console.log(`Question found:`, question ? "YES" : "NO", question ? `type: ${question.questionType}` : "");
 
       if (question) {
         let isCorrect = false;
@@ -196,8 +211,15 @@ const submitQuiz = async (req, res) => {
 
         processedAnswers.push(answerData);
         score += earnedMarks;
+        console.log(`Answer processed: earned ${earnedMarks}/${question.marks}, total score: ${score}`);
+      } else {
+        console.log(`WARNING: Question not found for answer ${i}`);
       }
     }
+
+    console.log("=== FINAL RESULTS ===");
+    console.log("Processed answers:", processedAnswers.length);
+    console.log("Total score:", score);
 
     // Calculate total marks
     const totalMarks = processedAnswers.reduce((sum, a) => sum + a.marks, 0);

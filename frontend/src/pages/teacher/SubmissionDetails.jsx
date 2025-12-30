@@ -3,10 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   FiArrowLeft,
-  FiUser,
   FiCheckCircle,
   FiXCircle,
-  FiClock,
   FiAward,
 } from "react-icons/fi";
 import toast from "react-hot-toast";

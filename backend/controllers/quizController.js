@@ -276,6 +276,13 @@ const getQuiz = async (req, res) => {
             case "mcq":
               baseQuestion.options = q.options;
               break;
+            case "truefalse":
+              baseQuestion.options = q.options || ["True", "False"];
+              break;
+            case "written":
+              // Written questions don't need additional fields for display
+              // Student will see a textarea to type their answer
+              break;
             case "fillblank":
               baseQuestion.blanksCount = q.blanks.length;
               break;
@@ -304,6 +311,10 @@ const getQuiz = async (req, res) => {
           switch (q.questionType) {
             case "mcq":
               data.options = q.options;
+              data.correctOption = q.correctOption;
+              break;
+            case "truefalse":
+              data.options = q.options || ["True", "False"];
               data.correctOption = q.correctOption;
               break;
             case "written":
@@ -346,13 +357,46 @@ const getQuiz = async (req, res) => {
     }
 
     if (req.user.role === "student") {
-      // Hide correct answers from students
-      questions = questions.map((q) => ({
-        _id: q._id,
-        questionText: q.questionText,
-        options: q.options,
-        marks: q.marks,
-      }));
+      // Hide correct answers from students but include question type
+      questions = questions.map((q) => {
+        const baseQuestion = {
+          _id: q._id,
+          questionText: q.questionText,
+          questionType: q.questionType || "mcq",
+          marks: q.marks,
+        };
+
+        // Add type-specific fields (but not answers)
+        switch (q.questionType) {
+          case "mcq":
+            baseQuestion.options = q.options;
+            break;
+          case "truefalse":
+            baseQuestion.options = q.options || ["True", "False"];
+            break;
+          case "written":
+            // Written questions don't need additional fields for display
+            break;
+          case "fillblank":
+            baseQuestion.blanksCount = q.blanks?.length || 1;
+            break;
+          case "matching":
+            if (q.matchPairs) {
+              // Shuffle right side for matching questions
+              const shuffledRights = [...q.matchPairs.map((p) => p.right)].sort(
+                () => Math.random() - 0.5
+              );
+              baseQuestion.leftItems = q.matchPairs.map((p) => p.left);
+              baseQuestion.rightItems = shuffledRights;
+            }
+            break;
+          default:
+            // Default to MCQ behavior
+            baseQuestion.options = q.options;
+        }
+
+        return baseQuestion;
+      });
     }
 
     res.status(200).json({
