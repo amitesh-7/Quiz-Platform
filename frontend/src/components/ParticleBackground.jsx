@@ -1,8 +1,28 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useEffect, useState } from "react";
 import Particles from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 
 const ParticleBackground = () => {
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const checkTheme = () => {
+      const savedTheme = localStorage.getItem("theme");
+      setIsDark(savedTheme !== "light");
+    };
+
+    checkTheme();
+
+    // Listen for theme changes
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const particlesInit = useCallback(async (engine) => {
     await loadSlim(engine);
   }, []);
@@ -38,13 +58,13 @@ const ParticleBackground = () => {
       },
       particles: {
         color: {
-          value: "#ffffff",
+          value: isDark ? "#ffffff" : "#1e293b",
         },
         links: {
-          color: "#ffffff",
+          color: isDark ? "#ffffff" : "#1e293b",
           distance: 150,
           enable: true,
-          opacity: 0.2,
+          opacity: isDark ? 0.2 : 0.3,
           width: 1,
         },
         move: {
@@ -65,7 +85,7 @@ const ParticleBackground = () => {
           value: 60,
         },
         opacity: {
-          value: 0.3,
+          value: isDark ? 0.3 : 0.5,
         },
         shape: {
           type: "circle",
@@ -76,7 +96,7 @@ const ParticleBackground = () => {
       },
       detectRetina: true,
     }),
-    []
+    [isDark]
   );
 
   return (

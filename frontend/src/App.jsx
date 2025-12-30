@@ -8,9 +8,12 @@ import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import ParticleBackground from "./components/ParticleBackground";
+import ThemeToggle from "./components/ThemeToggle";
 
-// Auth Pages
-import Login from "./pages/auth/Login";
+// Landing & Auth Pages
+import Landing from "./pages/Landing";
+import StudentLogin from "./pages/auth/StudentLogin";
+import TeacherLogin from "./pages/auth/TeacherLogin";
 import Register from "./pages/auth/Register";
 
 // Teacher Pages
@@ -18,6 +21,7 @@ import TeacherDashboard from "./pages/teacher/Dashboard";
 import CreateQuiz from "./pages/teacher/CreateQuiz";
 import ManageQuiz from "./pages/teacher/ManageQuiz";
 import QuizSubmissions from "./pages/teacher/QuizSubmissions";
+import ManageStudents from "./pages/teacher/ManageStudents";
 
 // Student Pages
 import StudentDashboard from "./pages/student/Dashboard";
@@ -30,6 +34,7 @@ function App() {
     <AuthProvider>
       <Router>
         <ParticleBackground />
+        <ThemeToggle />
         <Toaster
           position="top-right"
           toastOptions={{
@@ -57,7 +62,9 @@ function App() {
 
         <Routes>
           {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<StudentLogin />} />
+          <Route path="/teacher-login" element={<TeacherLogin />} />
           <Route path="/register" element={<Register />} />
 
           {/* Teacher Routes */}
@@ -69,6 +76,7 @@ function App() {
               path="quiz/:quizId/submissions"
               element={<QuizSubmissions />}
             />
+            <Route path="students" element={<ManageStudents />} />
           </Route>
 
           {/* Student Routes */}
@@ -80,8 +88,7 @@ function App() {
           </Route>
 
           {/* Default Redirect */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

@@ -12,24 +12,35 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
-      unique: true,
+      sparse: true, // Allow multiple null values for students
       lowercase: true,
       trim: true,
       match: [
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
         "Please enter a valid email",
       ],
+      // Email only required for teachers
+      required: function () {
+        return this.role === "teacher";
+      },
+      // Unique only for teachers
+      unique: function () {
+        return this.role === "teacher";
+      },
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters"],
+      // Password only required for teachers
+      required: function () {
+        return this.role === "teacher";
+      },
     },
     role: {
       type: String,
       enum: ["teacher", "student"],
       required: [true, "Role is required"],
+      default: "student",
     },
   },
   {
@@ -37,9 +48,14 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Hash password before saving
+// Hash password before saving (only for teachers with passwords)
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
+  // Skip if password not modified or user is a student
+  if (
+    !this.isModified("password") ||
+    this.role === "student" ||
+    !this.password
+  ) {
     return next();
   }
 
@@ -52,8 +68,11 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// Compare password method
+// Compare password method (only for teachers)
 userSchema.methods.comparePassword = async function (candidatePassword) {
+  if (this.role === "student" || !this.password) {
+    return false;
+  }
   return await bcrypt.compare(candidatePassword, this.password);
 };
 

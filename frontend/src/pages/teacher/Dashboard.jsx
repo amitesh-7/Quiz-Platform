@@ -91,16 +91,28 @@ const TeacherDashboard = () => {
             <p className="text-gray-400">Create and manage your quizzes</p>
           </div>
 
-          <Link to="/teacher/create-quiz">
-            <motion.button
-              className="btn-primary flex items-center gap-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FiPlus className="w-5 h-5" />
-              Create Quiz
-            </motion.button>
-          </Link>
+          <div className="flex gap-3">
+            <Link to="/teacher/students">
+              <motion.button
+                className="btn-secondary flex items-center gap-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <FiUsers className="w-5 h-5" />
+                Manage Students
+              </motion.button>
+            </Link>
+            <Link to="/teacher/create-quiz">
+              <motion.button
+                className="btn-primary flex items-center gap-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <FiPlus className="w-5 h-5" />
+                Create Quiz
+              </motion.button>
+            </Link>
+          </div>
         </motion.div>
 
         {/* Stats */}

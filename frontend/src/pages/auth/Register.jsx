@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FiUser, FiMail, FiLock, FiUserPlus } from "react-icons/fi";
+import { FiUser, FiMail, FiLock, FiUserPlus, FiKey } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
@@ -11,7 +11,8 @@ const Register = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "student",
+    secretKey: "",
+    role: "teacher", // Changed to teacher as students are added by teachers
   });
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -37,13 +38,19 @@ const Register = () => {
       return;
     }
 
+    if (!formData.secretKey.trim()) {
+      toast.error("Secret key is required");
+      return;
+    }
+
     setLoading(true);
 
     const result = await register(
       formData.name,
       formData.email,
       formData.password,
-      formData.role
+      formData.role,
+      formData.secretKey
     );
 
     if (result.success) {
@@ -77,8 +84,10 @@ const Register = () => {
           >
             <span className="text-white font-bold text-4xl">Q</span>
           </motion.div>
-          <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-          <p className="text-gray-400">Join Quiz Platform today</p>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Teacher Registration
+          </h1>
+          <p className="text-gray-400">Create your teacher account</p>
         </div>
 
         {/* Form */}
@@ -148,38 +157,22 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label className="input-label">I am a</label>
-            <div className="grid grid-cols-2 gap-4">
-              <motion.button
-                type="button"
-                onClick={() => setFormData({ ...formData, role: "student" })}
-                className={`p-4 rounded-xl border-2 transition-all ${
-                  formData.role === "student"
-                    ? "border-blue-500 bg-blue-500/20 text-white"
-                    : "border-white/20 bg-white/5 text-gray-400 hover:border-white/40"
-                }`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="text-2xl mb-2">🎓</div>
-                <div className="font-medium">Student</div>
-              </motion.button>
-
-              <motion.button
-                type="button"
-                onClick={() => setFormData({ ...formData, role: "teacher" })}
-                className={`p-4 rounded-xl border-2 transition-all ${
-                  formData.role === "teacher"
-                    ? "border-purple-500 bg-purple-500/20 text-white"
-                    : "border-white/20 bg-white/5 text-gray-400 hover:border-white/40"
-                }`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="text-2xl mb-2">👨‍🏫</div>
-                <div className="font-medium">Teacher</div>
-              </motion.button>
+            <label className="input-label">Secret Key</label>
+            <div className="relative">
+              <FiKey className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="password"
+                name="secretKey"
+                value={formData.secretKey}
+                onChange={handleChange}
+                className="glass-input pl-12"
+                placeholder="Enter teacher registration secret key"
+                required
+              />
             </div>
+            <p className="text-sm text-gray-500 mt-2">
+              🔒 Contact administrator for the secret key
+            </p>
           </div>
 
           <motion.button
@@ -197,7 +190,7 @@ const Register = () => {
             ) : (
               <>
                 <FiUserPlus className="w-5 h-5" />
-                Create Account
+                Create Teacher Account
               </>
             )}
           </motion.button>
@@ -208,11 +201,14 @@ const Register = () => {
           <p className="text-gray-400">
             Already have an account?{" "}
             <Link
-              to="/login"
+              to="/teacher-login"
               className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
             >
-              Sign in
+              Sign in as Teacher
             </Link>
+          </p>
+          <p className="text-gray-500 text-sm mt-3">
+            Students: Your teacher will create your account
           </p>
         </div>
       </motion.div>

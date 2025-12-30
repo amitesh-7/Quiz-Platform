@@ -34,6 +34,9 @@ const registerValidation = [
     .withMessage("Role is required")
     .isIn(["teacher", "student"])
     .withMessage("Role must be teacher or student"),
+  body("secretKey")
+    .notEmpty()
+    .withMessage("Secret key is required for teacher registration"),
 ];
 
 // Validation rules for login
@@ -53,7 +56,25 @@ const loginValidation = [
 // @access  Public
 const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, secretKey } = req.body;
+
+    // Validate secret key for teacher registration
+    if (role === "teacher") {
+      if (!secretKey) {
+        return res.status(400).json({
+          success: false,
+          message: "Secret key is required for teacher registration",
+        });
+      }
+
+      if (secretKey !== process.env.TEACHER_SECRET_KEY) {
+        return res.status(403).json({
+          success: false,
+          message:
+            "Invalid secret key. Contact administrator for the correct key.",
+        });
+      }
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -168,10 +189,182 @@ const getMe = async (req, res) => {
   }
 };
 
+// @desc    Student login with name only
+// @route   POST /api/auth/student-login
+// @access  Public
+const studentLogin = async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!name || name.trim().length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter your name (minimum 2 characters)",
+      });
+    }
+
+    // Find student by name (case-insensitive)
+    const student = await User.findOne({
+      name: { $regex: new RegExp(`^${name.trim()}$`, "i") },
+      role: "student",
+    });
+
+    if (!student) {
+      return res.status(401).json({
+        success: false,
+        message: "Student not found. Please contact your teacher to register.",
+      });
+    }
+
+    // Generate token
+    const token = generateToken(student._id);
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      data: {
+        user: {
+          id: student._id,
+          name: student.name,
+          role: student.role,
+        },
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Student login error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error during login",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+// @desc    Add student (Teacher only)
+// @route   POST /api/auth/add-student
+// @access  Private (Teacher)
+const addStudent = async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!name || name.trim().length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: "Name must be at least 2 characters",
+      });
+    }
+
+    // Check if student already exists (case-insensitive)
+    const existingStudent = await User.findOne({
+      name: { $regex: new RegExp(`^${name.trim()}$`, "i") },
+      role: "student",
+    });
+
+    if (existingStudent) {
+      return res.status(400).json({
+        success: false,
+        message: "A student with this name already exists",
+      });
+    }
+
+    // Create student account (no password required)
+    const student = await User.create({
+      name: name.trim(),
+      role: "student",
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Student added successfully",
+      data: {
+        student: {
+          _id: student._id,
+          name: student.name,
+          role: student.role,
+          createdAt: student.createdAt,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Add student error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while adding student",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+// @desc    Get all students (Teacher only)
+// @route   GET /api/auth/students
+// @access  Private (Teacher)
+const getStudents = async (req, res) => {
+  try {
+    const students = await User.find({ role: "student" })
+      .select("name createdAt")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        students,
+        count: students.length,
+      },
+    });
+  } catch (error) {
+    console.error("Get students error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching students",
+    });
+  }
+};
+
+// @desc    Delete student (Teacher only)
+// @route   DELETE /api/auth/students/:id
+// @access  Private (Teacher)
+const deleteStudent = async (req, res) => {
+  try {
+    const student = await User.findById(req.params.id);
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    if (student.role !== "student") {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete non-student user",
+      });
+    }
+
+    await student.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: "Student deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete student error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while deleting student",
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   getMe,
+  studentLogin,
+  addStudent,
+  getStudents,
+  deleteStudent,
   registerValidation,
   loginValidation,
 };
