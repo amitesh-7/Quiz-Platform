@@ -31,14 +31,14 @@ const Landing = () => {
               <span className="text-white font-bold text-6xl">Q</span>
             </motion.div>
 
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-6">
               Quiz Platform
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 mb-4">
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-4 px-4">
               Create, Manage, and Take Quizzes with AI-Powered Question
               Generation
             </p>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto px-4">
               The ultimate quiz platform for teachers and students featuring
               real-time scoring, timer-based tests, and intelligent question
               generation using Google's Gemini AI.

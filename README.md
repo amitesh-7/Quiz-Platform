@@ -1,26 +1,54 @@
 # 📝 Quiz Platform
 
-A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, featuring AI-powered question generation using Google's Gemini API.
+A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, featuring AI-powered question generation, OCR-based answer extraction, and intelligent evaluation using Google's Gemini API.
 
-![Quiz Platform](https://img.shields.io/badge/Stack-MERN-green) ![React](https://img.shields.io/badge/React-18-blue) ![Node.js](https://img.shields.io/badge/Node.js-Express-green) ![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen)
+![Quiz Platform](https://img.shields.io/badge/Stack-MERN-green) ![React](https://img.shields.io/badge/React-18-blue) ![Node.js](https://img.shields.io/badge/Node.js-Express-green) ![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen) ![AI](https://img.shields.io/badge/AI-Gemini-purple)
 
 ## ✨ Features
 
 ### 🎓 Teacher Portal
 
-- Create and manage quizzes
-- Add questions manually or generate with AI (Gemini API)
-- Set quiz duration and total marks
-- Activate/deactivate quizzes
-- View student submissions and scores
+- **Quiz Management**: Create and manage quizzes with multiple question types
+- **AI Question Generation**:
+  - Generate questions using AI from topics
+  - Bulk question processing from raw text
+  - Extract questions from uploaded images (test papers, worksheets)
+- **5 Question Types**: MCQ, Written, Fill in the Blanks, Matching, True/False
+- **Flexible Quiz Settings**: Set duration, total marks, and activation status
+- **Student Management**: View all students and their quiz attempts
+- **Detailed Analytics**: View submissions with detailed scoring and evaluation
 
 ### 📚 Student Portal
 
-- Browse available quizzes
-- Attempt quizzes with countdown timer
-- Auto-submit on timeout
-- View detailed results with question review
-- Track all past submissions
+- **Browse Quizzes**: View all available active quizzes
+- **Multiple Attempts**: Retake quizzes unlimited times (results update automatically)
+- **Smart Answer Submission**:
+  - Traditional text input for all question types
+  - Upload answer sheet images (up to 10 per quiz)
+  - AI automatically extracts and maps answers from images
+  - Support for numbered answers (e.g., Ans29, Ans30)
+- **Real-time Timer**: Countdown timer with auto-submit on timeout
+- **Comprehensive Results**: View detailed results with:
+  - Score breakdown and percentage
+  - Question-wise review with correct answers
+  - AI feedback for written answers
+  - Proportional marking display
+
+### 🤖 AI-Powered Features
+
+- **Question Generation**: Generate diverse questions on any topic
+- **Image Processing**:
+  - Extract questions from images (OCR)
+  - Extract handwritten/printed answers from student submissions
+- **Smart Answer Parsing**: Automatically detect and map answers like "Ans32: [text]"
+- **Proportional Marking**: AI evaluates written answers with detailed marking:
+  - 95-100% match: Full marks
+  - 75-94%: Minor deduction (1-2 marks)
+  - 50-74%: Moderate deduction (30-50%)
+  - 25-49%: Major deduction (50-75%)
+  - 1-24%: Minimal marks (1-2)
+  - 0%: Zero marks
+- **Feedback Generation**: Detailed AI-generated feedback for written answers
 
 ### 🔐 Security
 
@@ -95,22 +123,28 @@ Quiz Platform/
 ├── frontend/
 │   ├── public/
 │   ├── src/
-│   │   ├── components/
+│   ├── components/
 │   │   │   ├── Loading.jsx
 │   │   │   ├── Navbar.jsx
 │   │   │   ├── ParticleBackground.jsx
-│   │   │   └── PrivateRoute.jsx
+│   │   │   ├── PrivateRoute.jsx
+│   │   │   └── ThemeToggle.jsx
 │   │   ├── context/
 │   │   │   └── AuthContext.jsx
-│   │   ├── pages/
+│   ├── pages/
+│   │   │   ├── Landing.jsx
 │   │   │   ├── auth/
 │   │   │   │   ├── Login.jsx
-│   │   │   │   └── Register.jsx
+│   │   │   │   ├── Register.jsx
+│   │   │   │   ├── StudentLogin.jsx
+│   │   │   │   └── TeacherLogin.jsx
 │   │   │   ├── teacher/
 │   │   │   │   ├── Dashboard.jsx
 │   │   │   │   ├── CreateQuiz.jsx
 │   │   │   │   ├── ManageQuiz.jsx
-│   │   │   │   └── QuizSubmissions.jsx
+│   │   │   │   ├── ManageStudents.jsx
+│   │   │   │   ├── QuizSubmissions.jsx
+│   │   │   │   └── StudentQuizzes.jsx
 │   │   │   └── student/
 │   │   │       ├── Dashboard.jsx
 │   │   │       ├── AttemptQuiz.jsx
@@ -229,11 +263,14 @@ npm run dev
 | PUT    | `/api/questions/:id`     | Update question       |
 | DELETE | `/api/questions/:id`     | Delete question       |
 
-### Gemini AI (Teacher)
+### Gemini AI
 
-| Method | Endpoint               | Description                |
-| ------ | ---------------------- | -------------------------- |
-| POST   | `/api/gemini/generate` | Generate questions with AI |
+| Method | Endpoint                        | Description                     |
+| ------ | ------------------------------- | ------------------------------- |
+| POST   | `/api/gemini/generate`          | Generate questions with AI      |
+| POST   | `/api/gemini/process-questions` | Process raw text to quiz format |
+| POST   | `/api/gemini/extract-questions` | Extract questions from image    |
+| POST   | `/api/gemini/ocr`               | Extract text from image (OCR)   |
 
 ### Submissions (Student)
 
@@ -294,15 +331,96 @@ npm run dev
 
 ### 2. As Teacher
 
+**Manual Question Creation:**
+
 - Create a new quiz
-- Add questions manually or use AI generation
+- Add questions of different types (MCQ, Written, Fill Blanks, Matching, True/False)
+- Set marks for each question
 - Activate the quiz
+
+**AI-Powered Question Creation:**
+
+- Use "Generate with AI" to create questions from a topic
+- Use "Process Raw Questions" to convert plain text into quiz format
+- Upload an image of a test paper to extract questions automatically
 
 ### 3. As Student
 
+**Traditional Approach:**
+
 - View available quizzes
 - Attempt a quiz (timer will start)
-- View results after submission
+- Answer each question individually
+- Submit and view results
+
+**Answer Sheet Upload:**
+
+- Navigate to the last question of the quiz
+- Upload images of your handwritten answer sheets (up to 10)
+- Ensure answers are labeled with numbers (e.g., Ans1, Ans29, Ans30)
+- AI will extract and map answers automatically
+- Submit and view results with AI feedback
+
+### 4. Multiple Attempts
+
+- Students can retake any quiz unlimited times
+- Results are updated with each new submission
+- View all attempt history in "My Results"
+
+## 🎯 Question Types Guide
+
+### 1. Multiple Choice Questions (MCQ)
+
+- 4 options (A, B, C, D)
+- Single correct answer
+- Binary scoring (correct/incorrect)
+
+### 2. True/False Questions
+
+- 2 options (True, False)
+- Single correct answer
+- Binary scoring
+
+### 3. Written Answer Questions
+
+- Open-ended text response
+- AI-powered evaluation with proportional marking
+- Detailed feedback provided
+- Support for image upload with OCR
+
+### 4. Fill in the Blanks
+
+- Multiple blanks possible
+- Exact match scoring
+- Case-insensitive comparison
+
+### 5. Matching Questions
+
+- Pairs of items to match
+- Left column and right column
+- All pairs must be correct for full marks
+
+## 📸 Image Upload Features
+
+### For Teachers
+
+- **Extract Questions**: Upload test paper images to automatically generate quiz questions
+- **Bulk Processing**: Convert raw text questions to structured format
+
+### For Students
+
+- **Answer Sheet Upload**: Upload up to 10 images of handwritten answers
+- **Auto-Mapping**: AI detects answer numbers (Ans1, Ans29, etc.) and maps to questions
+- **OCR Processing**: Extracts text from handwritten or printed answers
+- **Smart Evaluation**: AI evaluates written answers with proportional marking
+
+### Best Practices for Image Upload
+
+- Use clear, well-lit photos
+- Write on white paper with dark ink
+- Label each answer with its number (e.g., Ans1, Ans32)
+- Maximum 5MB per image
+- Supported formats: JPG, PNG, JPEG
 
 ## 🎨 UI Components
 
@@ -353,10 +471,23 @@ npm run dev
 ```javascript
 {
   quizId: ObjectId (Quiz),
+  questionType: "mcq" | "written" | "fillblank" | "matching" | "truefalse",
   questionText: String,
-  options: [String] (4 options),
+
+  // For MCQ and True/False
+  options: [String],
   correctOption: Number (0-3),
-  marks: Number
+
+  // For Written Answer
+  correctAnswer: String,
+
+  // For Fill in the Blanks
+  blanks: [String],
+
+  // For Matching
+  matchPairs: [{left: String, right: String}],
+
+  marks: Number (1-10)
 }
 ```
 
@@ -366,8 +497,20 @@ npm run dev
 {
   quizId: ObjectId (Quiz),
   studentId: ObjectId (User),
-  answers: [{questionId, selectedOption}],
+  answers: [
+    {
+      questionId: ObjectId,
+      selectedOption: Number,        // For MCQ/True-False
+      studentAnswer: String,         // For written/fill blank
+      studentMatches: [{left, right}], // For matching
+      isCorrect: Boolean,
+      awardedMarks: Number,          // For proportional marking
+      feedback: String               // AI feedback for written answers
+    }
+  ],
   score: Number,
+  totalMarks: Number,
+  percentage: Number,
   submittedAt: Date
 }
 ```
@@ -379,6 +522,37 @@ npm run dev
 3. **Password**: Minimum 6 characters, bcrypt hashed
 4. **CORS**: Configure for production domains
 5. **Input Validation**: All inputs are validated
+6. **File Upload**: Images validated for type and size (max 5MB)
+7. **API Rate Limiting**: Consider implementing for Gemini API calls
+
+## 🚀 Performance Optimization
+
+- **OCR Caching**: Consider caching OCR results for identical images
+- **Lazy Loading**: Images and components loaded on demand
+- **Optimistic Updates**: UI updates before server confirmation
+- **Debounced Requests**: Reduced API calls for text inputs
+
+## 🔄 Recent Updates
+
+### Version 2.0 (Latest)
+
+- ✅ Added 5 question types (MCQ, Written, Fill Blanks, Matching, True/False)
+- ✅ Multiple quiz attempts with result updates
+- ✅ Image upload for answer sheets (up to 10 per quiz)
+- ✅ Smart answer parsing with number detection (Ans29, Ans30, etc.)
+- ✅ AI-powered proportional marking for written answers
+- ✅ OCR-based text extraction from images
+- ✅ Bulk question processing from raw text
+- ✅ Question extraction from uploaded images
+- ✅ Enhanced result display for all question types
+- ✅ Detailed AI feedback for written answers
+
+## 📱 Browser Support
+
+- Chrome/Edge (latest)
+- Firefox (latest)
+- Safari (latest)
+- Mobile browsers (iOS Safari, Chrome Mobile)
 
 ## 🤝 Contributing
 

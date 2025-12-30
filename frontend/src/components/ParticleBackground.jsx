@@ -4,6 +4,7 @@ import { loadSlim } from "@tsparticles/slim";
 
 const ParticleBackground = () => {
   const [isDark, setIsDark] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkTheme = () => {
@@ -11,7 +12,12 @@ const ParticleBackground = () => {
       setIsDark(savedTheme !== "light");
     };
 
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
     checkTheme();
+    checkMobile();
 
     // Listen for theme changes
     const observer = new MutationObserver(checkTheme);
@@ -20,7 +26,13 @@ const ParticleBackground = () => {
       attributeFilter: ["class"],
     });
 
-    return () => observer.disconnect();
+    // Listen for resize
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", checkMobile);
+    };
   }, []);
 
   const particlesInit = useCallback(async (engine) => {
@@ -82,7 +94,7 @@ const ParticleBackground = () => {
             enable: true,
             area: 800,
           },
-          value: 60,
+          value: isMobile ? 30 : 60, // Reduce particles on mobile
         },
         opacity: {
           value: isDark ? 0.3 : 0.5,
@@ -91,12 +103,12 @@ const ParticleBackground = () => {
           type: "circle",
         },
         size: {
-          value: { min: 1, max: 3 },
+          value: { min: 1, max: isMobile ? 2 : 3 }, // Smaller particles on mobile
         },
       },
       detectRetina: true,
     }),
-    [isDark]
+    [isDark, isMobile]
   );
 
   return (

@@ -150,85 +150,143 @@ const QuizSubmissions = () => {
             </p>
           </motion.div>
         ) : (
-          <motion.div
-            className="glass-card overflow-hidden"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left py-4 px-4 text-gray-400 font-medium">
-                      #
-                    </th>
-                    <th className="text-left py-4 px-4 text-gray-400 font-medium">
-                      Student
-                    </th>
-                    <th className="text-left py-4 px-4 text-gray-400 font-medium">
-                      Email
-                    </th>
-                    <th className="text-center py-4 px-4 text-gray-400 font-medium">
-                      Score
-                    </th>
-                    <th className="text-center py-4 px-4 text-gray-400 font-medium">
-                      Percentage
-                    </th>
-                    <th className="text-right py-4 px-4 text-gray-400 font-medium">
-                      Submitted
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.submissions.map((submission, index) => (
-                    <motion.tr
-                      key={submission.id}
-                      className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <td className="py-4 px-4 text-gray-400">{index + 1}</td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                            {submission.student?.name?.charAt(0).toUpperCase()}
+          <>
+            {/* Desktop Table View */}
+            <motion.div
+              className="glass-card overflow-hidden hidden md:block"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-white/10">
+                      <th className="text-left py-4 px-4 text-gray-400 font-medium">
+                        #
+                      </th>
+                      <th className="text-left py-4 px-4 text-gray-400 font-medium">
+                        Student
+                      </th>
+                      <th className="text-left py-4 px-4 text-gray-400 font-medium">
+                        Email
+                      </th>
+                      <th className="text-center py-4 px-4 text-gray-400 font-medium">
+                        Score
+                      </th>
+                      <th className="text-center py-4 px-4 text-gray-400 font-medium">
+                        Percentage
+                      </th>
+                      <th className="text-right py-4 px-4 text-gray-400 font-medium">
+                        Submitted
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.submissions.map((submission, index) => (
+                      <motion.tr
+                        key={submission.id}
+                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <td className="py-4 px-4 text-gray-400">{index + 1}</td>
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                              {submission.student?.name
+                                ?.charAt(0)
+                                .toUpperCase()}
+                            </div>
+                            <span className="text-white">
+                              {submission.student?.name}
+                            </span>
                           </div>
-                          <span className="text-white">
-                            {submission.student?.name}
+                        </td>
+                        <td className="py-4 px-4 text-gray-400">
+                          {submission.student?.email}
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          <span className="text-white font-medium">
+                            {submission.score} / {submission.totalMarks}
                           </span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 text-gray-400">
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          <span
+                            className={`font-bold ${getScoreColor(
+                              submission.percentage
+                            )}`}
+                          >
+                            {submission.percentage}%
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-right text-gray-400">
+                          {new Date(
+                            submission.submittedAt
+                          ).toLocaleDateString()}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {data.submissions.map((submission, index) => (
+                <motion.div
+                  key={submission.id}
+                  className="glass-card"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                      {submission.student?.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-white font-semibold">
+                        {submission.student?.name}
+                      </h3>
+                      <p className="text-sm text-gray-400">
                         {submission.student?.email}
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="text-white font-medium">
-                          {submission.score} / {submission.totalMarks}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span
-                          className={`font-bold ${getScoreColor(
-                            submission.percentage
-                          )}`}
-                        >
-                          {submission.percentage}%
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-right text-gray-400">
-                        <div className="flex items-center justify-end gap-1">
-                          <FiClock className="w-4 h-4" />
-                          {new Date(submission.submittedAt).toLocaleString()}
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
+                      </p>
+                    </div>
+                    <span className="text-xs text-gray-400">#{index + 1}</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-white/5 p-3 rounded-lg">
+                      <p className="text-xs text-gray-400 mb-1">Score</p>
+                      <p className="text-white font-semibold">
+                        {submission.score} / {submission.totalMarks}
+                      </p>
+                    </div>
+                    <div className="bg-white/5 p-3 rounded-lg">
+                      <p className="text-xs text-gray-400 mb-1">Percentage</p>
+                      <p
+                        className={`font-bold ${getScoreColor(
+                          submission.percentage
+                        )}`}
+                      >
+                        {submission.percentage}%
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <p className="text-xs text-gray-400">
+                      Submitted:{" "}
+                      {new Date(submission.submittedAt).toLocaleString()}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
-          </motion.div>
+          </>
         )}
       </div>
     </div>

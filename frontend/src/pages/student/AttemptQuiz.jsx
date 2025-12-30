@@ -455,26 +455,26 @@ const AttemptQuiz = () => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
       >
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h2 className="text-lg font-semibold text-white hidden sm:block">
+        <div className="container mx-auto px-3 sm:px-4 py-2 sm:py-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+              <h2 className="text-sm sm:text-lg font-semibold text-white truncate hidden sm:block">
                 {quiz.title}
               </h2>
-              <span className="text-sm text-gray-400">
-                {answeredCount}/{questions.length} answered
+              <span className="text-xs sm:text-sm text-gray-400 whitespace-nowrap">
+                {answeredCount}/{questions.length}
               </span>
             </div>
 
             <div
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg ${
                 timeLeft <= 60
                   ? "bg-red-500/20 text-red-400"
                   : "bg-blue-500/20 text-blue-400"
               }`}
             >
-              <FiClock className="w-5 h-5" />
-              <span className="font-mono text-lg font-bold">
+              <FiClock className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="font-mono text-sm sm:text-lg font-bold">
                 {formatTime(timeLeft)}
               </span>
             </div>
@@ -494,21 +494,23 @@ const AttemptQuiz = () => {
         </div>
       </motion.div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <div className="max-w-3xl mx-auto">
           {/* Question Navigator */}
           <motion.div
-            className="glass-card mb-6"
+            className="glass-card mb-4 sm:mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <p className="text-sm text-gray-400 mb-3">Question Navigator</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="text-xs sm:text-sm text-gray-400 mb-3">
+              Question Navigator
+            </p>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {questions.map((q, index) => (
                 <motion.button
                   key={q._id}
                   onClick={() => setCurrentQuestion(index)}
-                  className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg font-medium text-sm sm:text-base transition-colors ${
                     currentQuestion === index
                       ? "bg-blue-500 text-white"
                       : answers[q._id] !== undefined
@@ -534,30 +536,32 @@ const AttemptQuiz = () => {
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="flex items-center gap-3 mb-6">
-                <span className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 font-bold">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <span className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 font-bold text-sm sm:text-base">
                   {currentQuestion + 1}
                 </span>
                 <div className="flex-1">
-                  <span className="text-sm text-gray-400">
+                  <span className="text-xs sm:text-sm text-gray-400">
                     Question {currentQuestion + 1} of {questions.length}
                   </span>
                 </div>
-                <span className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm">
+                <span className="px-2 sm:px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs sm:text-sm">
                   {question.marks} mark{question.marks > 1 ? "s" : ""}
                 </span>
               </div>
 
-              <p className="text-xl text-white mb-8">{question.questionText}</p>
+              <p className="text-base sm:text-lg md:text-xl text-white mb-6 sm:mb-8">
+                {question.questionText}
+              </p>
 
               {/* Render based on question type */}
               {(question.questionType === "mcq" || !question.questionType) && (
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {question.options.map((option, index) => (
                     <motion.button
                       key={index}
                       onClick={() => handleSelectOption(question._id, index)}
-                      className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${
+                      className={`w-full p-3 sm:p-4 rounded-xl text-left transition-all flex items-center gap-2 sm:gap-3 text-sm sm:text-base ${
                         answers[question._id] === index
                           ? "bg-blue-500/20 border-2 border-blue-500 text-white"
                           : "bg-white/5 border-2 border-white/10 text-gray-300 hover:border-white/30 hover:bg-white/10"
