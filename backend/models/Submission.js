@@ -11,7 +11,7 @@ const answerSchema = new mongoose.Schema(
     },
     questionType: {
       type: String,
-      enum: ["mcq", "written", "fillblank", "matching"],
+      enum: ["mcq", "written", "fillblank", "matching", "truefalse"],
       default: "mcq",
     },
     // MCQ fields
@@ -90,7 +90,7 @@ const submissionSchema = new mongoose.Schema(
   }
 );
 
-// Compound index to ensure one submission per student per quiz
-submissionSchema.index({ quizId: 1, studentId: 1 }, { unique: true });
+// Index for efficient querying (removed unique constraint to allow multiple attempts)
+submissionSchema.index({ quizId: 1, studentId: 1 });
 
 module.exports = mongoose.model("Submission", submissionSchema);

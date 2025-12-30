@@ -9,6 +9,7 @@ import {
   FiAlertTriangle,
   FiUpload,
   FiImage,
+  FiXCircle,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
@@ -27,6 +28,7 @@ const AttemptQuiz = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [answerImages, setAnswerImages] = useState({}); // Store image URLs
+  const [answerSheets, setAnswerSheets] = useState([]); // Store multiple answer sheet images
   const [uploadingOCR, setUploadingOCR] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -44,7 +46,7 @@ const AttemptQuiz = () => {
       setTimeLeft(response.data.data.quiz.duration * 60);
     } catch (error) {
       if (error.response?.status === 400) {
-        toast.error("You have already submitted this quiz");
+        toast.error(error.response?.data?.message || "Unable to load quiz");
         navigate("/student");
       } else {
         toast.error("Failed to load quiz");
@@ -209,6 +211,127 @@ const AttemptQuiz = () => {
     } finally {
       setUploadingOCR(false);
     }
+  };
+
+  const handleAnswerSheetUpload = async (file) => {
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must be less than 5MB");
+      return;
+    }
+
+    // Check max 10 images
+    if (answerSheets.length >= 10) {
+      toast.error("Maximum 10 answer sheets allowed");
+      return;
+    }
+
+    setUploadingOCR(true);
+
+    try {
+      // Convert image to base64
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = async () => {
+        const base64 = reader.result.split(",")[1];
+
+        // Call OCR API
+        const response = await geminiAPI.ocr(base64, file.type);
+        const extractedText = response.data.data.text;
+
+        // Parse answer numbers from the extracted text
+        // Match patterns like: Ans32, Ans 32, Answer32, Q32, etc.
+        // Use word boundaries to ensure exact number matching
+        const answerPattern =
+          /(?:Ans(?:wer)?|Q(?:uestion)?)\s*(\d+)\s*[:.\-]?\s*([^\n]+(?:\n(?!(?:Ans(?:wer)?|Q(?:uestion)?)\s*\d+)[^\n]+)*)/gi;
+        const matches = [...extractedText.matchAll(answerPattern)];
+
+        let mappedCount = 0;
+        const mappingDetails = [];
+
+        matches.forEach((match) => {
+          const questionNumber = parseInt(match[1], 10);
+          const answerText = match[2].trim();
+
+          // Find the EXACT question at position (questionNumber - 1)
+          // Question 32 means index 31 in the array
+          const questionIndex = questionNumber - 1;
+
+          if (questionIndex >= 0 && questionIndex < questions.length) {
+            const question = questions[questionIndex];
+            const questionId = question._id;
+            const questionType = question.questionType;
+
+            // Only map to written type questions
+            if (questionType === "written") {
+              setAnswers((prev) => ({
+                ...prev,
+                [questionId]: answerText,
+              }));
+              mappedCount++;
+              mappingDetails.push(`Q${questionNumber}`);
+            } else {
+              // Log when question number exists but is not a written type
+              console.log(
+                `Question ${questionNumber} is not a written question (type: ${questionType})`
+              );
+            }
+          } else {
+            // Log when question number is out of range
+            console.log(
+              `Question ${questionNumber} not found in quiz (total: ${questions.length})`
+            );
+          }
+        });
+
+        // Store the answer sheet
+        setAnswerSheets((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            imageUrl: reader.result,
+            fileName: file.name,
+            extractedText,
+            mappedAnswers: mappedCount,
+            mappedQuestions: mappingDetails.join(", "),
+          },
+        ]);
+
+        if (mappedCount > 0) {
+          toast.success(
+            `Mapped ${mappedCount} answer(s): ${mappingDetails.join(", ")}`
+          );
+        } else {
+          toast.success(
+            "Image uploaded! Please ensure answers are labeled with numbers (e.g., Ans1, Ans32)"
+          );
+        }
+      };
+
+      reader.onerror = () => {
+        toast.error("Failed to read image file");
+        setUploadingOCR(false);
+      };
+    } catch (error) {
+      console.error("OCR error:", error);
+      toast.error("Failed to extract text from image");
+    } finally {
+      setUploadingOCR(false);
+    }
+  };
+
+  const removeAnswerSheet = (sheetId) => {
+    setAnswerSheets((prev) => prev.filter((sheet) => sheet.id !== sheetId));
+    toast.success("Answer sheet removed");
   };
 
   const handleConfirmSubmit = () => {
@@ -553,9 +676,13 @@ const AttemptQuiz = () => {
               {/* Match the Following */}
               {question.questionType === "matching" && (
                 <div className="space-y-4">
-                  {question.leftItems?.map((leftItem, index) => (
+                  <p className="text-gray-300 text-sm mb-4">
+                    Match each item on the left with the correct option on the
+                    right
+                  </p>
+                  {question.matchPairs?.map((pair, index) => (
                     <div key={index} className="glass p-4 rounded-xl">
-                      <p className="text-white mb-3">{leftItem}</p>
+                      <p className="text-white font-medium mb-3">{pair.left}</p>
                       <select
                         value={(answers[question._id] || {})[index] || ""}
                         onChange={(e) =>
@@ -564,14 +691,117 @@ const AttemptQuiz = () => {
                         className="glass-input w-full"
                       >
                         <option value="">Select match</option>
-                        {question.rightItems?.map((rightItem, rIndex) => (
-                          <option key={rIndex} value={rightItem}>
-                            {rightItem}
+                        {question.matchPairs?.map((matchPair, rIndex) => (
+                          <option key={rIndex} value={matchPair.right}>
+                            {matchPair.right}
                           </option>
                         ))}
                       </select>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Image Upload Section - After Last Question */}
+              {isLastQuestion && (
+                <div className="mt-8 p-6 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-xl">
+                  <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                    <FiImage className="w-5 h-5 text-blue-400" />
+                    Upload Answer Sheets ({answerSheets.length}/10)
+                  </h3>
+                  <p className="text-sm text-gray-400 mb-4">
+                    Upload images of your answer sheets. Label answers with
+                    numbers (e.g., Ans1, Ans2, Ans29, Ans30) for automatic
+                    extraction.
+                  </p>
+
+                  <label className="flex items-center gap-4 p-4 bg-white/5 rounded-lg cursor-pointer group hover:bg-white/10 transition-colors">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          handleAnswerSheetUpload(file);
+                          e.target.value = ""; // Reset input
+                        }
+                      }}
+                      className="hidden"
+                      disabled={uploadingOCR || answerSheets.length >= 10}
+                    />
+                    <div className="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                      {uploadingOCR ? (
+                        <div className="w-8 h-8 border-3 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <FiUpload className="w-8 h-8 text-blue-400" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-medium text-lg">
+                        {uploadingOCR
+                          ? "Processing..."
+                          : answerSheets.length >= 10
+                          ? "Max Limit Reached"
+                          : "Choose Image"}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        {uploadingOCR
+                          ? "Extracting and mapping answers..."
+                          : `Upload answer sheet images (Max 10, 5MB each)`}
+                      </p>
+                    </div>
+                  </label>
+
+                  {/* Uploaded Sheets List */}
+                  {answerSheets.length > 0 && (
+                    <div className="mt-4 space-y-2">
+                      <p className="text-sm text-gray-400 font-medium">
+                        Uploaded Answer Sheets:
+                      </p>
+                      {answerSheets.map((sheet) => (
+                        <div
+                          key={sheet.id}
+                          className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg flex items-center gap-3"
+                        >
+                          <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <FiCheck className="w-4 h-4 text-green-400" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-green-400 font-medium text-sm">
+                              {sheet.fileName}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {sheet.mappedAnswers > 0
+                                ? `${sheet.mappedAnswers} answer(s) extracted`
+                                : "No answers detected with numbers"}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => removeAnswerSheet(sheet.id)}
+                            className="text-red-400 hover:text-red-300 transition-colors"
+                          >
+                            <FiXCircle className="w-5 h-5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                    <p className="text-xs text-blue-300 mb-1">
+                      💡 Tips for best results:
+                    </p>
+                    <ul className="text-xs text-gray-400 space-y-1 list-disc list-inside">
+                      <li>
+                        Label each answer with its number: Ans1, Ans29, etc.
+                      </li>
+                      <li>Write clearly on white paper with dark ink</li>
+                      <li>Take photos in good lighting without shadows</li>
+                      <li>
+                        Upload up to 10 sheets to cover all written questions
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               )}
 

@@ -186,29 +186,32 @@ const StudentDashboard = () => {
                   </div>
 
                   <div className="mt-4 pt-4 border-t border-white/10">
-                    {quiz.hasSubmitted ? (
-                      <Link to={`/student/result/${quiz._id}`}>
+                    <div className="flex gap-2">
+                      <Link to={`/student/quiz/${quiz._id}`} className="flex-1">
                         <motion.button
-                          className="btn-secondary w-full flex items-center justify-center gap-2"
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <FiAward className="w-5 h-5" />
-                          View Result
-                        </motion.button>
-                      </Link>
-                    ) : (
-                      <Link to={`/student/quiz/${quiz._id}`}>
-                        <motion.button
-                          className="btn-primary w-full flex items-center justify-center gap-2"
+                          className={`w-full flex items-center justify-center gap-2 ${
+                            quiz.hasSubmitted ? "btn-secondary" : "btn-primary"
+                          }`}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                         >
                           <FiPlay className="w-5 h-5" />
-                          Start Quiz
+                          {quiz.hasSubmitted ? "Retake Quiz" : "Start Quiz"}
                         </motion.button>
                       </Link>
-                    )}
+                      {quiz.hasSubmitted && (
+                        <Link to={`/student/result/${quiz._id}`}>
+                          <motion.button
+                            className="btn-secondary px-4 flex items-center justify-center gap-2"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                          >
+                            <FiAward className="w-5 h-5" />
+                            Result
+                          </motion.button>
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </div>
               </motion.div>

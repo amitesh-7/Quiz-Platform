@@ -175,57 +175,197 @@ const QuizResult = () => {
                     )}
                   </span>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="text-gray-400 text-sm">
                         Question {index + 1}
                       </span>
                       <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded text-xs">
                         {item.marks} mark{item.marks > 1 ? "s" : ""}
                       </span>
+                      <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs uppercase">
+                        {item.questionType === "mcq" && "MCQ"}
+                        {item.questionType === "written" && "Written"}
+                        {item.questionType === "fillblank" && "Fill Blank"}
+                        {item.questionType === "matching" && "Matching"}
+                        {item.questionType === "truefalse" && "True/False"}
+                      </span>
                     </div>
                     <p className="text-white">{item.questionText}</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {item.options.map((option, optIndex) => {
-                    const isCorrect = optIndex === item.correctOption;
-                    const isSelected = optIndex === item.selectedOption;
+                {/* MCQ and True/False Questions */}
+                {(item.questionType === "mcq" ||
+                  item.questionType === "truefalse") && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {item.options.map((option, optIndex) => {
+                      const isCorrect = optIndex === item.correctOption;
+                      const isSelected = optIndex === item.selectedOption;
 
-                    let bgClass = "bg-white/5 text-gray-400";
-                    if (isCorrect) {
-                      bgClass =
-                        "bg-green-500/20 text-green-300 border border-green-500/30";
-                    } else if (isSelected && !isCorrect) {
-                      bgClass =
-                        "bg-red-500/20 text-red-300 border border-red-500/30";
-                    }
+                      let bgClass = "bg-white/5 text-gray-400";
+                      if (isCorrect) {
+                        bgClass =
+                          "bg-green-500/20 text-green-300 border border-green-500/30";
+                      } else if (isSelected && !isCorrect) {
+                        bgClass =
+                          "bg-red-500/20 text-red-300 border border-red-500/30";
+                      }
 
-                    return (
-                      <div
-                        key={optIndex}
-                        className={`p-3 rounded-lg flex items-center gap-2 ${bgClass}`}
-                      >
-                        <span className="font-medium">
-                          {String.fromCharCode(65 + optIndex)}.
-                        </span>
-                        <span className="flex-1">{option}</span>
-                        {isCorrect && (
-                          <FiCheckCircle className="w-4 h-4 text-green-400" />
-                        )}
-                        {isSelected && !isCorrect && (
-                          <FiXCircle className="w-4 h-4 text-red-400" />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {item.selectedOption === null && (
-                  <p className="text-yellow-400 text-sm mt-3">
-                    ⚠️ Not answered
-                  </p>
+                      return (
+                        <div
+                          key={optIndex}
+                          className={`p-3 rounded-lg flex items-center gap-2 ${bgClass}`}
+                        >
+                          <span className="font-medium">
+                            {String.fromCharCode(65 + optIndex)}.
+                          </span>
+                          <span className="flex-1">{option}</span>
+                          {isCorrect && (
+                            <FiCheckCircle className="w-4 h-4 text-green-400" />
+                          )}
+                          {isSelected && !isCorrect && (
+                            <FiXCircle className="w-4 h-4 text-red-400" />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
+
+                {/* Written Answer Questions */}
+                {item.questionType === "written" && (
+                  <div className="space-y-3">
+                    <div className="bg-white/5 p-4 rounded-lg">
+                      <p className="text-sm text-gray-400 mb-1">Your Answer:</p>
+                      <p className="text-white whitespace-pre-wrap">
+                        {item.studentAnswer || "Not answered"}
+                      </p>
+                    </div>
+                    {item.expectedAnswer && (
+                      <div className="bg-green-500/10 p-4 rounded-lg border border-green-500/30">
+                        <p className="text-sm text-green-400 mb-1">
+                          Expected Answer:
+                        </p>
+                        <p className="text-green-300 whitespace-pre-wrap">
+                          {item.expectedAnswer}
+                        </p>
+                      </div>
+                    )}
+                    {item.feedback && (
+                      <div className="bg-blue-500/10 p-4 rounded-lg border border-blue-500/30">
+                        <p className="text-sm text-blue-400 mb-1">Feedback:</p>
+                        <p className="text-blue-300">{item.feedback}</p>
+                      </div>
+                    )}
+                    {item.awardedMarks !== undefined && (
+                      <div className="text-sm text-gray-400">
+                        Awarded: {item.awardedMarks}/{item.marks} marks
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Fill in the Blank Questions */}
+                {item.questionType === "fillblank" && (
+                  <div className="space-y-3">
+                    <div className="bg-white/5 p-4 rounded-lg">
+                      <p className="text-sm text-gray-400 mb-1">Your Answer:</p>
+                      <p className="text-white">
+                        {item.studentAnswer || "Not answered"}
+                      </p>
+                    </div>
+                    <div
+                      className={`p-4 rounded-lg border ${
+                        item.isCorrect
+                          ? "bg-green-500/10 border-green-500/30"
+                          : "bg-red-500/10 border-red-500/30"
+                      }`}
+                    >
+                      <p
+                        className={`text-sm mb-1 ${
+                          item.isCorrect ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        Correct Answer:
+                      </p>
+                      <p
+                        className={
+                          item.isCorrect ? "text-green-300" : "text-red-300"
+                        }
+                      >
+                        {item.correctAnswer}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Matching Questions */}
+                {item.questionType === "matching" && (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Student's Matches */}
+                      <div className="bg-white/5 p-4 rounded-lg">
+                        <p className="text-sm text-gray-400 mb-3 font-medium">
+                          Your Matches:
+                        </p>
+                        <div className="space-y-2">
+                          {item.studentMatches &&
+                            item.studentMatches.map((match, idx) => (
+                              <div
+                                key={idx}
+                                className="text-sm bg-white/5 p-2 rounded"
+                              >
+                                <span className="text-blue-400">
+                                  {match.left}
+                                </span>
+                                <span className="text-gray-500 mx-2">→</span>
+                                <span className="text-purple-400">
+                                  {match.right}
+                                </span>
+                              </div>
+                            ))}
+                          {!item.studentMatches && (
+                            <p className="text-yellow-400 text-sm">
+                              Not answered
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Correct Matches */}
+                      <div className="bg-green-500/10 p-4 rounded-lg border border-green-500/30">
+                        <p className="text-sm text-green-400 mb-3 font-medium">
+                          Correct Matches:
+                        </p>
+                        <div className="space-y-2">
+                          {item.correctMatches &&
+                            item.correctMatches.map((match, idx) => (
+                              <div
+                                key={idx}
+                                className="text-sm bg-green-500/10 p-2 rounded"
+                              >
+                                <span className="text-green-300">
+                                  {match.left}
+                                </span>
+                                <span className="text-gray-500 mx-2">→</span>
+                                <span className="text-green-300">
+                                  {match.right}
+                                </span>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {item.selectedOption === null &&
+                  !item.studentAnswer &&
+                  !item.studentMatches && (
+                    <p className="text-yellow-400 text-sm mt-3">
+                      ⚠️ Not answered
+                    </p>
+                  )}
               </motion.div>
             ))}
           </div>

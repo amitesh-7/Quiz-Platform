@@ -226,20 +226,7 @@ const getQuiz = async (req, res) => {
       });
     }
 
-    // Check if student has already submitted
-    if (req.user.role === "student") {
-      const existingSubmission = await Submission.findOne({
-        quizId: quiz._id,
-        studentId: req.user._id,
-      });
-
-      if (existingSubmission) {
-        return res.status(400).json({
-          success: false,
-          message: "You have already submitted this quiz",
-        });
-      }
-    }
+    // Allow multiple attempts - no check for existing submission
 
     let questions;
 

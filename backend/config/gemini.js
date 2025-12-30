@@ -224,16 +224,31 @@ Evaluate the student's answer based on:
 2. Key points covered - Are the important points mentioned?
 3. Accuracy - Is the information correct?
 
-The threshold for full marks is ${threshold * 100}% match.
+MARKING SCHEME:
+- Fully correct (95-100% match): Award full marks (${maxMarks})
+- Minor errors (75-94% match): Deduct 1-2 marks based on severity
+- Moderate errors (50-74% match): Deduct 3-4 marks or 30-50% of total
+- Major errors (25-49% match): Deduct 50-75% of total marks
+- Mostly wrong (1-24% match): Award minimal marks (1-2) if any relevant point
+- Completely wrong (0% match): Award 0 marks
+
+Be lenient with:
+- Spelling errors and minor grammatical issues if meaning is clear
+- Different word choices with same meaning
+- Rephrased answers that convey the correct concept
+
+Be strict with:
+- Missing key concepts or important points
+- Factual errors or incorrect information
+- Completely unrelated or off-topic answers
 
 Return ONLY a JSON object with this structure:
 {
   "score": <number between 0 and ${maxMarks}>,
   "percentage": <number between 0 and 100>,
-  "feedback": "<brief feedback explaining the score>"
+  "feedback": "<brief feedback explaining the score and what was correct/incorrect>"
 }
 
-Be lenient with spelling errors and minor grammatical issues if the meaning is correct.
 Return ONLY the JSON object, nothing else.`;
 
   try {

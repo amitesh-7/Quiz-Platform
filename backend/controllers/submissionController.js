@@ -38,18 +38,11 @@ const submitQuiz = async (req, res) => {
       });
     }
 
-    // Check if student has already submitted
+    // Check if student has already submitted - allow multiple attempts
     const existingSubmission = await Submission.findOne({
       quizId,
       studentId: req.user._id,
     });
-
-    if (existingSubmission) {
-      return res.status(400).json({
-        success: false,
-        message: "You have already submitted this quiz",
-      });
-    }
 
     let questions;
     let questionMap = new Map();
@@ -93,6 +86,8 @@ const submitQuiz = async (req, res) => {
         // Check answer based on question type
         switch (questionType) {
           case "mcq":
+          case "truefalse":
+            // MCQ and True/False both use correctOption
             isCorrect = answer.selectedOption === question.correctOption;
             earnedMarks = isCorrect ? question.marks : 0;
             break;
@@ -164,7 +159,7 @@ const submitQuiz = async (req, res) => {
         };
 
         // Add type-specific fields
-        if (questionType === "mcq") {
+        if (questionType === "mcq" || questionType === "truefalse") {
           answerData.options = question.options;
           answerData.correctOption = question.correctOption;
         } else if (questionType === "written") {
@@ -183,18 +178,35 @@ const submitQuiz = async (req, res) => {
     // Calculate total marks
     const totalMarks = processedAnswers.reduce((sum, a) => sum + a.marks, 0);
 
-    // Create submission
-    const submission = await Submission.create({
-      quizId,
-      studentId: req.user._id,
-      answers: processedAnswers,
-      score,
-      submittedAt: new Date(),
-    });
+    // Update existing submission or create new one
+    let submission;
+    if (existingSubmission) {
+      // Update existing submission with new attempt
+      submission = await Submission.findByIdAndUpdate(
+        existingSubmission._id,
+        {
+          answers: processedAnswers,
+          score,
+          submittedAt: new Date(),
+        },
+        { new: true }
+      );
+    } else {
+      // Create new submission
+      submission = await Submission.create({
+        quizId,
+        studentId: req.user._id,
+        answers: processedAnswers,
+        score,
+        submittedAt: new Date(),
+      });
+    }
 
     res.status(201).json({
       success: true,
-      message: "Quiz submitted successfully",
+      message: existingSubmission
+        ? "Quiz resubmitted successfully. Your result has been updated."
+        : "Quiz submitted successfully",
       data: {
         submission: {
           id: submission._id,
@@ -209,14 +221,6 @@ const submitQuiz = async (req, res) => {
     });
   } catch (error) {
     console.error("Submit quiz error:", error);
-
-    // Handle duplicate submission error
-    if (error.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        message: "You have already submitted this quiz",
-      });
-    }
 
     res.status(500).json({
       success: false,
