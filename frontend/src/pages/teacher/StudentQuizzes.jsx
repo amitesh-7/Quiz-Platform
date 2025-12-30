@@ -35,15 +35,16 @@ const StudentQuizzes = () => {
       const allQuizzes = response.data.data.quizzes;
 
       // Filter quizzes for this student
-      const studentQuizzes = allQuizzes.filter(
-        (q) => q.assignedTo === studentId
-      );
+      // assignedTo can be an object (populated) or string
+      const studentQuizzes = allQuizzes.filter((q) => {
+        const assignedId = q.assignedTo?._id || q.assignedTo;
+        return assignedId === studentId || assignedId?.toString() === studentId;
+      });
       setQuizzes(studentQuizzes);
 
-      // Get student name from first quiz or URL
-      if (studentQuizzes.length > 0) {
-        // You might want to add a proper API call to get student details
-        setStudentName("Student");
+      // Get student name from first quiz
+      if (studentQuizzes.length > 0 && studentQuizzes[0].assignedTo?.name) {
+        setStudentName(studentQuizzes[0].assignedTo.name);
       }
     } catch (error) {
       toast.error("Failed to fetch quizzes");

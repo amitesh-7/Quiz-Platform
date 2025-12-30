@@ -151,31 +151,27 @@ const createQuiz = async (req, res) => {
   }
 };
 
-// @desc    Get all quizzes (students see active only, teachers see their own)
+// @desc    Get all quizzes (students see assigned only, teachers see all)
 // @route   GET /api/quizzes
 // @access  Private
 const getQuizzes = async (req, res) => {
   try {
     let query = {};
-    let populate = "";
+    let populate = "createdBy";
 
     if (req.user.role === "teacher") {
-      // Teachers see their own quizzes
-      query.createdBy = req.user._id;
+      // Teachers see ALL quizzes
+      // No filter - get all quizzes
     } else {
       // Students see only active quizzes assigned to them
       query.isActive = true;
       query.assignedTo = req.user._id;
-      populate = "createdBy";
     }
 
-    let quizzesQuery = Quiz.find(query).sort({ createdAt: -1 });
-
-    if (populate) {
-      quizzesQuery = quizzesQuery.populate("createdBy", "name");
-    }
-
-    const quizzes = await quizzesQuery;
+    const quizzes = await Quiz.find(query)
+      .populate("createdBy", "name")
+      .populate("assignedTo", "name")
+      .sort({ createdAt: -1 });
 
     // For students, check if they have already submitted each quiz
     if (req.user.role === "student") {
@@ -225,6 +221,25 @@ const getQuiz = async (req, res) => {
         message: "Quiz not found",
       });
     }
+
+    // Authorization check - only for students
+    if (req.user.role === "student") {
+      // Students can only access quizzes assigned to them
+      if (quiz.assignedTo.toString() !== req.user._id.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: "Not authorized to access this quiz",
+        });
+      }
+      // Students can only access active quizzes
+      if (!quiz.isActive) {
+        return res.status(403).json({
+          success: false,
+          message: "This quiz is no longer active",
+        });
+      }
+    }
+    // Teachers can access any quiz
 
     // Allow multiple attempts - no check for existing submission
 
@@ -359,7 +374,7 @@ const getQuiz = async (req, res) => {
 
 // @desc    Update quiz
 // @route   PUT /api/quizzes/:id
-// @access  Private (Teacher only - owner)
+// @access  Private (Teacher only)
 const updateQuiz = async (req, res) => {
   try {
     const quiz = await Quiz.findById(req.params.id);
@@ -371,13 +386,7 @@ const updateQuiz = async (req, res) => {
       });
     }
 
-    // Check ownership
-    if (quiz.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: "Not authorized to update this quiz",
-      });
-    }
+    // Any teacher can update any quiz
 
     const { title, description, duration, isActive } = req.body;
 
@@ -406,7 +415,7 @@ const updateQuiz = async (req, res) => {
 
 // @desc    Delete quiz
 // @route   DELETE /api/quizzes/:id
-// @access  Private (Teacher only - owner)
+// @access  Private (Teacher only)
 const deleteQuiz = async (req, res) => {
   try {
     const quiz = await Quiz.findById(req.params.id);
@@ -418,13 +427,7 @@ const deleteQuiz = async (req, res) => {
       });
     }
 
-    // Check ownership
-    if (quiz.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: "Not authorized to delete this quiz",
-      });
-    }
+    // Any teacher can delete any quiz
 
     // Delete all related questions and submissions
     await Question.deleteMany({ quizId: quiz._id });

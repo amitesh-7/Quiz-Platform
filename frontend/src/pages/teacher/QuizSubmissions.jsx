@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   FiArrowLeft,
   FiUser,
   FiAward,
-  FiClock,
   FiCheckCircle,
+  FiEye,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
@@ -67,13 +67,13 @@ const QuizSubmissions = () => {
       <div className="container mx-auto px-4 pb-8">
         {/* Back Button */}
         <motion.button
-          onClick={() => navigate("/teacher")}
+          onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
         >
           <FiArrowLeft className="w-5 h-5" />
-          Back to Dashboard
+          Back
         </motion.button>
 
         {/* Quiz Info */}
@@ -162,24 +162,12 @@ const QuizSubmissions = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-white/10">
-                      <th className="text-left py-4 px-4 text-gray-400 font-medium">
-                        #
-                      </th>
-                      <th className="text-left py-4 px-4 text-gray-400 font-medium">
-                        Student
-                      </th>
-                      <th className="text-left py-4 px-4 text-gray-400 font-medium">
-                        Email
-                      </th>
-                      <th className="text-center py-4 px-4 text-gray-400 font-medium">
-                        Score
-                      </th>
-                      <th className="text-center py-4 px-4 text-gray-400 font-medium">
-                        Percentage
-                      </th>
-                      <th className="text-right py-4 px-4 text-gray-400 font-medium">
-                        Submitted
-                      </th>
+                      <th className="text-left py-4 px-4 text-gray-400 font-medium">#</th>
+                      <th className="text-left py-4 px-4 text-gray-400 font-medium">Student</th>
+                      <th className="text-center py-4 px-4 text-gray-400 font-medium">Score</th>
+                      <th className="text-center py-4 px-4 text-gray-400 font-medium">Percentage</th>
+                      <th className="text-center py-4 px-4 text-gray-400 font-medium">Submitted</th>
+                      <th className="text-center py-4 px-4 text-gray-400 font-medium">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -195,17 +183,10 @@ const QuizSubmissions = () => {
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                              {submission.student?.name
-                                ?.charAt(0)
-                                .toUpperCase()}
+                              {submission.student?.name?.charAt(0).toUpperCase()}
                             </div>
-                            <span className="text-white">
-                              {submission.student?.name}
-                            </span>
+                            <span className="text-white">{submission.student?.name}</span>
                           </div>
-                        </td>
-                        <td className="py-4 px-4 text-gray-400">
-                          {submission.student?.email}
                         </td>
                         <td className="py-4 px-4 text-center">
                           <span className="text-white font-medium">
@@ -213,18 +194,24 @@ const QuizSubmissions = () => {
                           </span>
                         </td>
                         <td className="py-4 px-4 text-center">
-                          <span
-                            className={`font-bold ${getScoreColor(
-                              submission.percentage
-                            )}`}
-                          >
+                          <span className={`font-bold ${getScoreColor(submission.percentage)}`}>
                             {submission.percentage}%
                           </span>
                         </td>
-                        <td className="py-4 px-4 text-right text-gray-400">
-                          {new Date(
-                            submission.submittedAt
-                          ).toLocaleDateString()}
+                        <td className="py-4 px-4 text-center text-gray-400">
+                          {new Date(submission.submittedAt).toLocaleDateString()}
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          <Link to={`/teacher/submission/${submission.id}`}>
+                            <motion.button
+                              className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg flex items-center gap-1 hover:bg-blue-500/30 transition-colors mx-auto"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <FiEye className="w-4 h-4" />
+                              View Details
+                            </motion.button>
+                          </Link>
                         </td>
                       </motion.tr>
                     ))}
@@ -248,12 +235,8 @@ const QuizSubmissions = () => {
                       {submission.student?.name?.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-white font-semibold">
-                        {submission.student?.name}
-                      </h3>
-                      <p className="text-sm text-gray-400">
-                        {submission.student?.email}
-                      </p>
+                      <h3 className="text-white font-semibold">{submission.student?.name}</h3>
+                      <p className="text-sm text-gray-400">{submission.student?.email}</p>
                     </div>
                     <span className="text-xs text-gray-400">#{index + 1}</span>
                   </div>
@@ -267,21 +250,26 @@ const QuizSubmissions = () => {
                     </div>
                     <div className="bg-white/5 p-3 rounded-lg">
                       <p className="text-xs text-gray-400 mb-1">Percentage</p>
-                      <p
-                        className={`font-bold ${getScoreColor(
-                          submission.percentage
-                        )}`}
-                      >
+                      <p className={`font-bold ${getScoreColor(submission.percentage)}`}>
                         {submission.percentage}%
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-3 border-t border-white/10">
+                  <div className="mt-3 pt-3 border-t border-white/10 flex justify-between items-center">
                     <p className="text-xs text-gray-400">
-                      Submitted:{" "}
                       {new Date(submission.submittedAt).toLocaleString()}
                     </p>
+                    <Link to={`/teacher/submission/${submission.id}`}>
+                      <motion.button
+                        className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg flex items-center gap-1 hover:bg-blue-500/30 transition-colors text-sm"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <FiEye className="w-4 h-4" />
+                        View Details
+                      </motion.button>
+                    </Link>
                   </div>
                 </motion.div>
               ))}

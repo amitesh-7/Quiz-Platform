@@ -75,6 +75,7 @@ export const submissionAPI = {
   submit: (data) => api.post("/submissions", data),
   getMy: () => api.get("/submissions/my"),
   getByQuiz: (quizId) => api.get(`/submissions/quiz/${quizId}`),
+  getDetails: (submissionId) => api.get(`/submissions/${submissionId}`),
 };
 
 export const resultAPI = {

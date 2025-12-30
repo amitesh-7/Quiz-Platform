@@ -21,6 +21,7 @@ import TeacherDashboard from "./pages/teacher/Dashboard";
 import CreateQuiz from "./pages/teacher/CreateQuiz";
 import ManageQuiz from "./pages/teacher/ManageQuiz";
 import QuizSubmissions from "./pages/teacher/QuizSubmissions";
+import SubmissionDetails from "./pages/teacher/SubmissionDetails";
 import ManageStudents from "./pages/teacher/ManageStudents";
 import StudentQuizzes from "./pages/teacher/StudentQuizzes";
 
@@ -76,6 +77,10 @@ function App() {
             <Route
               path="quiz/:quizId/submissions"
               element={<QuizSubmissions />}
+            />
+            <Route
+              path="submission/:submissionId"
+              element={<SubmissionDetails />}
             />
             <Route path="students" element={<ManageStudents />} />
             <Route

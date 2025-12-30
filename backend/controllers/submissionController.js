@@ -48,9 +48,10 @@ const submitQuiz = async (req, res) => {
     let questionMap = new Map();
 
     // If questionsData provided (unique per student), use it
-    if (questionsData && Array.isArray(questionsData)) {
+    if (questionsData && Array.isArray(questionsData) && questionsData.length > 0) {
       questions = questionsData;
       questions.forEach((q, index) => {
+        // Map by temp_index for AI-generated questions
         questionMap.set(`temp_${index}`, q);
       });
     } else {
@@ -73,9 +74,32 @@ const submitQuiz = async (req, res) => {
     let score = 0;
     const processedAnswers = [];
 
-    for (const answer of answers) {
-      const questionKey = answer.questionId || answer.questionId;
-      const question = questionMap.get(questionKey);
+    // Process answers - handle both indexed and ID-based answers
+    for (let i = 0; i < answers.length; i++) {
+      const answer = answers[i];
+      let question = null;
+      
+      // Try to find question by questionId first
+      if (answer.questionId) {
+        question = questionMap.get(answer.questionId);
+        
+        // If not found, try as MongoDB ObjectId string
+        if (!question) {
+          question = questionMap.get(answer.questionId.toString());
+        }
+      }
+      
+      // If still not found and we have questionsData, try by index
+      if (!question && questionsData && questionsData.length > 0) {
+        // Extract index from temp_X format or use loop index
+        let idx = i;
+        if (answer.questionId && answer.questionId.startsWith('temp_')) {
+          idx = parseInt(answer.questionId.replace('temp_', ''));
+        }
+        if (questionsData[idx]) {
+          question = questionsData[idx];
+        }
+      }
 
       if (question) {
         let isCorrect = false;
@@ -340,7 +364,7 @@ const getQuizSubmissions = async (req, res) => {
   try {
     const { quizId } = req.params;
 
-    // Verify quiz ownership
+    // Verify quiz exists
     const quiz = await Quiz.findById(quizId);
     if (!quiz) {
       return res.status(404).json({
@@ -349,12 +373,7 @@ const getQuizSubmissions = async (req, res) => {
       });
     }
 
-    if (quiz.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: "Not authorized to view submissions for this quiz",
-      });
-    }
+    // Any teacher can view submissions for any quiz
 
     const submissions = await Submission.find({ quizId })
       .populate("studentId", "name email")
@@ -393,10 +412,72 @@ const getQuizSubmissions = async (req, res) => {
   }
 };
 
+// @desc    Get detailed submission by ID (Teacher view)
+// @route   GET /api/submissions/:submissionId
+// @access  Private (Teacher only)
+const getSubmissionDetails = async (req, res) => {
+  try {
+    const { submissionId } = req.params;
+
+    const submission = await Submission.findById(submissionId)
+      .populate("studentId", "name email")
+      .populate("quizId", "title totalMarks duration");
+
+    if (!submission) {
+      return res.status(404).json({
+        success: false,
+        message: "Submission not found",
+      });
+    }
+
+    // Calculate total marks from answers
+    const totalMarks = submission.answers.reduce((sum, a) => sum + (a.marks || 0), 0);
+    const earnedMarks = submission.answers.reduce((sum, a) => sum + (a.earnedMarks || 0), 0);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        submission: {
+          id: submission._id,
+          student: submission.studentId,
+          quiz: submission.quizId,
+          score: submission.score,
+          totalMarks: totalMarks,
+          percentage: totalMarks > 0 ? Math.round((earnedMarks / totalMarks) * 100) : 0,
+          submittedAt: submission.submittedAt,
+          answers: submission.answers.map((answer) => ({
+            questionText: answer.questionText,
+            questionType: answer.questionType || "mcq",
+            options: answer.options,
+            correctOption: answer.correctOption,
+            correctAnswer: answer.correctAnswer,
+            blanks: answer.blanks,
+            matchPairs: answer.matchPairs,
+            selectedOption: answer.selectedOption,
+            marks: answer.marks,
+            earnedMarks: answer.earnedMarks,
+            isCorrect: answer.earnedMarks === answer.marks,
+            feedback: answer.feedback,
+            imageUrl: answer.imageUrl,
+          })),
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Get submission details error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching submission details",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
 module.exports = {
   submitQuiz,
   getResult,
   getMySubmissions,
   getQuizSubmissions,
+  getSubmissionDetails,
   submitValidation,
 };

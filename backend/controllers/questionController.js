@@ -62,7 +62,7 @@ const createQuestion = async (req, res) => {
       marks = 1,
     } = req.body;
 
-    // Verify quiz exists and belongs to teacher
+    // Verify quiz exists
     const quiz = await Quiz.findById(quizId);
     if (!quiz) {
       return res.status(404).json({
@@ -71,12 +71,7 @@ const createQuestion = async (req, res) => {
       });
     }
 
-    if (quiz.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: "Not authorized to add questions to this quiz",
-      });
-    }
+    // Any teacher can add questions to any quiz
 
     const question = await Question.create({
       quizId,
@@ -108,7 +103,7 @@ const bulkCreateQuestions = async (req, res) => {
   try {
     const { quizId, questions } = req.body;
 
-    // Verify quiz exists and belongs to teacher
+    // Verify quiz exists
     const quiz = await Quiz.findById(quizId);
     if (!quiz) {
       return res.status(404).json({
@@ -117,12 +112,7 @@ const bulkCreateQuestions = async (req, res) => {
       });
     }
 
-    if (quiz.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: "Not authorized to add questions to this quiz",
-      });
-    }
+    // Any teacher can add questions to any quiz
 
     // Add quizId to each question
     const questionsWithQuizId = questions.map((q) => ({
@@ -160,9 +150,10 @@ const bulkCreateQuestions = async (req, res) => {
 
 // @desc    Get questions for a quiz
 // @route   GET /api/questions/:quizId
-// @access  Private
+// @access  Private (Teacher only)
 const getQuestions = async (req, res) => {
   try {
+    // Any teacher can view questions for any quiz
     const questions = await Question.find({ quizId: req.params.quizId });
 
     res.status(200).json({
@@ -181,7 +172,7 @@ const getQuestions = async (req, res) => {
 
 // @desc    Update a question
 // @route   PUT /api/questions/:id
-// @access  Private (Teacher only - owner)
+// @access  Private (Teacher only)
 const updateQuestion = async (req, res) => {
   try {
     const question = await Question.findById(req.params.id);
@@ -193,14 +184,7 @@ const updateQuestion = async (req, res) => {
       });
     }
 
-    // Verify quiz ownership
-    const quiz = await Quiz.findById(question.quizId);
-    if (quiz.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: "Not authorized to update this question",
-      });
-    }
+    // Any teacher can update any question
 
     const { questionText, options, correctOption, marks } = req.body;
 
@@ -229,7 +213,7 @@ const updateQuestion = async (req, res) => {
 
 // @desc    Delete a question
 // @route   DELETE /api/questions/:id
-// @access  Private (Teacher only - owner)
+// @access  Private (Teacher only)
 const deleteQuestion = async (req, res) => {
   try {
     const question = await Question.findById(req.params.id);
@@ -241,14 +225,7 @@ const deleteQuestion = async (req, res) => {
       });
     }
 
-    // Verify quiz ownership
-    const quiz = await Quiz.findById(question.quizId);
-    if (quiz.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: "Not authorized to delete this question",
-      });
-    }
+    // Any teacher can delete any question
 
     await Question.findByIdAndDelete(req.params.id);
 
