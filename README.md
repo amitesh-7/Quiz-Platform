@@ -7,6 +7,7 @@ A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, 
 ## ✨ Features
 
 ### 🎓 Teacher Portal
+
 - Create and manage quizzes
 - Add questions manually or generate with AI (Gemini API)
 - Set quiz duration and total marks
@@ -14,6 +15,7 @@ A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, 
 - View student submissions and scores
 
 ### 📚 Student Portal
+
 - Browse available quizzes
 - Attempt quizzes with countdown timer
 - Auto-submit on timeout
@@ -21,6 +23,7 @@ A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, 
 - Track all past submissions
 
 ### 🔐 Security
+
 - JWT-based authentication
 - Role-based access control (Teacher/Student)
 - Password hashing with bcrypt
@@ -28,6 +31,7 @@ A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, 
 - Gemini API key secured on backend only
 
 ### 🎨 UI/UX
+
 - Glassmorphism design
 - Particle background effects
 - Smooth animations with Framer Motion
@@ -37,6 +41,7 @@ A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, 
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **React 18** (Vite)
 - **Tailwind CSS** - Styling
 - **Framer Motion** - Animations
@@ -46,6 +51,7 @@ A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, 
 - **React Hot Toast** - Notifications
 
 ### Backend
+
 - **Node.js** with **Express.js**
 - **MongoDB** with **Mongoose**
 - **JWT** - Authentication
@@ -125,11 +131,13 @@ Quiz Platform/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - MongoDB Atlas account
 - Google Gemini API key
 
 ### 1. Clone the Repository
+
 ```bash
 git clone <repository-url>
 cd "Quiz Platform"
@@ -148,6 +156,7 @@ cp .env.example .env
 ```
 
 Edit `.env` with your credentials:
+
 ```env
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/quiz-platform
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
@@ -174,6 +183,7 @@ cp .env.example .env
 ```
 
 Edit `.env`:
+
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
@@ -184,6 +194,7 @@ npm run dev
 ```
 
 ### 4. Access the Application
+
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:5000
 - Health Check: http://localhost:5000/health
@@ -191,74 +202,84 @@ npm run dev
 ## 📡 API Endpoints
 
 ### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Register new user |
-| POST | `/api/auth/login` | Login user |
-| GET | `/api/auth/me` | Get current user |
+
+| Method | Endpoint             | Description       |
+| ------ | -------------------- | ----------------- |
+| POST   | `/api/auth/register` | Register new user |
+| POST   | `/api/auth/login`    | Login user        |
+| GET    | `/api/auth/me`       | Get current user  |
 
 ### Quizzes (Teacher)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/quizzes` | Create quiz |
-| GET | `/api/quizzes` | Get all quizzes |
-| GET | `/api/quizzes/:id` | Get quiz by ID |
-| PUT | `/api/quizzes/:id` | Update quiz |
-| DELETE | `/api/quizzes/:id` | Delete quiz |
+
+| Method | Endpoint           | Description     |
+| ------ | ------------------ | --------------- |
+| POST   | `/api/quizzes`     | Create quiz     |
+| GET    | `/api/quizzes`     | Get all quizzes |
+| GET    | `/api/quizzes/:id` | Get quiz by ID  |
+| PUT    | `/api/quizzes/:id` | Update quiz     |
+| DELETE | `/api/quizzes/:id` | Delete quiz     |
 
 ### Questions (Teacher)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/questions` | Create question |
-| POST | `/api/questions/bulk` | Bulk create questions |
-| GET | `/api/questions/:quizId` | Get quiz questions |
-| PUT | `/api/questions/:id` | Update question |
-| DELETE | `/api/questions/:id` | Delete question |
+
+| Method | Endpoint                 | Description           |
+| ------ | ------------------------ | --------------------- |
+| POST   | `/api/questions`         | Create question       |
+| POST   | `/api/questions/bulk`    | Bulk create questions |
+| GET    | `/api/questions/:quizId` | Get quiz questions    |
+| PUT    | `/api/questions/:id`     | Update question       |
+| DELETE | `/api/questions/:id`     | Delete question       |
 
 ### Gemini AI (Teacher)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/gemini/generate` | Generate questions with AI |
+
+| Method | Endpoint               | Description                |
+| ------ | ---------------------- | -------------------------- |
+| POST   | `/api/gemini/generate` | Generate questions with AI |
 
 ### Submissions (Student)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/submissions` | Submit quiz |
-| GET | `/api/submissions/my` | Get my submissions |
-| GET | `/api/results/:quizId` | Get quiz result |
+
+| Method | Endpoint               | Description        |
+| ------ | ---------------------- | ------------------ |
+| POST   | `/api/submissions`     | Submit quiz        |
+| GET    | `/api/submissions/my`  | Get my submissions |
+| GET    | `/api/results/:quizId` | Get quiz result    |
 
 ## 🔑 Environment Variables
 
 ### Backend
-| Variable | Description |
-|----------|-------------|
-| `MONGODB_URI` | MongoDB connection string |
-| `JWT_SECRET` | Secret key for JWT tokens |
-| `GEMINI_API_KEY` | Google Gemini API key |
-| `PORT` | Server port (default: 5000) |
-| `NODE_ENV` | Environment (development/production) |
-| `FRONTEND_URL` | Frontend URL for CORS |
+
+| Variable         | Description                          |
+| ---------------- | ------------------------------------ |
+| `MONGODB_URI`    | MongoDB connection string            |
+| `JWT_SECRET`     | Secret key for JWT tokens            |
+| `GEMINI_API_KEY` | Google Gemini API key                |
+| `PORT`           | Server port (default: 5000)          |
+| `NODE_ENV`       | Environment (development/production) |
+| `FRONTEND_URL`   | Frontend URL for CORS                |
 
 ### Frontend
-| Variable | Description |
-|----------|-------------|
+
+| Variable       | Description     |
+| -------------- | --------------- |
 | `VITE_API_URL` | Backend API URL |
 
 ## 🌐 Deployment
 
 ### Frontend (Vercel)
+
 1. Push to GitHub
 2. Import project in Vercel
 3. Set environment variables
 4. Deploy
 
 ### Backend (Render/Railway)
+
 1. Push to GitHub
 2. Create new web service
 3. Set environment variables
 4. Deploy
 
 ### Database (MongoDB Atlas)
+
 1. Create cluster
 2. Add database user
 3. Whitelist IP addresses
@@ -267,15 +288,18 @@ npm run dev
 ## 🧪 Testing the Application
 
 ### 1. Register Users
+
 - Create a teacher account
 - Create a student account
 
 ### 2. As Teacher
+
 - Create a new quiz
 - Add questions manually or use AI generation
 - Activate the quiz
 
 ### 3. As Student
+
 - View available quizzes
 - Attempt a quiz (timer will start)
 - View results after submission
@@ -283,6 +307,7 @@ npm run dev
 ## 🎨 UI Components
 
 ### Glassmorphism Classes
+
 ```css
 .glass {
   @apply bg-white/10 backdrop-blur-lg border border-white/20;
@@ -300,6 +325,7 @@ npm run dev
 ## 📝 Database Schemas
 
 ### User
+
 ```javascript
 {
   name: String,
@@ -310,6 +336,7 @@ npm run dev
 ```
 
 ### Quiz
+
 ```javascript
 {
   title: String,
@@ -322,6 +349,7 @@ npm run dev
 ```
 
 ### Question
+
 ```javascript
 {
   quizId: ObjectId (Quiz),
@@ -333,6 +361,7 @@ npm run dev
 ```
 
 ### Submission
+
 ```javascript
 {
   quizId: ObjectId (Quiz),

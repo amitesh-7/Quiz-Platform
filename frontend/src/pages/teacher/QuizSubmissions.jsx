@@ -1,16 +1,22 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiArrowLeft, FiUser, FiAward, FiClock, FiCheckCircle } from 'react-icons/fi';
-import toast from 'react-hot-toast';
-import Navbar from '../../components/Navbar';
-import Loading from '../../components/Loading';
-import { submissionAPI } from '../../services/api';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  FiArrowLeft,
+  FiUser,
+  FiAward,
+  FiClock,
+  FiCheckCircle,
+} from "react-icons/fi";
+import toast from "react-hot-toast";
+import Navbar from "../../components/Navbar";
+import Loading from "../../components/Loading";
+import { submissionAPI } from "../../services/api";
 
 const QuizSubmissions = () => {
   const { quizId } = useParams();
   const navigate = useNavigate();
-  
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -23,8 +29,8 @@ const QuizSubmissions = () => {
       const response = await submissionAPI.getByQuiz(quizId);
       setData(response.data.data);
     } catch (error) {
-      toast.error('Failed to fetch submissions');
-      navigate('/teacher');
+      toast.error("Failed to fetch submissions");
+      navigate("/teacher");
     } finally {
       setLoading(false);
     }
@@ -35,28 +41,33 @@ const QuizSubmissions = () => {
   }
 
   const getScoreColor = (percentage) => {
-    if (percentage >= 80) return 'text-green-400';
-    if (percentage >= 60) return 'text-yellow-400';
-    if (percentage >= 40) return 'text-orange-400';
-    return 'text-red-400';
+    if (percentage >= 80) return "text-green-400";
+    if (percentage >= 60) return "text-yellow-400";
+    if (percentage >= 40) return "text-orange-400";
+    return "text-red-400";
   };
 
-  const averageScore = data.submissions.length > 0
-    ? Math.round(data.submissions.reduce((acc, s) => acc + s.percentage, 0) / data.submissions.length)
-    : 0;
+  const averageScore =
+    data.submissions.length > 0
+      ? Math.round(
+          data.submissions.reduce((acc, s) => acc + s.percentage, 0) /
+            data.submissions.length
+        )
+      : 0;
 
-  const highestScore = data.submissions.length > 0
-    ? Math.max(...data.submissions.map(s => s.percentage))
-    : 0;
+  const highestScore =
+    data.submissions.length > 0
+      ? Math.max(...data.submissions.map((s) => s.percentage))
+      : 0;
 
   return (
     <div className="min-h-screen">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 pb-8">
         {/* Back Button */}
         <motion.button
-          onClick={() => navigate('/teacher')}
+          onClick={() => navigate("/teacher")}
           className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -71,7 +82,9 @@ const QuizSubmissions = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-2xl font-bold text-white mb-2">{data.quiz.title}</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">
+            {data.quiz.title}
+          </h1>
           <p className="text-gray-400">Total Marks: {data.quiz.totalMarks}</p>
         </motion.div>
 
@@ -89,7 +102,9 @@ const QuizSubmissions = () => {
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Total Submissions</p>
-                <p className="text-2xl font-bold text-white">{data.submissions.length}</p>
+                <p className="text-2xl font-bold text-white">
+                  {data.submissions.length}
+                </p>
               </div>
             </div>
           </div>
@@ -127,8 +142,12 @@ const QuizSubmissions = () => {
             animate={{ opacity: 1 }}
           >
             <div className="text-6xl mb-4">📊</div>
-            <h2 className="text-xl font-semibold text-white mb-2">No submissions yet</h2>
-            <p className="text-gray-400">Students haven't attempted this quiz yet</p>
+            <h2 className="text-xl font-semibold text-white mb-2">
+              No submissions yet
+            </h2>
+            <p className="text-gray-400">
+              Students haven't attempted this quiz yet
+            </p>
           </motion.div>
         ) : (
           <motion.div
@@ -141,12 +160,24 @@ const QuizSubmissions = () => {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-white/10">
-                    <th className="text-left py-4 px-4 text-gray-400 font-medium">#</th>
-                    <th className="text-left py-4 px-4 text-gray-400 font-medium">Student</th>
-                    <th className="text-left py-4 px-4 text-gray-400 font-medium">Email</th>
-                    <th className="text-center py-4 px-4 text-gray-400 font-medium">Score</th>
-                    <th className="text-center py-4 px-4 text-gray-400 font-medium">Percentage</th>
-                    <th className="text-right py-4 px-4 text-gray-400 font-medium">Submitted</th>
+                    <th className="text-left py-4 px-4 text-gray-400 font-medium">
+                      #
+                    </th>
+                    <th className="text-left py-4 px-4 text-gray-400 font-medium">
+                      Student
+                    </th>
+                    <th className="text-left py-4 px-4 text-gray-400 font-medium">
+                      Email
+                    </th>
+                    <th className="text-center py-4 px-4 text-gray-400 font-medium">
+                      Score
+                    </th>
+                    <th className="text-center py-4 px-4 text-gray-400 font-medium">
+                      Percentage
+                    </th>
+                    <th className="text-right py-4 px-4 text-gray-400 font-medium">
+                      Submitted
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -164,17 +195,25 @@ const QuizSubmissions = () => {
                           <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
                             {submission.student?.name?.charAt(0).toUpperCase()}
                           </div>
-                          <span className="text-white">{submission.student?.name}</span>
+                          <span className="text-white">
+                            {submission.student?.name}
+                          </span>
                         </div>
                       </td>
-                      <td className="py-4 px-4 text-gray-400">{submission.student?.email}</td>
+                      <td className="py-4 px-4 text-gray-400">
+                        {submission.student?.email}
+                      </td>
                       <td className="py-4 px-4 text-center">
                         <span className="text-white font-medium">
                           {submission.score} / {submission.totalMarks}
                         </span>
                       </td>
                       <td className="py-4 px-4 text-center">
-                        <span className={`font-bold ${getScoreColor(submission.percentage)}`}>
+                        <span
+                          className={`font-bold ${getScoreColor(
+                            submission.percentage
+                          )}`}
+                        >
                           {submission.percentage}%
                         </span>
                       </td>

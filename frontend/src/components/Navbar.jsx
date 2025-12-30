@@ -1,7 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiLogOut, FiHome, FiUser } from 'react-icons/fi';
-import { useAuth } from '../context/AuthContext';
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FiLogOut, FiHome, FiUser } from "react-icons/fi";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -9,10 +9,10 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
-  const dashboardPath = user?.role === 'teacher' ? '/teacher' : '/student';
+  const dashboardPath = user?.role === "teacher" ? "/teacher" : "/student";
 
   return (
     <motion.nav
@@ -31,7 +31,7 @@ const Navbar = () => {
           </Link>
 
           <div className="flex items-center gap-4">
-            <Link 
+            <Link
               to={dashboardPath}
               className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
             >
@@ -41,7 +41,9 @@ const Navbar = () => {
 
             <div className="flex items-center gap-2 px-3 py-2 glass rounded-lg">
               <FiUser className="w-5 h-5 text-blue-400" />
-              <span className="text-gray-300 hidden sm:inline">{user?.name}</span>
+              <span className="text-gray-300 hidden sm:inline">
+                {user?.name}
+              </span>
               <span className="text-xs px-2 py-1 bg-blue-500/30 rounded-full text-blue-300 capitalize">
                 {user?.role}
               </span>

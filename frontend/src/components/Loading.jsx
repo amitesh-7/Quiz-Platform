@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
-const Loading = ({ message = 'Loading...' }) => {
+const Loading = ({ message = "Loading..." }) => {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <motion.div

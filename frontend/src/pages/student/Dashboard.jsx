@@ -1,11 +1,17 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiPlay, FiClock, FiCheckCircle, FiAward, FiBook } from 'react-icons/fi';
-import toast from 'react-hot-toast';
-import Navbar from '../../components/Navbar';
-import Loading from '../../components/Loading';
-import { quizAPI } from '../../services/api';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  FiPlay,
+  FiClock,
+  FiCheckCircle,
+  FiAward,
+  FiBook,
+} from "react-icons/fi";
+import toast from "react-hot-toast";
+import Navbar from "../../components/Navbar";
+import Loading from "../../components/Loading";
+import { quizAPI } from "../../services/api";
 
 const StudentDashboard = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -20,7 +26,7 @@ const StudentDashboard = () => {
       const response = await quizAPI.getAll();
       setQuizzes(response.data.data.quizzes);
     } catch (error) {
-      toast.error('Failed to fetch quizzes');
+      toast.error("Failed to fetch quizzes");
     } finally {
       setLoading(false);
     }
@@ -30,13 +36,13 @@ const StudentDashboard = () => {
     return <Loading message="Loading quizzes..." />;
   }
 
-  const availableQuizzes = quizzes.filter(q => !q.hasSubmitted);
-  const completedQuizzes = quizzes.filter(q => q.hasSubmitted);
+  const availableQuizzes = quizzes.filter((q) => !q.hasSubmitted);
+  const completedQuizzes = quizzes.filter((q) => q.hasSubmitted);
 
   return (
     <div className="min-h-screen">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 pb-8">
         {/* Header */}
         <motion.div
@@ -45,7 +51,9 @@ const StudentDashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-3xl font-bold text-white mb-2">Available Quizzes</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Available Quizzes
+          </h1>
           <p className="text-gray-400">Select a quiz to start attempting</p>
         </motion.div>
 
@@ -63,7 +71,9 @@ const StudentDashboard = () => {
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Total Quizzes</p>
-                <p className="text-2xl font-bold text-white">{quizzes.length}</p>
+                <p className="text-2xl font-bold text-white">
+                  {quizzes.length}
+                </p>
               </div>
             </div>
           </div>
@@ -75,7 +85,9 @@ const StudentDashboard = () => {
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Completed</p>
-                <p className="text-2xl font-bold text-white">{completedQuizzes.length}</p>
+                <p className="text-2xl font-bold text-white">
+                  {completedQuizzes.length}
+                </p>
               </div>
             </div>
           </div>
@@ -87,7 +99,9 @@ const StudentDashboard = () => {
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Pending</p>
-                <p className="text-2xl font-bold text-white">{availableQuizzes.length}</p>
+                <p className="text-2xl font-bold text-white">
+                  {availableQuizzes.length}
+                </p>
               </div>
             </div>
           </div>
@@ -121,7 +135,9 @@ const StudentDashboard = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <div className="text-6xl mb-4">📚</div>
-            <h2 className="text-xl font-semibold text-white mb-2">No quizzes available</h2>
+            <h2 className="text-xl font-semibold text-white mb-2">
+              No quizzes available
+            </h2>
             <p className="text-gray-400">Check back later for new quizzes</p>
           </motion.div>
         ) : (
@@ -146,9 +162,9 @@ const StudentDashboard = () => {
                         </span>
                       )}
                     </div>
-                    
+
                     <p className="text-gray-400 text-sm mb-4 line-clamp-2">
-                      {quiz.description || 'No description available'}
+                      {quiz.description || "No description available"}
                     </p>
 
                     <div className="flex flex-wrap gap-3 mb-4">

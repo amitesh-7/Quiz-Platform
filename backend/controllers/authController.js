@@ -1,42 +1,51 @@
-const jwt = require('jsonwebtoken');
-const { body } = require('express-validator');
-const User = require('../models/User');
+const jwt = require("jsonwebtoken");
+const { body } = require("express-validator");
+const User = require("../models/User");
 
 // Generate JWT Token
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '7d'
+    expiresIn: "7d",
   });
 };
 
 // Validation rules for registration
 const registerValidation = [
-  body('name')
+  body("name")
     .trim()
-    .notEmpty().withMessage('Name is required')
-    .isLength({ min: 2, max: 50 }).withMessage('Name must be 2-50 characters'),
-  body('email')
+    .notEmpty()
+    .withMessage("Name is required")
+    .isLength({ min: 2, max: 50 })
+    .withMessage("Name must be 2-50 characters"),
+  body("email")
     .trim()
-    .notEmpty().withMessage('Email is required')
-    .isEmail().withMessage('Please enter a valid email')
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("Please enter a valid email")
     .normalizeEmail(),
-  body('password')
-    .notEmpty().withMessage('Password is required')
-    .isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('role')
-    .notEmpty().withMessage('Role is required')
-    .isIn(['teacher', 'student']).withMessage('Role must be teacher or student')
+  body("password")
+    .notEmpty()
+    .withMessage("Password is required")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters"),
+  body("role")
+    .notEmpty()
+    .withMessage("Role is required")
+    .isIn(["teacher", "student"])
+    .withMessage("Role must be teacher or student"),
 ];
 
 // Validation rules for login
 const loginValidation = [
-  body('email')
+  body("email")
     .trim()
-    .notEmpty().withMessage('Email is required')
-    .isEmail().withMessage('Please enter a valid email')
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("Please enter a valid email")
     .normalizeEmail(),
-  body('password')
-    .notEmpty().withMessage('Password is required')
+  body("password").notEmpty().withMessage("Password is required"),
 ];
 
 // @desc    Register a new user
@@ -51,7 +60,7 @@ const register = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'User already exists with this email'
+        message: "User already exists with this email",
       });
     }
 
@@ -60,7 +69,7 @@ const register = async (req, res) => {
       name,
       email,
       password,
-      role
+      role,
     });
 
     // Generate token
@@ -68,23 +77,23 @@ const register = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful',
+      message: "Registration successful",
       data: {
         user: {
           id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role
+          role: user.role,
         },
-        token
-      }
+        token,
+      },
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error("Registration error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error during registration',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Server error during registration",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -101,7 +110,7 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: "Invalid email or password",
       });
     }
 
@@ -110,7 +119,7 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password'
+        message: "Invalid email or password",
       });
     }
 
@@ -119,23 +128,23 @@ const login = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Login successful',
+      message: "Login successful",
       data: {
         user: {
           id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role
+          role: user.role,
         },
-        token
-      }
+        token,
+      },
     });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error("Login error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error during login',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Server error during login",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -148,13 +157,13 @@ const getMe = async (req, res) => {
     res.status(200).json({
       success: true,
       data: {
-        user: req.user
-      }
+        user: req.user,
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: "Server error",
     });
   }
 };
@@ -164,5 +173,5 @@ module.exports = {
   login,
   getMe,
   registerValidation,
-  loginValidation
+  loginValidation,
 };

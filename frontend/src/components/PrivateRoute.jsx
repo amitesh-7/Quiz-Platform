@@ -1,6 +1,6 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import Loading from './Loading';
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Loading from "./Loading";
 
 const PrivateRoute = ({ role }) => {
   const { isAuthenticated, user, loading } = useAuth();
@@ -15,7 +15,7 @@ const PrivateRoute = ({ role }) => {
 
   if (role && user?.role !== role) {
     // Redirect to appropriate dashboard based on role
-    const redirectPath = user?.role === 'teacher' ? '/teacher' : '/student';
+    const redirectPath = user?.role === "teacher" ? "/teacher" : "/student";
     return <Navigate to={redirectPath} replace />;
   }
 

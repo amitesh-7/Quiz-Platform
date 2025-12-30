@@ -1,11 +1,19 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiPlus, FiEdit, FiTrash2, FiUsers, FiClock, FiCheckCircle, FiXCircle } from 'react-icons/fi';
-import toast from 'react-hot-toast';
-import Navbar from '../../components/Navbar';
-import Loading from '../../components/Loading';
-import { quizAPI } from '../../services/api';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  FiPlus,
+  FiEdit,
+  FiTrash2,
+  FiUsers,
+  FiClock,
+  FiCheckCircle,
+  FiXCircle,
+} from "react-icons/fi";
+import toast from "react-hot-toast";
+import Navbar from "../../components/Navbar";
+import Loading from "../../components/Loading";
+import { quizAPI } from "../../services/api";
 
 const TeacherDashboard = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -21,24 +29,28 @@ const TeacherDashboard = () => {
       const response = await quizAPI.getAll();
       setQuizzes(response.data.data.quizzes);
     } catch (error) {
-      toast.error('Failed to fetch quizzes');
+      toast.error("Failed to fetch quizzes");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (quizId) => {
-    if (!window.confirm('Are you sure you want to delete this quiz? This action cannot be undone.')) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this quiz? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
     setDeleteLoading(quizId);
     try {
       await quizAPI.delete(quizId);
-      setQuizzes(quizzes.filter(q => q._id !== quizId));
-      toast.success('Quiz deleted successfully');
+      setQuizzes(quizzes.filter((q) => q._id !== quizId));
+      toast.success("Quiz deleted successfully");
     } catch (error) {
-      toast.error('Failed to delete quiz');
+      toast.error("Failed to delete quiz");
     } finally {
       setDeleteLoading(null);
     }
@@ -47,12 +59,14 @@ const TeacherDashboard = () => {
   const handleToggleActive = async (quiz) => {
     try {
       await quizAPI.update(quiz._id, { isActive: !quiz.isActive });
-      setQuizzes(quizzes.map(q => 
-        q._id === quiz._id ? { ...q, isActive: !q.isActive } : q
-      ));
-      toast.success(`Quiz ${!quiz.isActive ? 'activated' : 'deactivated'}`);
+      setQuizzes(
+        quizzes.map((q) =>
+          q._id === quiz._id ? { ...q, isActive: !q.isActive } : q
+        )
+      );
+      toast.success(`Quiz ${!quiz.isActive ? "activated" : "deactivated"}`);
     } catch (error) {
-      toast.error('Failed to update quiz');
+      toast.error("Failed to update quiz");
     }
   };
 
@@ -63,7 +77,7 @@ const TeacherDashboard = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 pb-8">
         {/* Header */}
         <motion.div
@@ -76,7 +90,7 @@ const TeacherDashboard = () => {
             <h1 className="text-3xl font-bold text-white mb-2">My Quizzes</h1>
             <p className="text-gray-400">Create and manage your quizzes</p>
           </div>
-          
+
           <Link to="/teacher/create-quiz">
             <motion.button
               className="btn-primary flex items-center gap-2"
@@ -103,7 +117,9 @@ const TeacherDashboard = () => {
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Total Quizzes</p>
-                <p className="text-2xl font-bold text-white">{quizzes.length}</p>
+                <p className="text-2xl font-bold text-white">
+                  {quizzes.length}
+                </p>
               </div>
             </div>
           </div>
@@ -116,7 +132,7 @@ const TeacherDashboard = () => {
               <div>
                 <p className="text-gray-400 text-sm">Active Quizzes</p>
                 <p className="text-2xl font-bold text-white">
-                  {quizzes.filter(q => q.isActive).length}
+                  {quizzes.filter((q) => q.isActive).length}
                 </p>
               </div>
             </div>
@@ -146,8 +162,12 @@ const TeacherDashboard = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <div className="text-6xl mb-4">📝</div>
-            <h2 className="text-xl font-semibold text-white mb-2">No quizzes yet</h2>
-            <p className="text-gray-400 mb-6">Create your first quiz to get started</p>
+            <h2 className="text-xl font-semibold text-white mb-2">
+              No quizzes yet
+            </h2>
+            <p className="text-gray-400 mb-6">
+              Create your first quiz to get started
+            </p>
             <Link to="/teacher/create-quiz">
               <motion.button
                 className="btn-primary inline-flex items-center gap-2"
@@ -172,17 +192,21 @@ const TeacherDashboard = () => {
                 <div className="flex flex-col lg:flex-row justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-start gap-3 mb-2">
-                      <h3 className="text-xl font-semibold text-white">{quiz.title}</h3>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        quiz.isActive 
-                          ? 'bg-green-500/20 text-green-400' 
-                          : 'bg-red-500/20 text-red-400'
-                      }`}>
-                        {quiz.isActive ? 'Active' : 'Inactive'}
+                      <h3 className="text-xl font-semibold text-white">
+                        {quiz.title}
+                      </h3>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          quiz.isActive
+                            ? "bg-green-500/20 text-green-400"
+                            : "bg-red-500/20 text-red-400"
+                        }`}
+                      >
+                        {quiz.isActive ? "Active" : "Inactive"}
                       </span>
                     </div>
                     <p className="text-gray-400 mb-4 line-clamp-2">
-                      {quiz.description || 'No description'}
+                      {quiz.description || "No description"}
                     </p>
                     <div className="flex flex-wrap gap-4 text-sm text-gray-400">
                       <div className="flex items-center gap-1">
@@ -204,8 +228,8 @@ const TeacherDashboard = () => {
                       onClick={() => handleToggleActive(quiz)}
                       className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
                         quiz.isActive
-                          ? 'bg-orange-500/20 text-orange-400 hover:bg-orange-500/30'
-                          : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                          ? "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
+                          : "bg-green-500/20 text-green-400 hover:bg-green-500/30"
                       }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}

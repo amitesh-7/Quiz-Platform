@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiUser, FiMail, FiLock, FiUserPlus } from 'react-icons/fi';
-import toast from 'react-hot-toast';
-import { useAuth } from '../../context/AuthContext';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FiUser, FiMail, FiLock, FiUserPlus } from "react-icons/fi";
+import toast from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'student'
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: "student",
   });
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -20,7 +20,7 @@ const Register = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -28,12 +28,12 @@ const Register = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error("Passwords do not match");
       return;
     }
 
     if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+      toast.error("Password must be at least 6 characters");
       return;
     }
 
@@ -47,8 +47,9 @@ const Register = () => {
     );
 
     if (result.success) {
-      toast.success('Registration successful!');
-      const redirectPath = result.user.role === 'teacher' ? '/teacher' : '/student';
+      toast.success("Registration successful!");
+      const redirectPath =
+        result.user.role === "teacher" ? "/teacher" : "/student";
       navigate(redirectPath);
     } else {
       toast.error(result.message);
@@ -151,11 +152,11 @@ const Register = () => {
             <div className="grid grid-cols-2 gap-4">
               <motion.button
                 type="button"
-                onClick={() => setFormData({ ...formData, role: 'student' })}
+                onClick={() => setFormData({ ...formData, role: "student" })}
                 className={`p-4 rounded-xl border-2 transition-all ${
-                  formData.role === 'student'
-                    ? 'border-blue-500 bg-blue-500/20 text-white'
-                    : 'border-white/20 bg-white/5 text-gray-400 hover:border-white/40'
+                  formData.role === "student"
+                    ? "border-blue-500 bg-blue-500/20 text-white"
+                    : "border-white/20 bg-white/5 text-gray-400 hover:border-white/40"
                 }`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -166,11 +167,11 @@ const Register = () => {
 
               <motion.button
                 type="button"
-                onClick={() => setFormData({ ...formData, role: 'teacher' })}
+                onClick={() => setFormData({ ...formData, role: "teacher" })}
                 className={`p-4 rounded-xl border-2 transition-all ${
-                  formData.role === 'teacher'
-                    ? 'border-purple-500 bg-purple-500/20 text-white'
-                    : 'border-white/20 bg-white/5 text-gray-400 hover:border-white/40'
+                  formData.role === "teacher"
+                    ? "border-purple-500 bg-purple-500/20 text-white"
+                    : "border-white/20 bg-white/5 text-gray-400 hover:border-white/40"
                 }`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -205,9 +206,9 @@ const Register = () => {
         {/* Login Link */}
         <div className="mt-6 text-center">
           <p className="text-gray-400">
-            Already have an account?{' '}
-            <Link 
-              to="/login" 
+            Already have an account?{" "}
+            <Link
+              to="/login"
               className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
             >
               Sign in

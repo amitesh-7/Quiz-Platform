@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiArrowLeft, FiSave, FiClock, FiFileText } from 'react-icons/fi';
-import toast from 'react-hot-toast';
-import Navbar from '../../components/Navbar';
-import { quizAPI } from '../../services/api';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FiArrowLeft, FiSave, FiClock, FiFileText } from "react-icons/fi";
+import toast from "react-hot-toast";
+import Navbar from "../../components/Navbar";
+import { quizAPI } from "../../services/api";
 
 const CreateQuiz = () => {
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    duration: 30
+    title: "",
+    description: "",
+    duration: 30,
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const CreateQuiz = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === 'duration' ? parseInt(value) || 0 : value
+      [name]: name === "duration" ? parseInt(value) || 0 : value,
     });
   };
 
@@ -27,12 +27,12 @@ const CreateQuiz = () => {
     e.preventDefault();
 
     if (formData.title.length < 3) {
-      toast.error('Title must be at least 3 characters');
+      toast.error("Title must be at least 3 characters");
       return;
     }
 
     if (formData.duration < 1 || formData.duration > 180) {
-      toast.error('Duration must be between 1 and 180 minutes');
+      toast.error("Duration must be between 1 and 180 minutes");
       return;
     }
 
@@ -40,10 +40,10 @@ const CreateQuiz = () => {
 
     try {
       const response = await quizAPI.create(formData);
-      toast.success('Quiz created successfully!');
+      toast.success("Quiz created successfully!");
       navigate(`/teacher/quiz/${response.data.data.quiz._id}`);
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to create quiz');
+      toast.error(error.response?.data?.message || "Failed to create quiz");
     } finally {
       setLoading(false);
     }
@@ -52,11 +52,11 @@ const CreateQuiz = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 pb-8">
         {/* Back Button */}
         <motion.button
-          onClick={() => navigate('/teacher')}
+          onClick={() => navigate("/teacher")}
           className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -73,7 +73,9 @@ const CreateQuiz = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="glass-card">
-            <h1 className="text-2xl font-bold text-white mb-6">Create New Quiz</h1>
+            <h1 className="text-2xl font-bold text-white mb-6">
+              Create New Quiz
+            </h1>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Title */}
@@ -135,14 +137,14 @@ const CreateQuiz = () => {
               <div className="flex gap-4">
                 <motion.button
                   type="button"
-                  onClick={() => navigate('/teacher')}
+                  onClick={() => navigate("/teacher")}
                   className="btn-secondary flex-1"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   Cancel
                 </motion.button>
-                
+
                 <motion.button
                   type="submit"
                   className="btn-primary flex-1 flex items-center justify-center gap-2"

@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiMail, FiLock, FiLogIn } from 'react-icons/fi';
-import toast from 'react-hot-toast';
-import { useAuth } from '../../context/AuthContext';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FiMail, FiLock, FiLogIn } from "react-icons/fi";
+import toast from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -17,7 +17,7 @@ const Login = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -28,8 +28,9 @@ const Login = () => {
     const result = await login(formData.email, formData.password);
 
     if (result.success) {
-      toast.success('Login successful!');
-      const redirectPath = result.user.role === 'teacher' ? '/teacher' : '/student';
+      toast.success("Login successful!");
+      const redirectPath =
+        result.user.role === "teacher" ? "/teacher" : "/student";
       navigate(redirectPath);
     } else {
       toast.error(result.message);
@@ -119,9 +120,9 @@ const Login = () => {
         {/* Register Link */}
         <div className="mt-6 text-center">
           <p className="text-gray-400">
-            Don't have an account?{' '}
-            <Link 
-              to="/register" 
+            Don't have an account?{" "}
+            <Link
+              to="/register"
               className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
             >
               Sign up

@@ -1,11 +1,17 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiClock, FiArrowLeft, FiArrowRight, FiCheck, FiAlertTriangle } from 'react-icons/fi';
-import toast from 'react-hot-toast';
-import Navbar from '../../components/Navbar';
-import Loading from '../../components/Loading';
-import { quizAPI, submissionAPI } from '../../services/api';
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FiClock,
+  FiArrowLeft,
+  FiArrowRight,
+  FiCheck,
+  FiAlertTriangle,
+} from "react-icons/fi";
+import toast from "react-hot-toast";
+import Navbar from "../../components/Navbar";
+import Loading from "../../components/Loading";
+import { quizAPI, submissionAPI } from "../../services/api";
 
 const AttemptQuiz = () => {
   const { quizId } = useParams();
@@ -32,45 +38,50 @@ const AttemptQuiz = () => {
       setTimeLeft(response.data.data.quiz.duration * 60);
     } catch (error) {
       if (error.response?.status === 400) {
-        toast.error('You have already submitted this quiz');
-        navigate('/student');
+        toast.error("You have already submitted this quiz");
+        navigate("/student");
       } else {
-        toast.error('Failed to load quiz');
-        navigate('/student');
+        toast.error("Failed to load quiz");
+        navigate("/student");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = useCallback(async (isTimeout = false) => {
-    if (submitting) return;
-    setSubmitting(true);
+  const handleSubmit = useCallback(
+    async (isTimeout = false) => {
+      if (submitting) return;
+      setSubmitting(true);
 
-    // Prepare answers array
-    const answersArray = Object.entries(answers).map(([questionId, selectedOption]) => ({
-      questionId,
-      selectedOption
-    }));
+      // Prepare answers array
+      const answersArray = Object.entries(answers).map(
+        ([questionId, selectedOption]) => ({
+          questionId,
+          selectedOption,
+        })
+      );
 
-    try {
-      const response = await submissionAPI.submit({
-        quizId,
-        answers: answersArray
-      });
+      try {
+        const response = await submissionAPI.submit({
+          quizId,
+          answers: answersArray,
+        });
 
-      if (isTimeout) {
-        toast.success('Time\'s up! Quiz auto-submitted.');
-      } else {
-        toast.success('Quiz submitted successfully!');
+        if (isTimeout) {
+          toast.success("Time's up! Quiz auto-submitted.");
+        } else {
+          toast.success("Quiz submitted successfully!");
+        }
+
+        navigate(`/student/result/${quizId}`);
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Failed to submit quiz");
+        setSubmitting(false);
       }
-
-      navigate(`/student/result/${quizId}`);
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to submit quiz');
-      setSubmitting(false);
-    }
-  }, [answers, quizId, navigate, submitting]);
+    },
+    [answers, quizId, navigate, submitting]
+  );
 
   // Timer effect
   useEffect(() => {
@@ -93,29 +104,35 @@ const AttemptQuiz = () => {
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   const handleSelectOption = (questionId, optionIndex) => {
     setAnswers({
       ...answers,
-      [questionId]: optionIndex
+      [questionId]: optionIndex,
     });
   };
 
   const handleConfirmSubmit = () => {
     const unanswered = questions.length - Object.keys(answers).length;
-    
+
     if (unanswered > 0) {
-      if (!window.confirm(`You have ${unanswered} unanswered question(s). Are you sure you want to submit?`)) {
+      if (
+        !window.confirm(
+          `You have ${unanswered} unanswered question(s). Are you sure you want to submit?`
+        )
+      ) {
         return;
       }
     } else {
-      if (!window.confirm('Are you sure you want to submit?')) {
+      if (!window.confirm("Are you sure you want to submit?")) {
         return;
       }
     }
-    
+
     handleSubmit(false);
   };
 
@@ -127,7 +144,7 @@ const AttemptQuiz = () => {
     return (
       <div className="min-h-screen">
         <Navbar />
-        
+
         <div className="container mx-auto px-4 pb-8">
           <motion.div
             className="max-w-2xl mx-auto"
@@ -135,25 +152,37 @@ const AttemptQuiz = () => {
             animate={{ opacity: 1, y: 0 }}
           >
             <div className="glass-card text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl 
-                             flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <div
+                className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl 
+                             flex items-center justify-center mx-auto mb-6 shadow-lg"
+              >
                 <span className="text-white font-bold text-4xl">📝</span>
               </div>
 
-              <h1 className="text-3xl font-bold text-white mb-4">{quiz.title}</h1>
-              <p className="text-gray-400 mb-6">{quiz.description || 'No description'}</p>
+              <h1 className="text-3xl font-bold text-white mb-4">
+                {quiz.title}
+              </h1>
+              <p className="text-gray-400 mb-6">
+                {quiz.description || "No description"}
+              </p>
 
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="glass p-4 rounded-xl">
-                  <p className="text-2xl font-bold text-white">{questions.length}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {questions.length}
+                  </p>
                   <p className="text-sm text-gray-400">Questions</p>
                 </div>
                 <div className="glass p-4 rounded-xl">
-                  <p className="text-2xl font-bold text-white">{quiz.duration}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {quiz.duration}
+                  </p>
                   <p className="text-sm text-gray-400">Minutes</p>
                 </div>
                 <div className="glass p-4 rounded-xl">
-                  <p className="text-2xl font-bold text-white">{quiz.totalMarks}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {quiz.totalMarks}
+                  </p>
                   <p className="text-sm text-gray-400">Total Marks</p>
                 </div>
               </div>
@@ -173,7 +202,7 @@ const AttemptQuiz = () => {
 
               <div className="flex gap-4">
                 <motion.button
-                  onClick={() => navigate('/student')}
+                  onClick={() => navigate("/student")}
                   className="btn-secondary flex-1"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -211,17 +240,25 @@ const AttemptQuiz = () => {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <h2 className="text-lg font-semibold text-white hidden sm:block">{quiz.title}</h2>
+              <h2 className="text-lg font-semibold text-white hidden sm:block">
+                {quiz.title}
+              </h2>
               <span className="text-sm text-gray-400">
                 {answeredCount}/{questions.length} answered
               </span>
             </div>
 
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-              timeLeft <= 60 ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'
-            }`}>
+            <div
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                timeLeft <= 60
+                  ? "bg-red-500/20 text-red-400"
+                  : "bg-blue-500/20 text-blue-400"
+              }`}
+            >
               <FiClock className="w-5 h-5" />
-              <span className="font-mono text-lg font-bold">{formatTime(timeLeft)}</span>
+              <span className="font-mono text-lg font-bold">
+                {formatTime(timeLeft)}
+              </span>
             </div>
           </div>
 
@@ -230,7 +267,9 @@ const AttemptQuiz = () => {
             <motion.div
               className="bg-gradient-to-r from-blue-500 to-purple-500 h-1 rounded-full"
               initial={{ width: 0 }}
-              animate={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
+              animate={{
+                width: `${((currentQuestion + 1) / questions.length) * 100}%`,
+              }}
               transition={{ duration: 0.3 }}
             />
           </div>
@@ -253,10 +292,10 @@ const AttemptQuiz = () => {
                   onClick={() => setCurrentQuestion(index)}
                   className={`w-10 h-10 rounded-lg font-medium transition-colors ${
                     currentQuestion === index
-                      ? 'bg-blue-500 text-white'
+                      ? "bg-blue-500 text-white"
                       : answers[q._id] !== undefined
-                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                        : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                      ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                      : "bg-white/10 text-gray-400 hover:bg-white/20"
                   }`}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
@@ -287,7 +326,7 @@ const AttemptQuiz = () => {
                   </span>
                 </div>
                 <span className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm">
-                  {question.marks} mark{question.marks > 1 ? 's' : ''}
+                  {question.marks} mark{question.marks > 1 ? "s" : ""}
                 </span>
               </div>
 
@@ -300,17 +339,19 @@ const AttemptQuiz = () => {
                     onClick={() => handleSelectOption(question._id, index)}
                     className={`w-full p-4 rounded-xl text-left transition-all flex items-center gap-3 ${
                       answers[question._id] === index
-                        ? 'bg-blue-500/20 border-2 border-blue-500 text-white'
-                        : 'bg-white/5 border-2 border-white/10 text-gray-300 hover:border-white/30 hover:bg-white/10'
+                        ? "bg-blue-500/20 border-2 border-blue-500 text-white"
+                        : "bg-white/5 border-2 border-white/10 text-gray-300 hover:border-white/30 hover:bg-white/10"
                     }`}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                   >
-                    <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${
-                      answers[question._id] === index
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-white/10 text-gray-400'
-                    }`}>
+                    <span
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${
+                        answers[question._id] === index
+                          ? "bg-blue-500 text-white"
+                          : "bg-white/10 text-gray-400"
+                      }`}
+                    >
                       {String.fromCharCode(65 + index)}
                     </span>
                     <span className="flex-1">{option}</span>
@@ -324,7 +365,9 @@ const AttemptQuiz = () => {
               {/* Navigation */}
               <div className="flex gap-4 mt-8 pt-6 border-t border-white/10">
                 <motion.button
-                  onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
+                  onClick={() =>
+                    setCurrentQuestion(Math.max(0, currentQuestion - 1))
+                  }
                   disabled={currentQuestion === 0}
                   className="btn-secondary flex-1 flex items-center justify-center gap-2 disabled:opacity-50"
                   whileHover={{ scale: 1.02 }}
@@ -356,7 +399,11 @@ const AttemptQuiz = () => {
                   </motion.button>
                 ) : (
                   <motion.button
-                    onClick={() => setCurrentQuestion(Math.min(questions.length - 1, currentQuestion + 1))}
+                    onClick={() =>
+                      setCurrentQuestion(
+                        Math.min(questions.length - 1, currentQuestion + 1)
+                      )
+                    }
                     className="btn-primary flex-1 flex items-center justify-center gap-2"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}

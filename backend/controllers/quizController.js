@@ -1,21 +1,26 @@
-const { body } = require('express-validator');
-const Quiz = require('../models/Quiz');
-const Question = require('../models/Question');
-const Submission = require('../models/Submission');
+const { body } = require("express-validator");
+const Quiz = require("../models/Quiz");
+const Question = require("../models/Question");
+const Submission = require("../models/Submission");
 
 // Validation rules for creating a quiz
 const createQuizValidation = [
-  body('title')
+  body("title")
     .trim()
-    .notEmpty().withMessage('Title is required')
-    .isLength({ min: 3, max: 100 }).withMessage('Title must be 3-100 characters'),
-  body('description')
+    .notEmpty()
+    .withMessage("Title is required")
+    .isLength({ min: 3, max: 100 })
+    .withMessage("Title must be 3-100 characters"),
+  body("description")
     .optional()
     .trim()
-    .isLength({ max: 500 }).withMessage('Description cannot exceed 500 characters'),
-  body('duration')
-    .notEmpty().withMessage('Duration is required')
-    .isInt({ min: 1, max: 180 }).withMessage('Duration must be 1-180 minutes')
+    .isLength({ max: 500 })
+    .withMessage("Description cannot exceed 500 characters"),
+  body("duration")
+    .notEmpty()
+    .withMessage("Duration is required")
+    .isInt({ min: 1, max: 180 })
+    .withMessage("Duration must be 1-180 minutes"),
 ];
 
 // @desc    Create a new quiz
@@ -27,24 +32,24 @@ const createQuiz = async (req, res) => {
 
     const quiz = await Quiz.create({
       title,
-      description: description || '',
+      description: description || "",
       duration,
       createdBy: req.user._id,
       totalMarks: 0,
-      isActive: true
+      isActive: true,
     });
 
     res.status(201).json({
       success: true,
-      message: 'Quiz created successfully',
-      data: { quiz }
+      message: "Quiz created successfully",
+      data: { quiz },
     });
   } catch (error) {
-    console.error('Create quiz error:', error);
+    console.error("Create quiz error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error while creating quiz',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Server error while creating quiz",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -55,51 +60,53 @@ const createQuiz = async (req, res) => {
 const getQuizzes = async (req, res) => {
   try {
     let query = {};
-    let populate = '';
+    let populate = "";
 
-    if (req.user.role === 'teacher') {
+    if (req.user.role === "teacher") {
       // Teachers see their own quizzes
       query.createdBy = req.user._id;
     } else {
       // Students see only active quizzes
       query.isActive = true;
-      populate = 'createdBy';
+      populate = "createdBy";
     }
 
     let quizzesQuery = Quiz.find(query).sort({ createdAt: -1 });
-    
+
     if (populate) {
-      quizzesQuery = quizzesQuery.populate('createdBy', 'name');
+      quizzesQuery = quizzesQuery.populate("createdBy", "name");
     }
 
     const quizzes = await quizzesQuery;
 
     // For students, check if they have already submitted each quiz
-    if (req.user.role === 'student') {
-      const submissions = await Submission.find({ studentId: req.user._id }).select('quizId');
-      const submittedQuizIds = submissions.map(s => s.quizId.toString());
+    if (req.user.role === "student") {
+      const submissions = await Submission.find({
+        studentId: req.user._id,
+      }).select("quizId");
+      const submittedQuizIds = submissions.map((s) => s.quizId.toString());
 
-      const quizzesWithStatus = quizzes.map(quiz => ({
+      const quizzesWithStatus = quizzes.map((quiz) => ({
         ...quiz.toObject(),
-        hasSubmitted: submittedQuizIds.includes(quiz._id.toString())
+        hasSubmitted: submittedQuizIds.includes(quiz._id.toString()),
       }));
 
       return res.status(200).json({
         success: true,
-        data: { quizzes: quizzesWithStatus }
+        data: { quizzes: quizzesWithStatus },
       });
     }
 
     res.status(200).json({
       success: true,
-      data: { quizzes }
+      data: { quizzes },
     });
   } catch (error) {
-    console.error('Get quizzes error:', error);
+    console.error("Get quizzes error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error while fetching quizzes',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Server error while fetching quizzes",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -109,26 +116,29 @@ const getQuizzes = async (req, res) => {
 // @access  Private
 const getQuiz = async (req, res) => {
   try {
-    const quiz = await Quiz.findById(req.params.id).populate('createdBy', 'name');
+    const quiz = await Quiz.findById(req.params.id).populate(
+      "createdBy",
+      "name"
+    );
 
     if (!quiz) {
       return res.status(404).json({
         success: false,
-        message: 'Quiz not found'
+        message: "Quiz not found",
       });
     }
 
     // Check if student has already submitted
-    if (req.user.role === 'student') {
+    if (req.user.role === "student") {
       const existingSubmission = await Submission.findOne({
         quizId: quiz._id,
-        studentId: req.user._id
+        studentId: req.user._id,
       });
 
       if (existingSubmission) {
         return res.status(400).json({
           success: false,
-          message: 'You have already submitted this quiz'
+          message: "You have already submitted this quiz",
         });
       }
     }
@@ -136,29 +146,29 @@ const getQuiz = async (req, res) => {
     // Get questions (hide correct answers for students)
     let questions = await Question.find({ quizId: quiz._id });
 
-    if (req.user.role === 'student') {
+    if (req.user.role === "student") {
       // Hide correct answers from students
-      questions = questions.map(q => ({
+      questions = questions.map((q) => ({
         _id: q._id,
         questionText: q.questionText,
         options: q.options,
-        marks: q.marks
+        marks: q.marks,
       }));
     }
 
     res.status(200).json({
       success: true,
-      data: { 
+      data: {
         quiz,
-        questions
-      }
+        questions,
+      },
     });
   } catch (error) {
-    console.error('Get quiz error:', error);
+    console.error("Get quiz error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error while fetching quiz',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Server error while fetching quiz",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -173,7 +183,7 @@ const updateQuiz = async (req, res) => {
     if (!quiz) {
       return res.status(404).json({
         success: false,
-        message: 'Quiz not found'
+        message: "Quiz not found",
       });
     }
 
@@ -181,14 +191,15 @@ const updateQuiz = async (req, res) => {
     if (quiz.createdBy.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: 'Not authorized to update this quiz'
+        message: "Not authorized to update this quiz",
       });
     }
 
     const { title, description, duration, isActive } = req.body;
 
     quiz.title = title || quiz.title;
-    quiz.description = description !== undefined ? description : quiz.description;
+    quiz.description =
+      description !== undefined ? description : quiz.description;
     quiz.duration = duration || quiz.duration;
     quiz.isActive = isActive !== undefined ? isActive : quiz.isActive;
 
@@ -196,15 +207,15 @@ const updateQuiz = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Quiz updated successfully',
-      data: { quiz }
+      message: "Quiz updated successfully",
+      data: { quiz },
     });
   } catch (error) {
-    console.error('Update quiz error:', error);
+    console.error("Update quiz error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error while updating quiz',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Server error while updating quiz",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -219,7 +230,7 @@ const deleteQuiz = async (req, res) => {
     if (!quiz) {
       return res.status(404).json({
         success: false,
-        message: 'Quiz not found'
+        message: "Quiz not found",
       });
     }
 
@@ -227,7 +238,7 @@ const deleteQuiz = async (req, res) => {
     if (quiz.createdBy.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: 'Not authorized to delete this quiz'
+        message: "Not authorized to delete this quiz",
       });
     }
 
@@ -238,14 +249,14 @@ const deleteQuiz = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Quiz deleted successfully'
+      message: "Quiz deleted successfully",
     });
   } catch (error) {
-    console.error('Delete quiz error:', error);
+    console.error("Delete quiz error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error while deleting quiz',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Server error while deleting quiz",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -256,5 +267,5 @@ module.exports = {
   getQuiz,
   updateQuiz,
   deleteQuiz,
-  createQuizValidation
+  createQuizValidation,
 };

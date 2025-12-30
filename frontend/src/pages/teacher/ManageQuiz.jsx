@@ -1,19 +1,27 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FiArrowLeft, FiPlus, FiEdit, FiTrash2, FiSave, FiX, 
-  FiZap, FiClock, FiCheckCircle, FiAlertCircle
-} from 'react-icons/fi';
-import toast from 'react-hot-toast';
-import Navbar from '../../components/Navbar';
-import Loading from '../../components/Loading';
-import { quizAPI, questionAPI, geminiAPI } from '../../services/api';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FiArrowLeft,
+  FiPlus,
+  FiEdit,
+  FiTrash2,
+  FiSave,
+  FiX,
+  FiZap,
+  FiClock,
+  FiCheckCircle,
+  FiAlertCircle,
+} from "react-icons/fi";
+import toast from "react-hot-toast";
+import Navbar from "../../components/Navbar";
+import Loading from "../../components/Loading";
+import { quizAPI, questionAPI, geminiAPI } from "../../services/api";
 
 const ManageQuiz = () => {
   const { quizId } = useParams();
   const navigate = useNavigate();
-  
+
   const [quiz, setQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,17 +31,17 @@ const ManageQuiz = () => {
 
   // Question form state
   const [questionForm, setQuestionForm] = useState({
-    questionText: '',
-    options: ['', '', '', ''],
+    questionText: "",
+    options: ["", "", "", ""],
     correctOption: 0,
-    marks: 1
+    marks: 1,
   });
 
   // Generate form state
   const [generateForm, setGenerateForm] = useState({
-    topic: '',
+    topic: "",
     numberOfQuestions: 5,
-    difficulty: 'medium'
+    difficulty: "medium",
   });
   const [generating, setGenerating] = useState(false);
   const [generatedQuestions, setGeneratedQuestions] = useState([]);
@@ -46,13 +54,13 @@ const ManageQuiz = () => {
     try {
       const [quizRes, questionsRes] = await Promise.all([
         quizAPI.getOne(quizId),
-        questionAPI.getByQuiz(quizId)
+        questionAPI.getByQuiz(quizId),
       ]);
       setQuiz(quizRes.data.data.quiz);
       setQuestions(questionsRes.data.data.questions);
     } catch (error) {
-      toast.error('Failed to fetch quiz data');
-      navigate('/teacher');
+      toast.error("Failed to fetch quiz data");
+      navigate("/teacher");
     } finally {
       setLoading(false);
     }
@@ -60,51 +68,55 @@ const ManageQuiz = () => {
 
   const resetQuestionForm = () => {
     setQuestionForm({
-      questionText: '',
-      options: ['', '', '', ''],
+      questionText: "",
+      options: ["", "", "", ""],
       correctOption: 0,
-      marks: 1
+      marks: 1,
     });
     setEditingQuestion(null);
   };
 
   const handleAddQuestion = async () => {
     if (!questionForm.questionText.trim()) {
-      toast.error('Question text is required');
+      toast.error("Question text is required");
       return;
     }
 
-    if (questionForm.options.some(opt => !opt.trim())) {
-      toast.error('All options are required');
+    if (questionForm.options.some((opt) => !opt.trim())) {
+      toast.error("All options are required");
       return;
     }
 
     try {
       if (editingQuestion) {
         await questionAPI.update(editingQuestion._id, questionForm);
-        setQuestions(questions.map(q => 
-          q._id === editingQuestion._id ? { ...q, ...questionForm } : q
-        ));
-        toast.success('Question updated');
+        setQuestions(
+          questions.map((q) =>
+            q._id === editingQuestion._id ? { ...q, ...questionForm } : q
+          )
+        );
+        toast.success("Question updated");
       } else {
         const response = await questionAPI.create({
           quizId,
-          ...questionForm
+          ...questionForm,
         });
         setQuestions([...questions, response.data.data.question]);
-        toast.success('Question added');
+        toast.success("Question added");
       }
-      
+
       // Update quiz total marks
-      const newTotalMarks = questions.reduce((acc, q) => 
-        q._id === editingQuestion?._id ? acc : acc + q.marks, 0
-      ) + questionForm.marks;
+      const newTotalMarks =
+        questions.reduce(
+          (acc, q) => (q._id === editingQuestion?._id ? acc : acc + q.marks),
+          0
+        ) + questionForm.marks;
       setQuiz({ ...quiz, totalMarks: newTotalMarks });
-      
+
       setShowAddModal(false);
       resetQuestionForm();
     } catch (error) {
-      toast.error('Failed to save question');
+      toast.error("Failed to save question");
     }
   };
 
@@ -113,29 +125,29 @@ const ManageQuiz = () => {
       questionText: question.questionText,
       options: [...question.options],
       correctOption: question.correctOption,
-      marks: question.marks
+      marks: question.marks,
     });
     setEditingQuestion(question);
     setShowAddModal(true);
   };
 
   const handleDeleteQuestion = async (questionId) => {
-    if (!window.confirm('Delete this question?')) return;
+    if (!window.confirm("Delete this question?")) return;
 
     try {
       await questionAPI.delete(questionId);
-      const deletedQuestion = questions.find(q => q._id === questionId);
-      setQuestions(questions.filter(q => q._id !== questionId));
+      const deletedQuestion = questions.find((q) => q._id === questionId);
+      setQuestions(questions.filter((q) => q._id !== questionId));
       setQuiz({ ...quiz, totalMarks: quiz.totalMarks - deletedQuestion.marks });
-      toast.success('Question deleted');
+      toast.success("Question deleted");
     } catch (error) {
-      toast.error('Failed to delete question');
+      toast.error("Failed to delete question");
     }
   };
 
   const handleGenerate = async () => {
     if (!generateForm.topic.trim()) {
-      toast.error('Topic is required');
+      toast.error("Topic is required");
       return;
     }
 
@@ -143,9 +155,13 @@ const ManageQuiz = () => {
     try {
       const response = await geminiAPI.generate(generateForm);
       setGeneratedQuestions(response.data.data.questions);
-      toast.success(`Generated ${response.data.data.questions.length} questions`);
+      toast.success(
+        `Generated ${response.data.data.questions.length} questions`
+      );
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to generate questions');
+      toast.error(
+        error.response?.data?.message || "Failed to generate questions"
+      );
     } finally {
       setGenerating(false);
     }
@@ -157,16 +173,20 @@ const ManageQuiz = () => {
     try {
       await questionAPI.bulkCreate({
         quizId,
-        questions: generatedQuestions
+        questions: generatedQuestions,
       });
-      
+
       await fetchQuizData(); // Refresh to get updated questions
       setShowGenerateModal(false);
       setGeneratedQuestions([]);
-      setGenerateForm({ topic: '', numberOfQuestions: 5, difficulty: 'medium' });
-      toast.success('Questions added to quiz');
+      setGenerateForm({
+        topic: "",
+        numberOfQuestions: 5,
+        difficulty: "medium",
+      });
+      toast.success("Questions added to quiz");
     } catch (error) {
-      toast.error('Failed to add questions');
+      toast.error("Failed to add questions");
     }
   };
 
@@ -177,11 +197,11 @@ const ManageQuiz = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 pb-8">
         {/* Back Button */}
         <motion.button
-          onClick={() => navigate('/teacher')}
+          onClick={() => navigate("/teacher")}
           className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -198,8 +218,12 @@ const ManageQuiz = () => {
         >
           <div className="flex flex-col md:flex-row justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-white mb-2">{quiz.title}</h1>
-              <p className="text-gray-400 mb-4">{quiz.description || 'No description'}</p>
+              <h1 className="text-2xl font-bold text-white mb-2">
+                {quiz.title}
+              </h1>
+              <p className="text-gray-400 mb-4">
+                {quiz.description || "No description"}
+              </p>
               <div className="flex flex-wrap gap-4 text-sm">
                 <div className="flex items-center gap-2 text-gray-400">
                   <FiClock className="w-4 h-4" />
@@ -250,8 +274,12 @@ const ManageQuiz = () => {
             animate={{ opacity: 1 }}
           >
             <div className="text-6xl mb-4">❓</div>
-            <h2 className="text-xl font-semibold text-white mb-2">No questions yet</h2>
-            <p className="text-gray-400 mb-6">Add questions manually or generate with AI</p>
+            <h2 className="text-xl font-semibold text-white mb-2">
+              No questions yet
+            </h2>
+            <p className="text-gray-400 mb-6">
+              Add questions manually or generate with AI
+            </p>
             <div className="flex justify-center gap-4">
               <motion.button
                 onClick={() => setShowGenerateModal(true)}
@@ -288,7 +316,7 @@ const ManageQuiz = () => {
                         {index + 1}
                       </span>
                       <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
-                        {question.marks} mark{question.marks > 1 ? 's' : ''}
+                        {question.marks} mark{question.marks > 1 ? "s" : ""}
                       </span>
                     </div>
                     <p className="text-white mb-4">{question.questionText}</p>
@@ -298,8 +326,8 @@ const ManageQuiz = () => {
                           key={optIndex}
                           className={`p-3 rounded-lg ${
                             optIndex === question.correctOption
-                              ? 'bg-green-500/20 border border-green-500/30 text-green-300'
-                              : 'bg-white/5 border border-white/10 text-gray-400'
+                              ? "bg-green-500/20 border border-green-500/30 text-green-300"
+                              : "bg-white/5 border border-white/10 text-gray-400"
                           }`}
                         >
                           <span className="font-medium mr-2">
@@ -357,7 +385,7 @@ const ManageQuiz = () => {
               >
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-white">
-                    {editingQuestion ? 'Edit Question' : 'Add Question'}
+                    {editingQuestion ? "Edit Question" : "Add Question"}
                   </h2>
                   <button
                     onClick={() => {
@@ -375,7 +403,12 @@ const ManageQuiz = () => {
                     <label className="input-label">Question Text</label>
                     <textarea
                       value={questionForm.questionText}
-                      onChange={(e) => setQuestionForm({ ...questionForm, questionText: e.target.value })}
+                      onChange={(e) =>
+                        setQuestionForm({
+                          ...questionForm,
+                          questionText: e.target.value,
+                        })
+                      }
                       className="glass-input min-h-[100px]"
                       placeholder="Enter your question..."
                     />
@@ -388,11 +421,16 @@ const ManageQuiz = () => {
                         <div key={index} className="flex items-center gap-2">
                           <button
                             type="button"
-                            onClick={() => setQuestionForm({ ...questionForm, correctOption: index })}
+                            onClick={() =>
+                              setQuestionForm({
+                                ...questionForm,
+                                correctOption: index,
+                              })
+                            }
                             className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold transition-colors ${
                               questionForm.correctOption === index
-                                ? 'bg-green-500 text-white'
-                                : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                                ? "bg-green-500 text-white"
+                                : "bg-white/10 text-gray-400 hover:bg-white/20"
                             }`}
                           >
                             {String.fromCharCode(65 + index)}
@@ -403,10 +441,15 @@ const ManageQuiz = () => {
                             onChange={(e) => {
                               const newOptions = [...questionForm.options];
                               newOptions[index] = e.target.value;
-                              setQuestionForm({ ...questionForm, options: newOptions });
+                              setQuestionForm({
+                                ...questionForm,
+                                options: newOptions,
+                              });
                             }}
                             className="glass-input flex-1"
-                            placeholder={`Option ${String.fromCharCode(65 + index)}`}
+                            placeholder={`Option ${String.fromCharCode(
+                              65 + index
+                            )}`}
                           />
                         </div>
                       ))}
@@ -421,7 +464,12 @@ const ManageQuiz = () => {
                     <input
                       type="number"
                       value={questionForm.marks}
-                      onChange={(e) => setQuestionForm({ ...questionForm, marks: parseInt(e.target.value) || 1 })}
+                      onChange={(e) =>
+                        setQuestionForm({
+                          ...questionForm,
+                          marks: parseInt(e.target.value) || 1,
+                        })
+                      }
                       className="glass-input w-32"
                       min={1}
                       max={10}
@@ -447,7 +495,7 @@ const ManageQuiz = () => {
                       whileTap={{ scale: 0.98 }}
                     >
                       <FiSave className="w-5 h-5" />
-                      {editingQuestion ? 'Update' : 'Add'} Question
+                      {editingQuestion ? "Update" : "Add"} Question
                     </motion.button>
                   </div>
                 </div>
@@ -503,7 +551,12 @@ const ManageQuiz = () => {
                       <input
                         type="text"
                         value={generateForm.topic}
-                        onChange={(e) => setGenerateForm({ ...generateForm, topic: e.target.value })}
+                        onChange={(e) =>
+                          setGenerateForm({
+                            ...generateForm,
+                            topic: e.target.value,
+                          })
+                        }
                         className="glass-input"
                         placeholder="e.g., JavaScript Arrays, World War II, Photosynthesis"
                       />
@@ -511,14 +564,18 @@ const ManageQuiz = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="form-group">
-                        <label className="input-label">Number of Questions</label>
+                        <label className="input-label">
+                          Number of Questions
+                        </label>
                         <input
                           type="number"
                           value={generateForm.numberOfQuestions}
-                          onChange={(e) => setGenerateForm({ 
-                            ...generateForm, 
-                            numberOfQuestions: parseInt(e.target.value) || 5 
-                          })}
+                          onChange={(e) =>
+                            setGenerateForm({
+                              ...generateForm,
+                              numberOfQuestions: parseInt(e.target.value) || 5,
+                            })
+                          }
                           className="glass-input"
                           min={1}
                           max={20}
@@ -529,7 +586,12 @@ const ManageQuiz = () => {
                         <label className="input-label">Difficulty</label>
                         <select
                           value={generateForm.difficulty}
-                          onChange={(e) => setGenerateForm({ ...generateForm, difficulty: e.target.value })}
+                          onChange={(e) =>
+                            setGenerateForm({
+                              ...generateForm,
+                              difficulty: e.target.value,
+                            })
+                          }
                           className="glass-input"
                         >
                           <option value="easy">Easy</option>
@@ -562,14 +624,17 @@ const ManageQuiz = () => {
                 ) : (
                   <div className="space-y-4">
                     <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 text-green-300">
-                      Generated {generatedQuestions.length} questions. Review and add them to your quiz.
+                      Generated {generatedQuestions.length} questions. Review
+                      and add them to your quiz.
                     </div>
 
                     <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                       {generatedQuestions.map((question, index) => (
                         <div key={index} className="bg-white/5 rounded-lg p-4">
                           <p className="text-white mb-2">
-                            <span className="text-blue-400 font-bold">Q{index + 1}.</span>{' '}
+                            <span className="text-blue-400 font-bold">
+                              Q{index + 1}.
+                            </span>{" "}
                             {question.questionText}
                           </p>
                           <div className="grid grid-cols-2 gap-2 text-sm">
@@ -578,8 +643,8 @@ const ManageQuiz = () => {
                                 key={optIdx}
                                 className={`p-2 rounded ${
                                   optIdx === question.correctOption
-                                    ? 'bg-green-500/20 text-green-300'
-                                    : 'bg-white/5 text-gray-400'
+                                    ? "bg-green-500/20 text-green-300"
+                                    : "bg-white/5 text-gray-400"
                                 }`}
                               >
                                 {String.fromCharCode(65 + optIdx)}. {opt}
