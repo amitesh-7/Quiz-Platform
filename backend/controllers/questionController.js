@@ -13,8 +13,8 @@ const createQuestionValidation = [
     .trim()
     .notEmpty()
     .withMessage("Question text is required")
-    .isLength({ min: 5, max: 1000 })
-    .withMessage("Question must be 5-1000 characters"),
+    .isLength({ min: 5, max: 5000 })
+    .withMessage("Question must be 5-5000 characters"),
   body("questionType")
     .optional()
     .isIn(["mcq", "written", "fillblank", "matching", "truefalse"])
@@ -38,7 +38,9 @@ const bulkCreateValidation = [
   body("questions.*.questionText")
     .trim()
     .notEmpty()
-    .withMessage("Question text is required"),
+    .withMessage("Question text is required")
+    .isLength({ min: 5, max: 5000 })
+    .withMessage("Question must be 5-5000 characters"),
   body("questions.*.questionType")
     .optional()
     .isIn(["mcq", "written", "fillblank", "matching", "truefalse"])

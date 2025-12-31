@@ -239,6 +239,87 @@ ANSWER LENGTH REQUIREMENTS (VERY IMPORTANT):
 - For Science: Include formulas, reactions, labeled diagram descriptions, numerical examples
 `;
 
+    // UP Board English Format - Exact Paper Structure (70 Marks)
+    const upBoardEnglishFormat = `
+YOU ARE GENERATING UP BOARD CLASS 10 ENGLISH PAPER (अंग्रेजी) - TOTAL 70 MARKS
+Paper Code: 817(BH)
+
+TOPIC(S) FOR THIS PAPER: "${topic}"
+
+TOPIC HANDLING RULES:
+- User may enter SINGLE topic (e.g., "Reading Comprehension") OR MULTIPLE topics (e.g., "Grammar, Literature, Writing")
+- If SINGLE topic: Generate ALL questions from that ONE topic only
+- If MULTIPLE topics (comma-separated): Distribute questions EVENLY across ALL given topics
+- Questions MUST be ONLY from the given topic(s) - do NOT add questions from other topics
+
+FIXED PAPER STRUCTURE (31 questions = 70 marks):
+
+PART-A (Multiple Choice Questions) - 20 Marks:
+- Q1-Q20: 20 MCQs × 1 mark = 20 marks
+TOTAL: 20 MCQs = 20 marks
+
+PART-B (Descriptive Questions) - 50 Marks:
+- Q21: Reading Comprehension (8 marks) - LONG passage 250-350 words with 4 sub-questions
+- Q22: Letter/Application Writing (4 marks) with OR option
+- Q23: Article/Essay Writing (6 marks) with OR option  
+- Q24-Q27: Grammar Questions (4 questions × 2 marks = 8 marks)
+- Q28-Q31: Literature Questions (4 questions × 6 marks = 24 marks) with OR options
+TOTAL: 11 descriptive questions = 50 marks
+
+GRAND TOTAL: 31 questions = 70 marks
+
+SECTION VALUES (MUST include in each question):
+- Q1-Q20 (MCQ): "section": "PART-A (MCQ) - 1 mark"
+- Q21 (Reading): "section": "PART-B (Reading Comprehension) - 8 marks"
+- Q22 (Letter): "section": "PART-B (Writing - Letter) - 4 marks"
+- Q23 (Article): "section": "PART-B (Writing - Article/Essay) - 6 marks"
+- Q24-Q27 (Grammar): "section": "PART-B (Grammar) - 2 marks"
+- Q28-Q31 (Literature): "section": "PART-B (Literature) - 6 marks"
+
+=== CRITICAL: ANSWER LENGTH REQUIREMENTS ===
+- 1-mark MCQ: Just correct option
+- 2-mark Grammar: 30-50 words
+- 4-mark Letter: 150-200 words (FULL FORMAT with address, date, salutation, 3 body paragraphs, closing, signature)
+- 6-mark Article/Essay: 250-350 words (proper structure with introduction, body paragraphs, conclusion)
+- 6-mark Literature: 200-300 words (detailed explanation with examples from text)
+- 8-mark Reading: Each sub-answer 40-60 words
+
+=== CRITICAL: PASSAGE FORMAT (Q21) ===
+The passage MUST be 250-350 words with meaningful content:
+- Multiple paragraphs (3-4 paragraphs)
+- Topics: Education, Environment, Technology, Health, Moral Values, Social Issues
+- Include vocabulary words that can be asked
+- 4 sub-questions: (a) comprehension, (b) inference, (c) vocabulary, (d) opinion/summary
+
+=== CRITICAL: LETTER FORMAT (Q22) ===
+Letter answer MUST be 150-200 words with ALL parts:
+- Sender's Address (2 lines)
+- Date (15th March, 2024 format)
+- Receiver's Address (for formal) OR Dear [Name] (for informal)
+- Subject line (for formal letters)
+- Salutation
+- Body: 3 paragraphs (opening - purpose, middle - details/reasons, closing - request/wishes)
+- Complimentary close (Yours obediently/faithfully/sincerely/lovingly)
+- Signature with Name and details
+
+=== CRITICAL: ARTICLE/ESSAY FORMAT (Q23) ===
+Article/Essay answer MUST be 250-350 words with proper structure:
+- Title (centered)
+- By: [Name]
+- Introduction paragraph (40-50 words) - introduce the topic
+- Body paragraph 1 (80-100 words) - main points with examples
+- Body paragraph 2 (80-100 words) - more points, statistics, effects
+- Body paragraph 3 (50-60 words) - solutions/suggestions
+- Conclusion (40-50 words) - summary and final thoughts
+
+=== CRITICAL: LITERATURE ANSWERS (Q28-Q31) ===
+Literature answers MUST be 200-300 words with:
+- Direct reference to the text/poem
+- Explanation of theme/character/central idea
+- Relevant quotes or examples from the text
+- Personal interpretation where applicable
+`;
+
     // For UP Board, override settings
     let finalNumberOfQuestions = numberOfQuestions;
     let finalQuestionTypes = questionTypes;
@@ -248,12 +329,17 @@ ANSWER LENGTH REQUIREMENTS (VERY IMPORTANT):
       finalNumberOfQuestions = 31; // 20 MCQ + 4(4-mark) + 4(4-mark) + 3(6-mark) = 31
       finalQuestionTypes = ["mcq", "written"];
       finalLanguage = "bilingual";
+    } else if (examFormat === "upboard_english") {
+      finalNumberOfQuestions = 31; // 20 MCQ + 11 descriptive = 31
+      finalQuestionTypes = ["mcq", "written"];
+      finalLanguage = "english";
     }
 
     // Exam format specific instructions
     const examFormatInstructions = {
       general: "",
       upboard_science: upBoardScienceFormat,
+      upboard_english: upBoardEnglishFormat,
     };
 
     const examFormatNote = examFormatInstructions[examFormat] || "";
@@ -392,6 +478,40 @@ Written 6-mark with OR (Q29-Q31):
 }
 
 Return ONLY a valid JSON array with exactly 31 questions. No markdown, no explanation.`;
+    } else if (examFormat === "upboard_english") {
+      prompt = `Generate UP BOARD CLASS 10 ENGLISH PAPER - 70 marks, 31 questions.
+
+TOPIC: "${topic}"
+
+STRUCTURE:
+- Q1-Q20: MCQs (1 mark each) = 20 marks
+- Q21: Reading passage 250+ words with 4 sub-questions (8 marks)
+- Q22: Letter writing with OR option (4 marks) - FULL FORMAT with address, date, salutation, body, closing
+- Q23: Article/Essay with OR option (6 marks) - 250+ words
+- Q24-Q27: Grammar - Voice, Narration, Punctuation, Translation (2 marks each)
+- Q28-Q31: Literature with OR options (6 marks each) - 200+ words answers
+
+JSON FORMAT:
+
+MCQ: {"questionType":"mcq","questionText":"Q?","options":["A","B","C","D"],"correctOption":0,"marks":1,"section":"PART-A (MCQ) - 1 mark"}
+
+Reading (Q21): {"questionType":"written","questionText":"Read passage...\\n\\n[250-350 word passage]\\n\\n(a) Q1 (2m)\\n(b) Q2 (2m)\\n(c) Vocabulary (2m)\\n(d) Inference (2m)","correctAnswer":"(a) [answer]\\n(b) [answer]\\n(c) [answer]\\n(d) [answer]","marks":8,"section":"PART-B (Reading) - 8 marks"}
+
+Letter (Q22): {"questionType":"written","questionText":"Write a letter...","correctAnswer":"[Address]\\n[Date]\\n\\nDear/To...\\n\\n[3 paragraphs - 150-200 words total]\\n\\nYours...\\n[Name]","marks":4,"section":"PART-B (Writing) - 4 marks","hasAlternative":true,"alternativeQuestion":"OR: Write application...","alternativeAnswer":"[Full application 150-200 words]"}
+
+Article (Q23): {"questionType":"written","questionText":"Write article on...","correctAnswer":"[TITLE]\\nBy: Name\\n\\n[Introduction]\\n[Body 1]\\n[Body 2]\\n[Conclusion] - 250-350 words total","marks":6,"section":"PART-B (Writing) - 6 marks","hasAlternative":true,"alternativeQuestion":"OR: Essay on...","alternativeAnswer":"[250-350 words]"}
+
+Grammar (Q24-27): {"questionType":"written","questionText":"Change to passive: ...","correctAnswer":"[Answer with explanation]","marks":2,"section":"PART-B (Grammar) - 2 marks"}
+
+Literature (Q28-31): {"questionType":"written","questionText":"Central idea of...","correctAnswer":"[200-300 word detailed answer]","marks":6,"section":"PART-B (Literature) - 6 marks","hasAlternative":true,"alternativeQuestion":"OR: Character of...","alternativeAnswer":"[200-300 words]"}
+
+RULES:
+1. EXACTLY 31 questions
+2. English only
+3. Long answers for 4+ marks questions
+4. Q22,Q23,Q28-31 need hasAlternative
+
+Return ONLY valid JSON array.`;
     } else {
       prompt = `Generate exactly ${finalNumberOfQuestions} quiz questions about "${topic}".${languageNote}${descriptionContext}
 
@@ -776,6 +896,32 @@ STRICT RULES:
 9. Use Unicode subscripts: H₂O, CO₂, CH₄
 
 Return ONLY valid JSON array. No markdown, no explanation.`;
+    } else if (examFormat === "upboard_english") {
+      prompt = `Extract questions from images for UP BOARD CLASS 10 ENGLISH PAPER - 70 marks, 31 questions.
+
+EXTRACT ONLY what is visible in images. Do NOT generate new questions.
+
+STRUCTURE: 20 MCQs (1 mark) + 11 descriptive (50 marks)
+- Q21: Reading passage 250+ words (8 marks)
+- Q22: Letter with OR (4 marks) - FULL FORMAT
+- Q23: Article/Essay with OR (6 marks) - 250+ words
+- Q24-27: Grammar (2 marks each)
+- Q28-31: Literature with OR (6 marks each) - 200+ words
+
+JSON FORMAT:
+MCQ: {"questionType":"mcq","questionText":"Q?","options":["A","B","C","D"],"correctOption":0,"marks":1,"section":"PART-A (MCQ) - 1 mark"}
+
+Written: {"questionType":"written","questionText":"Q","correctAnswer":"[detailed answer]","marks":X,"section":"PART-B (Section) - X marks"}
+
+With OR: Add "hasAlternative":true,"alternativeQuestion":"OR: ...","alternativeAnswer":"..."
+
+RULES:
+1. Extract from images only
+2. 31 questions total
+3. English only
+4. Long answers for 4+ marks
+
+Return ONLY valid JSON array.`;
     } else {
       prompt = `You are a quiz question extractor. EXTRACT questions ONLY from the provided image(s).
 
@@ -1104,6 +1250,33 @@ STRICT RULES:
 8. Chemical formulas: H₂O, CO₂, CH₄, C₂H₆
 
 Return ONLY valid JSON array with exactly 31 questions. No markdown, no explanation.`;
+    } else if (examFormat === "upboard_english") {
+      prompt = `Generate UP BOARD CLASS 10 ENGLISH PAPER - 70 marks, 31 questions from topic: "${rawQuestions}"
+
+STRUCTURE:
+- Q1-Q20: MCQs (1 mark each) = 20 marks
+- Q21: Reading passage 250+ words (8 marks)
+- Q22: Letter with OR (4 marks) - FULL FORMAT 150-200 words
+- Q23: Article/Essay with OR (6 marks) - 250+ words
+- Q24-27: Grammar (2 marks each)
+- Q28-31: Literature with OR (6 marks each) - 200+ words
+
+JSON FORMAT:
+MCQ: {"questionType":"mcq","questionText":"Q?","options":["A","B","C","D"],"correctOption":0,"marks":1,"section":"PART-A (MCQ) - 1 mark"}
+
+Reading: {"questionType":"written","questionText":"Read passage...\\n\\n[250+ word passage]\\n\\n(a)...(b)...(c)...(d)...","correctAnswer":"(a)...(b)...(c)...(d)...","marks":8,"section":"PART-B (Reading) - 8 marks"}
+
+Letter: {"questionType":"written","questionText":"Write letter...","correctAnswer":"[Address]\\n[Date]\\n[Receiver]\\n[Subject]\\n[Body 150-200 words]\\n[Closing]\\n[Name]","marks":4,"section":"PART-B (Writing) - 4 marks","hasAlternative":true,"alternativeQuestion":"OR: Application...","alternativeAnswer":"[150-200 words]"}
+
+Article: {"questionType":"written","questionText":"Write article...","correctAnswer":"[TITLE]\\nBy: Name\\n[250-350 words]","marks":6,"section":"PART-B (Writing) - 6 marks","hasAlternative":true,"alternativeQuestion":"OR: Essay...","alternativeAnswer":"[250-350 words]"}
+
+Grammar: {"questionType":"written","questionText":"Change to passive...","correctAnswer":"[Answer]","marks":2,"section":"PART-B (Grammar) - 2 marks"}
+
+Literature: {"questionType":"written","questionText":"Central idea...","correctAnswer":"[200-300 words]","marks":6,"section":"PART-B (Literature) - 6 marks","hasAlternative":true,"alternativeQuestion":"OR: Character...","alternativeAnswer":"[200-300 words]"}
+
+RULES: 31 questions, English only, long answers for 4+ marks, Q22,Q23,Q28-31 need hasAlternative
+
+Return ONLY valid JSON array.`;
     } else {
       prompt = `You are a quiz question processor. Convert the following content into quiz questions.${languageNote}
 

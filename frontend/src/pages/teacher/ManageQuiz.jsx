@@ -1756,6 +1756,15 @@ ${answersHTML}
                               questionTypes: ["mcq", "written"],
                               numberOfQuestions: 30, // 20 MCQ + 10 descriptive
                             });
+                          } else if (format === "upboard_english") {
+                            // Auto-configure for UP Board English
+                            setGenerateForm({
+                              ...generateForm,
+                              examFormat: format,
+                              language: "english",
+                              questionTypes: ["mcq", "written"],
+                              numberOfQuestions: 30,
+                            });
                           } else {
                             setGenerateForm({
                               ...generateForm,
@@ -1767,6 +1776,7 @@ ${answersHTML}
                       >
                         <option value="general">General (Custom)</option>
                         <option value="upboard_science">UP Board Science (Class 10)</option>
+                        <option value="upboard_english">UP Board English (Class 10)</option>
                       </select>
                     </div>
 
@@ -1818,6 +1828,88 @@ ${answersHTML}
                           />
                           <p className="text-xs text-gray-500 mt-1">
                             Enter single topic OR multiple topics (comma-separated) - questions will be distributed evenly
+                          </p>
+                        </div>
+
+                        {/* Difficulty Only */}
+                        <div className="form-group">
+                          <label className="input-label">Difficulty Level</label>
+                          <div className="grid grid-cols-3 gap-3">
+                            {[
+                              { value: "easy", label: "Easy", desc: "Basic concepts", icon: "🟢" },
+                              { value: "medium", label: "Medium", desc: "Board level", icon: "🟡" },
+                              { value: "hard", label: "Hard", desc: "Competitive", icon: "🔴" },
+                            ].map((level) => (
+                              <button
+                                key={level.value}
+                                type="button"
+                                onClick={() =>
+                                  setGenerateForm({
+                                    ...generateForm,
+                                    difficulty: level.value,
+                                  })
+                                }
+                                className={`p-3 rounded-lg border text-center transition-all ${
+                                  generateForm.difficulty === level.value
+                                    ? "bg-blue-500/30 border-blue-500 text-white"
+                                    : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                                }`}
+                              >
+                                <span className="text-xl">{level.icon}</span>
+                                <p className="font-medium mt-1">{level.label}</p>
+                                <p className="text-xs opacity-70">{level.desc}</p>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    ) : generateForm.examFormat === "upboard_english" ? (
+                      <>
+                        {/* UP Board English Info Box */}
+                        <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
+                          <p className="text-green-300 font-medium mb-3">📋 UP Board English Paper - 70 Marks (31 Questions)</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                            <div className="bg-white/5 rounded-lg p-3">
+                              <p className="text-yellow-400 font-medium mb-2">PART-A - 20 Marks</p>
+                              <ul className="text-xs text-gray-400 space-y-1">
+                                <li>• Q1-Q20: 20 MCQs × 1 = 20 marks</li>
+                              </ul>
+                            </div>
+                            <div className="bg-white/5 rounded-lg p-3">
+                              <p className="text-green-400 font-medium mb-2">PART-B - 50 Marks</p>
+                              <ul className="text-xs text-gray-400 space-y-1">
+                                <li>• Q21: Reading (8 marks)</li>
+                                <li>• Q22: Letter (4 marks) + OR</li>
+                                <li>• Q23: Article/Essay (6 marks) + OR</li>
+                                <li>• Q24-27: Grammar (4 × 2 = 8 marks)</li>
+                                <li>• Q28-31: Literature (4 × 6 = 24 marks)</li>
+                              </ul>
+                            </div>
+                          </div>
+                          <div className="mt-3 pt-3 border-t border-white/10">
+                            <p className="text-xs text-gray-400">
+                              ✓ 31 questions = 70 marks • ✓ English only • ✓ Long passages • ✓ Full letter format
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Topic Input */}
+                        <div className="form-group">
+                          <label className="input-label">Topic / Chapter(s) *</label>
+                          <input
+                            type="text"
+                            value={generateForm.topic}
+                            onChange={(e) =>
+                              setGenerateForm({
+                                ...generateForm,
+                                topic: e.target.value,
+                              })
+                            }
+                            className="glass-input"
+                            placeholder="e.g., Reading Comprehension, Grammar, Letter Writing, First Flight Chapter 1"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Enter topic(s) - Grammar, Writing, Literature, or specific chapters
                           </p>
                         </div>
 
@@ -2199,6 +2291,12 @@ ${answersHTML}
                               examFormat: format,
                               language: "bilingual",
                             });
+                          } else if (format === "upboard_english") {
+                            setBulkForm({
+                              ...bulkForm,
+                              examFormat: format,
+                              language: "english",
+                            });
                           } else {
                             setBulkForm({
                               ...bulkForm,
@@ -2210,6 +2308,7 @@ ${answersHTML}
                       >
                         <option value="general">General (Custom)</option>
                         <option value="upboard_science">UP Board Science (Class 10)</option>
+                        <option value="upboard_english">UP Board English (Class 10)</option>
                       </select>
                     </div>
 
@@ -2238,6 +2337,36 @@ ${answersHTML}
                         <div className="mt-3 pt-3 border-t border-white/10">
                           <p className="text-xs text-gray-400">
                             ✓ 31 questions = 70 marks • ✓ Bilingual (Hindi/English) • ✓ Section headers
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* UP Board English Info Box */}
+                    {bulkForm.examFormat === "upboard_english" && (
+                      <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
+                        <p className="text-green-300 font-medium mb-3">📋 UP Board English Paper - 70 Marks (31 Questions)</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-yellow-400 font-medium mb-2">PART-A - 20 Marks</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• Q1-Q20: 20 MCQs × 1 = 20 marks</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-green-400 font-medium mb-2">PART-B - 50 Marks</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• Q21: Reading (8 marks)</li>
+                              <li>• Q22: Letter (4 marks) + OR</li>
+                              <li>• Q23: Article/Essay (6 marks) + OR</li>
+                              <li>• Q24-27: Grammar (4 × 2 = 8 marks)</li>
+                              <li>• Q28-31: Literature (4 × 6 = 24 marks)</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-white/10">
+                          <p className="text-xs text-gray-400">
+                            ✓ 31 questions = 70 marks • ✓ English only • ✓ Long passages • ✓ Full letter format
                           </p>
                         </div>
                       </div>
@@ -2311,6 +2440,16 @@ Example (Multiple topics - comma separated):
 प्रकाश, रासायनिक अभिक्रियाएं, जीवन प्रक्रियाएं
 
 OR paste raw questions in any format...`
+                          : bulkForm.examFormat === "upboard_english"
+                          ? `Enter topic(s) for UP Board English paper...
+
+Example (Single topic):
+Reading Comprehension
+
+Example (Multiple topics - comma separated):
+Grammar, Letter Writing, First Flight Chapter 1
+
+OR paste raw questions in any format...`
                           : `Paste your questions here in any format...
 
 Example:
@@ -2325,7 +2464,7 @@ Example:
                     </div>
 
                     {/* Show these fields only for General format, not for UP Board */}
-                    {bulkForm.examFormat !== "upboard_science" && (
+                    {bulkForm.examFormat !== "upboard_science" && bulkForm.examFormat !== "upboard_english" && (
                       <>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="form-group">
@@ -2615,6 +2754,12 @@ Example:
                               examFormat: format,
                               language: "bilingual",
                             });
+                          } else if (format === "upboard_english") {
+                            setImageForm({
+                              ...imageForm,
+                              examFormat: format,
+                              language: "english",
+                            });
                           } else {
                             setImageForm({
                               ...imageForm,
@@ -2626,6 +2771,7 @@ Example:
                       >
                         <option value="general">General (Custom)</option>
                         <option value="upboard_science">UP Board Science (Class 10)</option>
+                        <option value="upboard_english">UP Board English (Class 10)</option>
                       </select>
                     </div>
 
@@ -2654,6 +2800,36 @@ Example:
                         <div className="mt-3 pt-3 border-t border-white/10">
                           <p className="text-xs text-gray-400">
                             ✓ 31 questions = 70 marks • ✓ Bilingual (Hindi/English) • ✓ Section headers
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* UP Board English Info Box */}
+                    {imageForm.examFormat === "upboard_english" && (
+                      <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
+                        <p className="text-green-300 font-medium mb-3">📋 UP Board English Paper - 70 Marks (31 Questions)</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-yellow-400 font-medium mb-2">PART-A - 20 Marks</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• Q1-Q20: 20 MCQs × 1 = 20 marks</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-green-400 font-medium mb-2">PART-B - 50 Marks</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• Q21: Reading (8 marks)</li>
+                              <li>• Q22: Letter (4 marks) + OR</li>
+                              <li>• Q23: Article/Essay (6 marks) + OR</li>
+                              <li>• Q24-27: Grammar (4 × 2 = 8 marks)</li>
+                              <li>• Q28-31: Literature (4 × 6 = 24 marks)</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-white/10">
+                          <p className="text-xs text-gray-400">
+                            ✓ 31 questions = 70 marks • ✓ English only • ✓ Long passages • ✓ Full letter format
                           </p>
                         </div>
                       </div>
@@ -2779,7 +2955,7 @@ Example:
                     </div>
 
                     {/* Show these fields only for General format, not for UP Board */}
-                    {imageForm.examFormat !== "upboard_science" && (
+                    {imageForm.examFormat !== "upboard_science" && imageForm.examFormat !== "upboard_english" && (
                       <>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="form-group">

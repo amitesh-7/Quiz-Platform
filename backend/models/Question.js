@@ -18,7 +18,7 @@ const questionSchema = new mongoose.Schema(
       required: [true, "Question text is required"],
       trim: true,
       minlength: [5, "Question must be at least 5 characters"],
-      maxlength: [2000, "Question cannot exceed 2000 characters"],
+      maxlength: [5000, "Question cannot exceed 5000 characters"],
     },
     // For MCQ
     options: {

@@ -42,7 +42,7 @@ const generateValidation = [
     .withMessage("Description cannot exceed 1000 characters"),
   body("examFormat")
     .optional()
-    .isIn(["general", "upboard_science"])
+    .isIn(["general", "upboard_science", "upboard_english"])
     .withMessage("Invalid exam format"),
 ];
 
@@ -160,7 +160,7 @@ const processQuestionsController = async (req, res) => {
       });
     }
 
-    if (examFormat !== "upboard_science" && (!maxMarks || maxMarks < 1)) {
+    if (examFormat !== "upboard_science" && examFormat !== "upboard_english" && (!maxMarks || maxMarks < 1)) {
       return res.status(400).json({
         success: false,
         message: "Maximum marks must be at least 1",
@@ -175,13 +175,28 @@ const processQuestionsController = async (req, res) => {
       });
     }
 
+    // Determine settings based on exam format
+    let finalMaxMarks = maxMarks;
+    let finalLanguage = language || "english";
+    let finalNumberOfQuestions = numberOfQuestions || null;
+
+    if (examFormat === "upboard_science") {
+      finalMaxMarks = 70;
+      finalLanguage = "bilingual";
+      finalNumberOfQuestions = 31;
+    } else if (examFormat === "upboard_english") {
+      finalMaxMarks = 70;
+      finalLanguage = "english";
+      finalNumberOfQuestions = 31;
+    }
+
     // Process raw questions with exam format and difficulty
     const questions = await processRawQuestions(
       rawQuestions,
-      examFormat === "upboard_science" ? 70 : maxMarks,
+      finalMaxMarks,
       marksDistribution || "Distribute marks evenly across questions",
-      examFormat === "upboard_science" ? "bilingual" : (language || "english"),
-      examFormat === "upboard_science" ? 31 : (numberOfQuestions || null),
+      finalLanguage,
+      finalNumberOfQuestions,
       examFormat || "general",
       difficulty || "medium"
     );
@@ -240,7 +255,7 @@ const extractQuestionsFromImageController = async (req, res) => {
       });
     }
 
-    if (examFormat !== "upboard_science" && (!maxMarks || maxMarks < 1)) {
+    if (examFormat !== "upboard_science" && examFormat !== "upboard_english" && (!maxMarks || maxMarks < 1)) {
       return res.status(400).json({
         success: false,
         message: "Maximum marks must be at least 1",
@@ -262,13 +277,25 @@ const extractQuestionsFromImageController = async (req, res) => {
       return { base64Data, mimeType };
     });
 
+    // Determine settings based on exam format
+    let finalMaxMarks = maxMarks;
+    let finalLanguage = language || "english";
+
+    if (examFormat === "upboard_science") {
+      finalMaxMarks = 70;
+      finalLanguage = "bilingual";
+    } else if (examFormat === "upboard_english") {
+      finalMaxMarks = 70;
+      finalLanguage = "english";
+    }
+
     // Extract questions from image(s) with exam format and difficulty
     const questions = await extractQuestionsFromImage(
       parsedImages,
-      examFormat === "upboard_science" ? 70 : maxMarks,
+      finalMaxMarks,
       marksDistribution || "Distribute marks based on question difficulty",
       additionalInstructions || "",
-      examFormat === "upboard_science" ? "bilingual" : (language || "english"),
+      finalLanguage,
       examFormat || "general",
       difficulty || "medium"
     );
