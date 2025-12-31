@@ -66,7 +66,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center px-3 sm:px-4 py-6 sm:py-8 safe-area-top safe-area-bottom">
       <motion.div
         className="glass-card w-full max-w-md"
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -74,34 +74,34 @@ const Register = () => {
         transition={{ duration: 0.5 }}
       >
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <motion.div
-            className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl 
-                       flex items-center justify-center mx-auto mb-4 shadow-lg"
+            className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl sm:rounded-2xl 
+                       flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg"
             initial={{ rotate: 10 }}
             animate={{ rotate: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="text-white font-bold text-4xl">Q</span>
+            <span className="text-white font-bold text-3xl sm:text-4xl">Q</span>
           </motion.div>
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
             Teacher Registration
           </h1>
-          <p className="text-gray-400">Create your teacher account</p>
+          <p className="text-sm sm:text-base text-gray-400">Create your teacher account</p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
           <div className="form-group">
-            <label className="input-label">Full Name</label>
+            <label className="input-label text-sm sm:text-base">Full Name</label>
             <div className="relative">
-              <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <FiUser className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="glass-input pl-12"
+                className="glass-input pl-10 sm:pl-12 text-sm sm:text-base"
                 placeholder="Enter your name"
                 required
               />
@@ -109,15 +109,15 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label className="input-label">Email Address</label>
+            <label className="input-label text-sm sm:text-base">Email Address</label>
             <div className="relative">
-              <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <FiMail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="glass-input pl-12"
+                className="glass-input pl-10 sm:pl-12 text-sm sm:text-base"
                 placeholder="Enter your email"
                 required
               />
@@ -125,15 +125,15 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label className="input-label">Password</label>
+            <label className="input-label text-sm sm:text-base">Password</label>
             <div className="relative">
-              <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <FiLock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="glass-input pl-12"
+                className="glass-input pl-10 sm:pl-12 text-sm sm:text-base"
                 placeholder="Create a password"
                 required
               />
@@ -141,15 +141,15 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label className="input-label">Confirm Password</label>
+            <label className="input-label text-sm sm:text-base">Confirm Password</label>
             <div className="relative">
-              <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <FiLock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input
                 type="password"
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="glass-input pl-12"
+                className="glass-input pl-10 sm:pl-12 text-sm sm:text-base"
                 placeholder="Confirm your password"
                 required
               />
@@ -157,39 +157,39 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label className="input-label">Secret Key</label>
+            <label className="input-label text-sm sm:text-base">Secret Key</label>
             <div className="relative">
-              <FiKey className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <FiKey className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input
                 type="password"
                 name="secretKey"
                 value={formData.secretKey}
                 onChange={handleChange}
-                className="glass-input pl-12"
+                className="glass-input pl-10 sm:pl-12 text-sm sm:text-base"
                 placeholder="Enter teacher registration secret key"
                 required
               />
             </div>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-xs sm:text-sm text-gray-500 mt-2">
               🔒 Contact administrator for the secret key
             </p>
           </div>
 
           <motion.button
             type="submit"
-            className="btn-primary w-full flex items-center justify-center gap-2"
+            className="btn-primary w-full flex items-center justify-center gap-2 text-sm sm:text-base py-2.5 sm:py-3"
             disabled={loading}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             {loading ? (
               <>
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 Creating account...
               </>
             ) : (
               <>
-                <FiUserPlus className="w-5 h-5" />
+                <FiUserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
                 Create Teacher Account
               </>
             )}
@@ -197,8 +197,8 @@ const Register = () => {
         </form>
 
         {/* Login Link */}
-        <div className="mt-6 text-center">
-          <p className="text-gray-400">
+        <div className="mt-4 sm:mt-6 text-center">
+          <p className="text-gray-400 text-sm sm:text-base">
             Already have an account?{" "}
             <Link
               to="/teacher-login"
@@ -207,7 +207,7 @@ const Register = () => {
               Sign in as Teacher
             </Link>
           </p>
-          <p className="text-gray-500 text-sm mt-3">
+          <p className="text-gray-500 text-xs sm:text-sm mt-2 sm:mt-3">
             Students: Your teacher will create your account
           </p>
         </div>

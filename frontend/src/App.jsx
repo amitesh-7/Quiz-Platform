@@ -38,7 +38,10 @@ function App() {
         <ParticleBackground />
         <ThemeToggle />
         <Toaster
-          position="top-right"
+          position="top-center"
+          containerStyle={{
+            top: 12,
+          }}
           toastOptions={{
             duration: 4000,
             style: {
@@ -46,6 +49,8 @@ function App() {
               backdropFilter: "blur(10px)",
               color: "#fff",
               border: "1px solid rgba(255, 255, 255, 0.2)",
+              fontSize: "14px",
+              maxWidth: "90vw",
             },
             success: {
               iconTheme: {

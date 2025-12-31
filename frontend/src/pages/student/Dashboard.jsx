@@ -43,63 +43,63 @@ const StudentDashboard = () => {
     <div className="min-h-screen">
       <Navbar />
 
-      <div className="container mx-auto px-4 pb-8">
+      <div className="container mx-auto px-3 sm:px-4 pb-6 sm:pb-8">
         {/* Header */}
         <motion.div
-          className="mb-8"
+          className="mb-6 sm:mb-8"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
             Available Quizzes
           </h1>
-          <p className="text-gray-400">Select a quiz to start attempting</p>
+          <p className="text-sm sm:text-base text-gray-400">Select a quiz to start attempting</p>
         </motion.div>
 
         {/* Stats */}
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8"
+          className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <div className="glass-card">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                <FiBook className="w-6 h-6 text-blue-400" />
+          <div className="glass-card p-3 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-center sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500/20 rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-0">
+                <FiBook className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
               </div>
-              <div>
-                <p className="text-gray-400 text-sm">Total Quizzes</p>
-                <p className="text-2xl font-bold text-white">
+              <div className="text-center sm:text-left">
+                <p className="text-gray-400 text-xs sm:text-sm">Total</p>
+                <p className="text-xl sm:text-2xl font-bold text-white">
                   {quizzes.length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="glass-card">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
-                <FiCheckCircle className="w-6 h-6 text-green-400" />
+          <div className="glass-card p-3 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-center sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500/20 rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-0">
+                <FiCheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
               </div>
-              <div>
-                <p className="text-gray-400 text-sm">Completed</p>
-                <p className="text-2xl font-bold text-white">
+              <div className="text-center sm:text-left">
+                <p className="text-gray-400 text-xs sm:text-sm">Done</p>
+                <p className="text-xl sm:text-2xl font-bold text-white">
                   {completedQuizzes.length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="glass-card">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
-                <FiAward className="w-6 h-6 text-yellow-400" />
+          <div className="glass-card p-3 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-center sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-500/20 rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-0">
+                <FiAward className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
               </div>
-              <div>
-                <p className="text-gray-400 text-sm">Pending</p>
-                <p className="text-2xl font-bold text-white">
+              <div className="text-center sm:text-left">
+                <p className="text-gray-400 text-xs sm:text-sm">Pending</p>
+                <p className="text-xl sm:text-2xl font-bold text-white">
                   {availableQuizzes.length}
                 </p>
               </div>
@@ -109,18 +109,18 @@ const StudentDashboard = () => {
 
         {/* My Results Link */}
         <motion.div
-          className="mb-6"
+          className="mb-4 sm:mb-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
           <Link to="/student/results">
             <motion.button
-              className="btn-secondary flex items-center gap-2"
+              className="btn-secondary flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <FiAward className="w-5 h-5" />
+              <FiAward className="w-4 h-4 sm:w-5 sm:h-5" />
               View My Results
             </motion.button>
           </Link>
@@ -129,19 +129,19 @@ const StudentDashboard = () => {
         {/* Available Quizzes */}
         {quizzes.length === 0 ? (
           <motion.div
-            className="glass-card text-center py-12"
+            className="glass-card text-center py-8 sm:py-12"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <div className="text-6xl mb-4">📚</div>
-            <h2 className="text-xl font-semibold text-white mb-2">
+            <div className="text-5xl sm:text-6xl mb-3 sm:mb-4">📚</div>
+            <h2 className="text-lg sm:text-xl font-semibold text-white mb-2">
               No quizzes available
             </h2>
-            <p className="text-gray-400">Check back later for new quizzes</p>
+            <p className="text-sm sm:text-base text-gray-400">Check back later for new quizzes</p>
           </motion.div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
             {quizzes.map((quiz, index) => (
               <motion.div
                 key={quiz._id}
@@ -152,28 +152,28 @@ const StudentDashboard = () => {
               >
                 <div className="flex flex-col h-full">
                   <div className="flex-1">
-                    <div className="flex items-start justify-between gap-2 mb-3">
-                      <h3 className="text-xl font-semibold text-white line-clamp-2">
+                    <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3">
+                      <h3 className="text-base sm:text-xl font-semibold text-white line-clamp-2">
                         {quiz.title}
                       </h3>
                       {quiz.hasSubmitted && (
-                        <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium whitespace-nowrap">
-                          Completed
+                        <span className="px-2 py-0.5 sm:py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium whitespace-nowrap">
+                          Done
                         </span>
                       )}
                     </div>
 
-                    <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+                    <p className="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
                       {quiz.description || "No description available"}
                     </p>
 
-                    <div className="flex flex-wrap gap-3 mb-4">
-                      <div className="flex items-center gap-1 text-sm text-gray-400">
-                        <FiClock className="w-4 h-4" />
+                    <div className="flex flex-wrap gap-2 sm:gap-3 mb-3 sm:mb-4">
+                      <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-400">
+                        <FiClock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         <span>{quiz.duration} mins</span>
                       </div>
-                      <div className="flex items-center gap-1 text-sm text-gray-400">
-                        <FiCheckCircle className="w-4 h-4" />
+                      <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-400">
+                        <FiCheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         <span>{quiz.totalMarks} marks</span>
                       </div>
                     </div>
@@ -185,29 +185,29 @@ const StudentDashboard = () => {
                     )}
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-white/10">
+                  <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/10">
                     <div className="flex gap-2">
                       <Link to={`/student/quiz/${quiz._id}`} className="flex-1">
                         <motion.button
-                          className={`w-full flex items-center justify-center gap-2 ${
+                          className={`w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base py-2.5 sm:py-3 ${
                             quiz.hasSubmitted ? "btn-secondary" : "btn-primary"
                           }`}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                         >
-                          <FiPlay className="w-5 h-5" />
-                          {quiz.hasSubmitted ? "Retake Quiz" : "Start Quiz"}
+                          <FiPlay className="w-4 h-4 sm:w-5 sm:h-5" />
+                          {quiz.hasSubmitted ? "Retake" : "Start"}
                         </motion.button>
                       </Link>
                       {quiz.hasSubmitted && (
                         <Link to={`/student/result/${quiz._id}`}>
                           <motion.button
-                            className="btn-secondary px-4 flex items-center justify-center gap-2"
+                            className="btn-secondary px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base py-2.5 sm:py-3"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                           >
-                            <FiAward className="w-5 h-5" />
-                            Result
+                            <FiAward className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <span className="hidden sm:inline">Result</span>
                           </motion.button>
                         </Link>
                       )}
