@@ -283,7 +283,7 @@ const getResult = async (req, res) => {
   try {
     const { quizId } = req.params;
 
-    // Get submission
+    // Get submission with all stored answer data
     const submission = await Submission.findOne({
       quizId,
       studentId: req.user._id,
@@ -296,40 +296,81 @@ const getResult = async (req, res) => {
       });
     }
 
-    // Get questions with correct answers for review
-    const questions = await Question.find({ quizId });
+    // Get all questions for this quiz to show attempted and unattempted
+    const allQuestions = await Question.find({ quizId });
 
-    // Build detailed results
-    const detailedResults = questions.map((question) => {
-      const studentAnswer = submission.answers.find(
-        (a) => a.questionId.toString() === question._id.toString()
-      );
+    // Create a map of submitted answers by questionId
+    const answersMap = new Map();
+    submission.answers.forEach((answer) => {
+      answersMap.set(answer.questionId?.toString(), answer);
+    });
 
-      return {
+    // Build detailed results including all questions
+    const detailedResults = allQuestions.map((question, index) => {
+      const answer = answersMap.get(question._id.toString());
+      const isAttempted = !!answer;
+
+      const result = {
         questionId: question._id,
         questionText: question.questionText,
-        options: question.options,
-        correctOption: question.correctOption,
-        selectedOption: studentAnswer ? studentAnswer.selectedOption : null,
-        isCorrect: studentAnswer
-          ? studentAnswer.selectedOption === question.correctOption
-          : false,
-        marks: question.marks,
+        questionType: question.questionType || "mcq",
+        marks: question.marks || 0,
+        earnedMarks: answer?.earnedMarks || 0,
+        isCorrect: answer ? answer.earnedMarks === answer.marks : false,
+        isPartial: answer ? (answer.earnedMarks > 0 && answer.earnedMarks < answer.marks) : false,
+        isAttempted: isAttempted,
+        selectedOption: answer?.selectedOption ?? null,
+        feedback: answer?.feedback || "",
+        imageUrl: answer?.imageUrl || null,
       };
+
+      // Add type-specific fields from question (always include these)
+      if (question.questionType === "mcq" || question.questionType === "truefalse") {
+        result.options = question.options || [];
+        result.correctOption = question.correctOption;
+      } else if (question.questionType === "written") {
+        result.studentAnswer = answer?.selectedOption || "";
+        result.expectedAnswer = question.correctAnswer || "";
+        result.awardedMarks = answer?.earnedMarks || 0;
+      } else if (question.questionType === "fillblank") {
+        result.studentAnswer = answer?.selectedOption 
+          ? (Array.isArray(answer.selectedOption) ? answer.selectedOption.join(", ") : answer.selectedOption)
+          : "";
+        result.correctAnswer = Array.isArray(question.blanks) 
+          ? question.blanks.join(", ") 
+          : question.blanks || "";
+      } else if (question.questionType === "matching") {
+        // Format student matches
+        if (question.matchPairs) {
+          if (answer && typeof answer.selectedOption === "object") {
+            result.studentMatches = question.matchPairs.map((pair, idx) => ({
+              left: pair.left,
+              right: answer.selectedOption[idx] || "Not matched",
+            }));
+          } else {
+            result.studentMatches = null;
+          }
+          result.correctMatches = question.matchPairs.map((pair) => ({
+            left: pair.left,
+            right: pair.right,
+          }));
+        }
+      }
+
+      return result;
     });
+
+    // Calculate total marks and earned marks
+    const totalMarks = allQuestions.reduce((sum, q) => sum + (q.marks || 0), 0);
+    const earnedMarks = submission.answers.reduce((sum, a) => sum + (a.earnedMarks || 0), 0);
 
     res.status(200).json({
       success: true,
       data: {
         quiz: submission.quizId,
-        score: submission.score,
-        totalMarks: submission.quizId.totalMarks,
-        percentage:
-          submission.quizId.totalMarks > 0
-            ? Math.round(
-                (submission.score / submission.quizId.totalMarks) * 100
-              )
-            : 0,
+        score: earnedMarks,
+        totalMarks: totalMarks || submission.quizId?.totalMarks || 0,
+        percentage: totalMarks > 0 ? Math.round((earnedMarks / totalMarks) * 100) : 0,
         submittedAt: submission.submittedAt,
         detailedResults,
       },

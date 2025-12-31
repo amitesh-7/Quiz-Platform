@@ -30,6 +30,7 @@ const AttemptQuiz = () => {
   const [answerImages, setAnswerImages] = useState({}); // Store image URLs
   const [answerSheets, setAnswerSheets] = useState([]); // Store multiple answer sheet images
   const [uploadingOCR, setUploadingOCR] = useState(false);
+  const [uploadingQuestionId, setUploadingQuestionId] = useState(null); // Track which question is uploading
   const [timeLeft, setTimeLeft] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
@@ -176,40 +177,112 @@ const AttemptQuiz = () => {
     }
 
     setUploadingOCR(true);
+    setUploadingQuestionId(questionId);
 
     try {
       // Convert image to base64
       const reader = new FileReader();
-      reader.readAsDataURL(file);
-
+      
       reader.onload = async () => {
-        const base64 = reader.result.split(",")[1];
+        try {
+          const base64 = reader.result.split(",")[1];
 
-        // Call OCR API
-        const response = await geminiAPI.ocr(base64, file.type);
-        const extractedText = response.data.data.text;
+          // Call OCR API
+          const response = await geminiAPI.ocr(base64, file.type);
+          const extractedText = response.data.data.text;
 
-        // Set the extracted text as the answer
-        handleTextAnswer(questionId, extractedText);
+          // Set the extracted text as the answer
+          handleTextAnswer(questionId, extractedText);
 
-        // Store image URL for submission
-        setAnswerImages({
-          ...answerImages,
-          [questionId]: reader.result,
-        });
+          // Store image URL for submission
+          setAnswerImages((prev) => ({
+            ...prev,
+            [questionId]: reader.result,
+          }));
 
-        toast.success("Text extracted from image successfully!");
+          toast.success("Text extracted from image successfully!");
+        } catch (error) {
+          console.error("OCR error:", error);
+          toast.error("Failed to extract text from image");
+        } finally {
+          setUploadingOCR(false);
+          setUploadingQuestionId(null);
+        }
       };
 
       reader.onerror = () => {
         toast.error("Failed to read image file");
         setUploadingOCR(false);
+        setUploadingQuestionId(null);
       };
+
+      reader.readAsDataURL(file);
     } catch (error) {
-      console.error("OCR error:", error);
-      toast.error("Failed to extract text from image");
-    } finally {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload image");
       setUploadingOCR(false);
+      setUploadingQuestionId(null);
+    }
+  };
+
+  // Handle image upload for fill in the blanks
+  const handleFillBlankImageUpload = async (questionId, blankIndex, file) => {
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must be less than 5MB");
+      return;
+    }
+
+    setUploadingOCR(true);
+    setUploadingQuestionId(`${questionId}_blank_${blankIndex}`);
+
+    try {
+      const reader = new FileReader();
+      
+      reader.onload = async () => {
+        try {
+          const base64 = reader.result.split(",")[1];
+
+          // Call OCR API
+          const response = await geminiAPI.ocr(base64, file.type);
+          let extractedText = response.data.data.text;
+          
+          // Clean up the extracted text - remove extra whitespace and newlines
+          extractedText = extractedText.trim().replace(/\n/g, ' ').replace(/\s+/g, ' ');
+
+          // Set the extracted text for this blank
+          handleFillBlank(questionId, blankIndex, extractedText);
+
+          toast.success(`Blank ${blankIndex + 1}: Text extracted successfully!`);
+        } catch (error) {
+          console.error("OCR error:", error);
+          toast.error("Failed to extract text from image");
+        } finally {
+          setUploadingOCR(false);
+          setUploadingQuestionId(null);
+        }
+      };
+
+      reader.onerror = () => {
+        toast.error("Failed to read image file");
+        setUploadingOCR(false);
+        setUploadingQuestionId(null);
+      };
+
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload image");
+      setUploadingOCR(false);
+      setUploadingQuestionId(null);
     }
   };
 
@@ -753,44 +826,57 @@ const AttemptQuiz = () => {
 
               {/* Written Answer */}
               {question.questionType === "written" && (
-                <div className="space-y-4">
+                <div className="space-y-4 relative">
+                  {/* Loading Overlay */}
+                  {uploadingQuestionId === question._id && (
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-xl z-10 flex flex-col items-center justify-center">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 relative mb-4">
+                        <div className="w-full h-full border-4 border-blue-500/30 rounded-full"></div>
+                        <div className="w-full h-full border-4 border-transparent border-t-blue-500 rounded-full absolute top-0 left-0 animate-spin"></div>
+                      </div>
+                      <p className="text-white font-medium text-base sm:text-lg">Extracting text...</p>
+                      <p className="text-gray-400 text-sm mt-1">Please wait while AI reads your answer</p>
+                    </div>
+                  )}
+
                   {/* Image Upload Section */}
                   <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                    <label className="flex items-center gap-2 cursor-pointer group">
+                    <label className={`flex items-center gap-3 cursor-pointer group ${uploadingQuestionId === question._id ? 'pointer-events-none opacity-50' : ''}`}>
                       <input
                         type="file"
                         accept="image/*"
                         onChange={(e) => {
                           const file = e.target.files[0];
                           if (file) handleImageUpload(question._id, file);
+                          e.target.value = ''; // Reset input
                         }}
                         className="hidden"
                         disabled={uploadingOCR}
                       />
-                      <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
-                        {uploadingOCR ? (
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-500/20 rounded-lg flex items-center justify-center group-hover:bg-blue-500/30 transition-colors flex-shrink-0">
+                        {uploadingQuestionId === question._id ? (
                           <div className="w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
                         ) : (
                           <FiUpload className="w-6 h-6 text-blue-400" />
                         )}
                       </div>
-                      <div className="flex-1">
-                        <p className="text-white font-medium">
-                          Upload Answer Image
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-medium text-sm sm:text-base">
+                          {uploadingQuestionId === question._id ? "Extracting text..." : "Upload Answer Image"}
                         </p>
-                        <p className="text-sm text-gray-400">
-                          {uploadingOCR
-                            ? "Extracting text..."
+                        <p className="text-xs sm:text-sm text-gray-400 truncate">
+                          {uploadingQuestionId === question._id
+                            ? "AI is reading your handwritten answer..."
                             : "Take a photo of your handwritten answer"}
                         </p>
                       </div>
                     </label>
 
-                    {answerImages[question._id] && (
+                    {answerImages[question._id] && !uploadingQuestionId && (
                       <div className="mt-3 pt-3 border-t border-blue-500/30">
                         <div className="flex items-center gap-2 text-green-400">
-                          <FiImage className="w-4 h-4" />
-                          <span className="text-sm">Image uploaded</span>
+                          <FiCheck className="w-4 h-4" />
+                          <span className="text-sm">Image uploaded & text extracted</span>
                         </div>
                       </div>
                     )}
@@ -798,7 +884,7 @@ const AttemptQuiz = () => {
 
                   {/* Extracted/Edited Text */}
                   <div>
-                    <label className="input-label mb-2">
+                    <label className="input-label mb-2 text-sm sm:text-base">
                       Your Answer (Extracted or Type Manually)
                     </label>
                     <textarea
@@ -806,10 +892,11 @@ const AttemptQuiz = () => {
                       onChange={(e) =>
                         handleTextAnswer(question._id, e.target.value)
                       }
-                      className="glass-input min-h-[200px] resize-y w-full font-mono"
+                      className="glass-input min-h-[150px] sm:min-h-[200px] resize-y w-full font-mono text-sm sm:text-base"
                       placeholder="Write your answer here or upload an image of your handwritten answer..."
+                      disabled={uploadingQuestionId === question._id}
                     />
-                    <p className="text-sm text-gray-400 mt-2">
+                    <p className="text-xs sm:text-sm text-gray-400 mt-2">
                       Tip: Write your answer on paper, take a clear photo, and
                       upload it. AI will extract and evaluate your answer.
                     </p>
@@ -820,23 +907,67 @@ const AttemptQuiz = () => {
               {/* Fill in the Blanks */}
               {question.questionType === "fillblank" && (
                 <div className="space-y-4">
+                  <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg mb-4">
+                    <p className="text-sm text-blue-300">
+                      💡 Tip: You can upload an image of your handwritten answer for each blank
+                    </p>
+                  </div>
+                  
                   {Array.from({ length: question.blanksCount || 1 }).map(
-                    (_, index) => (
-                      <div key={index}>
-                        <label className="text-sm text-gray-400 mb-2 block">
-                          Blank {index + 1}
-                        </label>
+                    (_, index) => {
+                      const isUploadingThisBlank = uploadingQuestionId === `${question._id}_blank_${index}`;
+                      
+                      return (
+                      <div key={index} className="p-4 bg-white/5 rounded-xl border border-white/10">
+                        <div className="flex items-center justify-between mb-3">
+                          <label className="text-sm sm:text-base text-gray-300 font-medium">
+                            Blank {index + 1}
+                          </label>
+                          
+                          {/* Image Upload Button */}
+                          <label className={`flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg cursor-pointer transition-colors ${isUploadingThisBlank ? 'opacity-50 pointer-events-none' : ''}`}>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) handleFillBlankImageUpload(question._id, index, file);
+                                e.target.value = '';
+                              }}
+                              className="hidden"
+                              disabled={uploadingOCR}
+                            />
+                            {isUploadingThisBlank ? (
+                              <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                              <FiUpload className="w-4 h-4 text-blue-400" />
+                            )}
+                            <span className="text-xs sm:text-sm text-blue-400">
+                              {isUploadingThisBlank ? "Extracting..." : "Upload Image"}
+                            </span>
+                          </label>
+                        </div>
+                        
                         <input
                           type="text"
                           value={(answers[question._id] || [])[index] || ""}
                           onChange={(e) =>
                             handleFillBlank(question._id, index, e.target.value)
                           }
-                          className="glass-input w-full"
-                          placeholder={`Enter answer for blank ${index + 1}`}
+                          className="glass-input w-full text-sm sm:text-base"
+                          placeholder={`Type or upload image for blank ${index + 1}`}
+                          disabled={isUploadingThisBlank}
                         />
+                        
+                        {(answers[question._id] || [])[index] && (
+                          <div className="mt-2 flex items-center gap-2 text-green-400 text-xs sm:text-sm">
+                            <FiCheck className="w-4 h-4" />
+                            <span>Answer filled</span>
+                          </div>
+                        )}
                       </div>
-                    )
+                      );
+                    }
                   )}
                 </div>
               )}
@@ -867,109 +998,6 @@ const AttemptQuiz = () => {
                       </select>
                     </div>
                   ))}
-                </div>
-              )}
-
-              {/* Image Upload Section - After Last Question */}
-              {isLastQuestion && (
-                <div className="mt-8 p-6 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-xl">
-                  <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                    <FiImage className="w-5 h-5 text-blue-400" />
-                    Upload Answer Sheets ({answerSheets.length}/10)
-                  </h3>
-                  <p className="text-sm text-gray-400 mb-4">
-                    Upload images of your answer sheets. Label answers with
-                    numbers (e.g., Ans1, Ans2, Ans29, Ans30) for automatic
-                    extraction.
-                  </p>
-
-                  <label className="flex items-center gap-4 p-4 bg-white/5 rounded-lg cursor-pointer group hover:bg-white/10 transition-colors">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          handleAnswerSheetUpload(file);
-                          e.target.value = ""; // Reset input
-                        }
-                      }}
-                      className="hidden"
-                      disabled={uploadingOCR || answerSheets.length >= 10}
-                    />
-                    <div className="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
-                      {uploadingOCR ? (
-                        <div className="w-8 h-8 border-3 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-                      ) : (
-                        <FiUpload className="w-8 h-8 text-blue-400" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-white font-medium text-lg">
-                        {uploadingOCR
-                          ? "Processing..."
-                          : answerSheets.length >= 10
-                          ? "Max Limit Reached"
-                          : "Choose Image"}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        {uploadingOCR
-                          ? "Extracting and mapping answers..."
-                          : `Upload answer sheet images (Max 10, 5MB each)`}
-                      </p>
-                    </div>
-                  </label>
-
-                  {/* Uploaded Sheets List */}
-                  {answerSheets.length > 0 && (
-                    <div className="mt-4 space-y-2">
-                      <p className="text-sm text-gray-400 font-medium">
-                        Uploaded Answer Sheets:
-                      </p>
-                      {answerSheets.map((sheet) => (
-                        <div
-                          key={sheet.id}
-                          className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg flex items-center gap-3"
-                        >
-                          <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                            <FiCheck className="w-4 h-4 text-green-400" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-green-400 font-medium text-sm">
-                              {sheet.fileName}
-                            </p>
-                            <p className="text-xs text-gray-400">
-                              {sheet.mappedAnswers > 0
-                                ? `${sheet.mappedAnswers} answer(s) extracted`
-                                : "No answers detected with numbers"}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => removeAnswerSheet(sheet.id)}
-                            className="text-red-400 hover:text-red-300 transition-colors"
-                          >
-                            <FiXCircle className="w-5 h-5" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                    <p className="text-xs text-blue-300 mb-1">
-                      💡 Tips for best results:
-                    </p>
-                    <ul className="text-xs text-gray-400 space-y-1 list-disc list-inside">
-                      <li>
-                        Label each answer with its number: Ans1, Ans29, etc.
-                      </li>
-                      <li>Write clearly on white paper with dark ink</li>
-                      <li>Take photos in good lighting without shadows</li>
-                      <li>
-                        Upload up to 10 sheets to cover all written questions
-                      </li>
-                    </ul>
-                  </div>
                 </div>
               )}
 

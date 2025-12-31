@@ -7,6 +7,7 @@ import {
   FiCheckCircle,
   FiXCircle,
   FiHome,
+  FiAlertCircle,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
@@ -56,84 +57,97 @@ const QuizResult = () => {
 
   const gradeInfo = getGrade(result.percentage);
   const correctCount = result.detailedResults.filter((r) => r.isCorrect).length;
+  const partialCount = result.detailedResults.filter((r) => r.isPartial).length;
   const incorrectCount = result.detailedResults.filter(
-    (r) => !r.isCorrect && r.selectedOption !== null
+    (r) => !r.isCorrect && !r.isPartial && r.isAttempted
   ).length;
-  const unanswered = result.detailedResults.filter(
-    (r) => r.selectedOption === null
+  const unansweredCount = result.detailedResults.filter(
+    (r) => !r.isAttempted
   ).length;
 
   return (
     <div className="min-h-screen">
       <Navbar />
 
-      <div className="container mx-auto px-4 pb-8">
+      <div className="container mx-auto px-3 sm:px-4 pb-6 sm:pb-8">
         {/* Back Button */}
         <motion.button
           onClick={() => navigate("/student")}
-          className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
+          className="flex items-center gap-2 text-gray-400 hover:text-white mb-4 sm:mb-6 transition-colors text-sm sm:text-base"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
         >
-          <FiArrowLeft className="w-5 h-5" />
+          <FiArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           Back to Dashboard
         </motion.button>
 
         {/* Result Summary */}
         <motion.div
-          className="glass-card text-center mb-8"
+          className="glass-card text-center mb-6 sm:mb-8"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
         >
           <div
-            className={`w-24 h-24 ${gradeInfo.bg} rounded-full flex items-center justify-center mx-auto mb-4`}
+            className={`w-16 h-16 sm:w-24 sm:h-24 ${gradeInfo.bg} rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4`}
           >
-            <span className={`text-4xl font-bold ${gradeInfo.color}`}>
+            <span className={`text-2xl sm:text-4xl font-bold ${gradeInfo.color}`}>
               {gradeInfo.grade}
             </span>
           </div>
 
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
             {result.quiz.title}
           </h1>
-          <p className="text-gray-400 mb-6">
+          <p className="text-gray-400 text-sm sm:text-base mb-4 sm:mb-6">
             Submitted on {new Date(result.submittedAt).toLocaleString()}
           </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="glass p-4 rounded-xl">
-              <p className={`text-3xl font-bold ${gradeInfo.color}`}>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <div className="glass p-2 sm:p-4 rounded-xl">
+              <p className={`text-lg sm:text-2xl font-bold ${gradeInfo.color}`}>
                 {result.percentage}%
               </p>
-              <p className="text-sm text-gray-400">Score</p>
+              <p className="text-xs sm:text-sm text-gray-400">Score</p>
             </div>
-            <div className="glass p-4 rounded-xl">
-              <p className="text-3xl font-bold text-white">
+            <div className="glass p-2 sm:p-4 rounded-xl">
+              <p className="text-lg sm:text-2xl font-bold text-white">
                 {result.score}/{result.totalMarks}
               </p>
-              <p className="text-sm text-gray-400">Marks</p>
+              <p className="text-xs sm:text-sm text-gray-400">Marks</p>
             </div>
-            <div className="glass p-4 rounded-xl">
-              <p className="text-3xl font-bold text-green-400">
+            <div className="glass p-2 sm:p-4 rounded-xl">
+              <p className="text-lg sm:text-2xl font-bold text-green-400">
                 {correctCount}
               </p>
-              <p className="text-sm text-gray-400">Correct</p>
+              <p className="text-xs sm:text-sm text-gray-400">Correct</p>
             </div>
-            <div className="glass p-4 rounded-xl">
-              <p className="text-3xl font-bold text-red-400">
+            <div className="glass p-2 sm:p-4 rounded-xl">
+              <p className="text-lg sm:text-2xl font-bold text-orange-400">
+                {partialCount}
+              </p>
+              <p className="text-xs sm:text-sm text-gray-400">Partial</p>
+            </div>
+            <div className="glass p-2 sm:p-4 rounded-xl">
+              <p className="text-lg sm:text-2xl font-bold text-red-400">
                 {incorrectCount}
               </p>
-              <p className="text-sm text-gray-400">Incorrect</p>
+              <p className="text-xs sm:text-sm text-gray-400">Wrong</p>
+            </div>
+            <div className="glass p-2 sm:p-4 rounded-xl">
+              <p className="text-lg sm:text-2xl font-bold text-yellow-400">
+                {unansweredCount}
+              </p>
+              <p className="text-xs sm:text-sm text-gray-400">Skipped</p>
             </div>
           </div>
 
           <Link to="/student">
             <motion.button
-              className="btn-primary inline-flex items-center gap-2"
+              className="btn-primary inline-flex items-center gap-2 text-sm sm:text-base"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <FiHome className="w-5 h-5" />
+              <FiHome className="w-4 h-4 sm:w-5 sm:h-5" />
               Back to Quizzes
             </motion.button>
           </Link>
@@ -145,123 +159,191 @@ const QuizResult = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <h2 className="text-2xl font-bold text-white mb-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">
             Question Review
           </h2>
 
-          <div className="space-y-4">
-            {result.detailedResults.map((item, index) => (
+          <div className="space-y-3 sm:space-y-4">
+            {result.detailedResults.map((item, index) => {
+              // Determine border and icon color based on status
+              const getBorderColor = () => {
+                if (!item.isAttempted) return "border-yellow-500";
+                if (item.isCorrect) return "border-green-500";
+                if (item.isPartial) return "border-orange-500";
+                return "border-red-500";
+              };
+              
+              const getIconBg = () => {
+                if (!item.isAttempted) return "bg-yellow-500/20 text-yellow-400";
+                if (item.isCorrect) return "bg-green-500/20 text-green-400";
+                if (item.isPartial) return "bg-orange-500/20 text-orange-400";
+                return "bg-red-500/20 text-red-400";
+              };
+
+              const getStatusIcon = () => {
+                if (!item.isAttempted) return <FiAlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
+                if (item.isCorrect) return <FiCheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
+                if (item.isPartial) return <FiAward className="w-4 h-4 sm:w-5 sm:h-5" />;
+                return <FiXCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
+              };
+
+              return (
               <motion.div
-                key={item.questionId}
-                className={`glass-card border-l-4 ${
-                  item.isCorrect ? "border-green-500" : "border-red-500"
-                }`}
+                key={item.questionId || index}
+                className={`glass-card border-l-4 ${getBorderColor()}`}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <div className="flex items-start gap-3 mb-4">
+                <div className="flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
                   <span
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                      item.isCorrect
-                        ? "bg-green-500/20 text-green-400"
-                        : "bg-red-500/20 text-red-400"
-                    }`}
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${getIconBg()}`}
                   >
-                    {item.isCorrect ? (
-                      <FiCheckCircle className="w-5 h-5" />
-                    ) : (
-                      <FiXCircle className="w-5 h-5" />
-                    )}
+                    {getStatusIcon()}
                   </span>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="text-gray-400 text-sm">
-                        Question {index + 1}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 sm:gap-2 mb-1 flex-wrap">
+                      <span className="text-gray-400 text-xs sm:text-sm">
+                        Q{index + 1}
                       </span>
-                      <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded text-xs">
-                        {item.marks} mark{item.marks > 1 ? "s" : ""}
+                      <span className="px-1.5 sm:px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded text-xs">
+                        {item.earnedMarks || 0}/{item.marks} marks
                       </span>
-                      <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs uppercase">
+                      <span className="px-1.5 sm:px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs uppercase">
                         {item.questionType === "mcq" && "MCQ"}
                         {item.questionType === "written" && "Written"}
                         {item.questionType === "fillblank" && "Fill Blank"}
                         {item.questionType === "matching" && "Matching"}
                         {item.questionType === "truefalse" && "True/False"}
                       </span>
+                      {!item.isAttempted && (
+                        <span className="px-1.5 sm:px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-xs">
+                          Skipped
+                        </span>
+                      )}
+                      {item.isPartial && (
+                        <span className="px-1.5 sm:px-2 py-0.5 bg-orange-500/20 text-orange-400 rounded text-xs">
+                          Partial
+                        </span>
+                      )}
                     </div>
-                    <p className="text-white">{item.questionText}</p>
+                    <p className="text-white text-sm sm:text-base leading-relaxed">{item.questionText}</p>
                   </div>
                 </div>
 
                 {/* MCQ and True/False Questions */}
                 {(item.questionType === "mcq" ||
                   item.questionType === "truefalse") && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {item.options.map((option, optIndex) => {
-                      const isCorrect = optIndex === item.correctOption;
-                      const isSelected = optIndex === item.selectedOption;
+                  <div className="space-y-2">
+                    {item.options && item.options.length > 0 ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {item.options.map((option, optIndex) => {
+                          const isCorrect = optIndex === item.correctOption;
+                          const isSelected = optIndex === item.selectedOption;
+                          const hindiLabels = ["अ", "ब", "स", "द"];
+                          const englishLabels = ["A", "B", "C", "D"];
 
-                      let bgClass = "bg-white/5 text-gray-400";
-                      if (isCorrect) {
-                        bgClass =
-                          "bg-green-500/20 text-green-300 border border-green-500/30";
-                      } else if (isSelected && !isCorrect) {
-                        bgClass =
-                          "bg-red-500/20 text-red-300 border border-red-500/30";
-                      }
+                          let bgClass = "bg-white/5 text-gray-400";
+                          if (isCorrect) {
+                            bgClass =
+                              "bg-green-500/20 text-green-300 border border-green-500/30";
+                          } else if (isSelected && !isCorrect) {
+                            bgClass =
+                              "bg-red-500/20 text-red-300 border border-red-500/30";
+                          }
 
-                      return (
-                        <div
-                          key={optIndex}
-                          className={`p-3 rounded-lg flex items-center gap-2 ${bgClass}`}
-                        >
-                          <span className="font-medium">
-                            {String.fromCharCode(65 + optIndex)}.
-                          </span>
-                          <span className="flex-1">{option}</span>
-                          {isCorrect && (
-                            <FiCheckCircle className="w-4 h-4 text-green-400" />
-                          )}
-                          {isSelected && !isCorrect && (
-                            <FiXCircle className="w-4 h-4 text-red-400" />
-                          )}
-                        </div>
-                      );
-                    })}
+                          return (
+                            <div
+                              key={optIndex}
+                              className={`p-3 rounded-lg flex items-start gap-2 ${bgClass}`}
+                            >
+                              <span className="font-medium flex-shrink-0 w-8">
+                                ({hindiLabels[optIndex] || englishLabels[optIndex]})
+                              </span>
+                              <span className="flex-1 text-sm sm:text-base">{option}</span>
+                              {isCorrect && (
+                                <FiCheckCircle className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
+                              )}
+                              {isSelected && !isCorrect && (
+                                <FiXCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p className="text-yellow-400 text-sm">Options not available</p>
+                    )}
+                    
+                    {/* Show what student selected if not visible in options */}
+                    {item.selectedOption === null && (
+                      <p className="text-yellow-400 text-sm mt-2">⚠️ Not answered</p>
+                    )}
                   </div>
                 )}
 
                 {/* Written Answer Questions */}
                 {item.questionType === "written" && (
                   <div className="space-y-3">
+                    {/* Student's Answer */}
                     <div className="bg-white/5 p-4 rounded-lg">
-                      <p className="text-sm text-gray-400 mb-1">Your Answer:</p>
-                      <p className="text-white whitespace-pre-wrap">
-                        {item.studentAnswer || "Not answered"}
-                      </p>
+                      <p className="text-sm text-gray-400 mb-2 font-medium">Your Answer:</p>
+                      {item.studentAnswer ? (
+                        <p className="text-white whitespace-pre-wrap leading-relaxed">
+                          {item.studentAnswer}
+                        </p>
+                      ) : (
+                        <p className="text-yellow-400 italic">Not answered</p>
+                      )}
                     </div>
+
+                    {/* Image indicator if uploaded */}
+                    {item.imageUrl && (
+                      <div className="bg-blue-500/10 p-3 rounded-lg border border-blue-500/30 flex items-center gap-2">
+                        <FiCheckCircle className="w-4 h-4 text-blue-400" />
+                        <span className="text-sm text-blue-300">Answer extracted from uploaded image</span>
+                      </div>
+                    )}
+
+                    {/* Expected Answer */}
                     {item.expectedAnswer && (
                       <div className="bg-green-500/10 p-4 rounded-lg border border-green-500/30">
-                        <p className="text-sm text-green-400 mb-1">
+                        <p className="text-sm text-green-400 mb-2 font-medium">
                           Expected Answer:
                         </p>
-                        <p className="text-green-300 whitespace-pre-wrap">
+                        <p className="text-green-300 whitespace-pre-wrap leading-relaxed">
                           {item.expectedAnswer}
                         </p>
                       </div>
                     )}
+
+                    {/* AI Feedback */}
                     {item.feedback && (
                       <div className="bg-blue-500/10 p-4 rounded-lg border border-blue-500/30">
-                        <p className="text-sm text-blue-400 mb-1">Feedback:</p>
-                        <p className="text-blue-300">{item.feedback}</p>
+                        <p className="text-sm text-blue-400 mb-2 font-medium">AI Feedback:</p>
+                        <p className="text-blue-300 leading-relaxed">{item.feedback}</p>
                       </div>
                     )}
-                    {item.awardedMarks !== undefined && (
-                      <div className="text-sm text-gray-400">
-                        Awarded: {item.awardedMarks}/{item.marks} marks
-                      </div>
-                    )}
+
+                    {/* Marks awarded */}
+                    <div className={`p-3 rounded-lg ${
+                      item.isCorrect 
+                        ? 'bg-green-500/10 border border-green-500/30' 
+                        : item.isPartial 
+                          ? 'bg-orange-500/10 border border-orange-500/30'
+                          : 'bg-red-500/10 border border-red-500/30'
+                    }`}>
+                      <p className={`text-sm font-medium ${
+                        item.isCorrect 
+                          ? 'text-green-400' 
+                          : item.isPartial 
+                            ? 'text-orange-400'
+                            : 'text-red-400'
+                      }`}>
+                        Marks Awarded: {item.earnedMarks || item.awardedMarks || 0}/{item.marks}
+                        {item.isPartial && " (Partial Credit)"}
+                      </p>
+                    </div>
                   </div>
                 )}
 
@@ -359,15 +441,19 @@ const QuizResult = () => {
                   </div>
                 )}
 
-                {item.selectedOption === null &&
-                  !item.studentAnswer &&
-                  !item.studentMatches && (
+                {!item.isAttempted && (
                     <p className="text-yellow-400 text-sm mt-3">
-                      ⚠️ Not answered
+                      ⚠️ This question was skipped
+                    </p>
+                  )}
+                {item.isPartial && (
+                    <p className="text-orange-400 text-sm mt-3">
+                      📝 Partial marks awarded - answer was incomplete
                     </p>
                   )}
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </motion.div>
       </div>
