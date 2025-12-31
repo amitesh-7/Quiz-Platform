@@ -146,6 +146,46 @@ const generateQuestions = async (
 
     const languageNote = languageInstructions[language] || "";
 
+    // Difficulty level detailed instructions
+    const difficultyInstructions = {
+      easy: `
+DIFFICULTY: EASY (बोर्ड परीक्षा स्तर / Board Exam Level)
+- Questions should be from NCERT textbook directly
+- Focus on definitions, basic concepts, and direct recall
+- MCQs: Straightforward with one clearly correct answer
+- Written: Ask for definitions, list 2-3 points, simple explanations
+- Include: Basic formulas, simple diagrams, direct textbook questions
+- Avoid: Application-based, numerical problems, multi-step reasoning
+- Example MCQ: "प्रकाश संश्लेषण किसमें होता है? / Where does photosynthesis occur?"
+- Example Written: "प्रकाश के परावर्तन के नियम लिखिए। / Write the laws of reflection of light."
+`,
+      medium: `
+DIFFICULTY: MEDIUM (प्रतियोगी परीक्षा स्तर / Competitive Exam Level)
+- Questions should test understanding and application of concepts
+- MCQs: Include tricky options, require careful analysis, some calculation-based
+- Written: Ask for explanations with examples, compare/contrast, derive formulas
+- Include: Numerical problems, diagram-based questions, reason-based questions
+- Require: Multi-step thinking, connecting concepts, practical applications
+- Example MCQ: "यदि किसी लेंस की क्षमता -2D है, तो यह है / If power of a lens is -2D, then it is:" (with calculation needed)
+- Example Written: "उत्तल और अवतल दर्पण में अंतर स्पष्ट कीजिए। उदाहरण सहित समझाइए। / Differentiate between convex and concave mirrors with examples."
+- Include WHY and HOW questions, not just WHAT
+`,
+      hard: `
+DIFFICULTY: HARD (JEE/NEET/Olympiad स्तर / Competitive Entrance Level)
+- Questions should be challenging, requiring deep understanding
+- MCQs: Complex scenarios, multiple concepts combined, assertion-reason type, numerical with multiple steps
+- Written: Derivations, prove statements, complex numerical, case studies, HOTS questions
+- Include: Integration of multiple topics, real-world problem solving, critical thinking
+- Require: Advanced reasoning, mathematical calculations, conceptual clarity
+- Example MCQ: "एक उत्तल लेंस की फोकस दूरी 20cm है। यदि वस्तु को 15cm पर रखा जाए तो प्रतिबिंब की प्रकृति और आवर्धन ज्ञात कीजिए। / A convex lens has focal length 20cm. If object is placed at 15cm, find nature and magnification of image."
+- Example Written: "लेंस निर्माता सूत्र का व्युत्पन्न कीजिए और इसका उपयोग करके सिद्ध कीजिए कि... / Derive lens maker's formula and use it to prove that..."
+- Include: Assertion-Reason, Case-based, Numerical with 3+ steps, Derivations
+- Questions should make students THINK, not just recall
+`
+    };
+
+    const difficultyNote = difficultyInstructions[difficulty] || difficultyInstructions.medium;
+
     // UP Board Science Format - Exact Paper Structure (70 Marks)
     const upBoardScienceFormat = `
 YOU ARE GENERATING UP BOARD CLASS 10 SCIENCE PAPER (विज्ञान) - TOTAL 70 MARKS
@@ -280,8 +320,9 @@ Example: {"questionType": "truefalse", "questionText": "The Earth is flat.", "op
     if (examFormat === "upboard_science") {
       prompt = `${upBoardScienceFormat}
 
+${difficultyNote}
+
 TOPIC(S) FOR THIS PAPER: "${topic}"
-DIFFICULTY LEVEL: ${difficulty}
 
 GENERATE EXACTLY 31 QUESTIONS IN THIS EXACT ORDER:
 
@@ -352,7 +393,9 @@ Written 6-mark with OR (Q29-Q31):
 
 Return ONLY a valid JSON array with exactly 31 questions. No markdown, no explanation.`;
     } else {
-      prompt = `Generate exactly ${finalNumberOfQuestions} quiz questions about "${topic}" at ${difficulty} difficulty level.${languageNote}${descriptionContext}
+      prompt = `Generate exactly ${finalNumberOfQuestions} quiz questions about "${topic}".${languageNote}${descriptionContext}
+
+${difficultyNote}
 
 REQUIRED QUESTION TYPES (distribute evenly): ${finalQuestionTypes.join(", ")}
 
@@ -364,12 +407,12 @@ STRICT RULES:
 2. Distribute questions across selected types: ${finalQuestionTypes.join(", ")}
 3. Use ONLY these exact questionType values: "mcq", "written", "fillblank", "matching", "truefalse"
 4. DO NOT use variations like "multiple_choice", "true_false", "fill_in_blank" etc.
-5. Marks: 1 for easy, 2 for medium, 3-6 for hard questions
-6. MCQ must have exactly 4 options with correctOption 0-3
-7. True/False must have options ["True", "False"] with correctOption 0 or 1
-8. Written must have a comprehensive correctAnswer
-9. Fill blank must have blanks array matching _____ count
-10. Matching must have 4-6 pairs with left and right values
+5. MCQ must have exactly 4 options with correctOption 0-3
+6. True/False must have options ["True", "False"] with correctOption 0 or 1
+7. Written must have a comprehensive correctAnswer
+8. Fill blank must have blanks array matching _____ count
+9. Matching must have 4-6 pairs with left and right values
+10. FOLLOW THE DIFFICULTY LEVEL STRICTLY - questions must match the specified difficulty
 ${finalLanguage !== "english" ? `11. ALL text MUST be in ${finalLanguage} language` : ""}
 
 CRITICAL: Return ONLY a valid JSON array. No markdown, no explanation, no code blocks.
