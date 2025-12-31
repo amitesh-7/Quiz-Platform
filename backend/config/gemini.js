@@ -121,7 +121,8 @@ const generateQuestions = async (
   difficulty = "medium",
   language = "english",
   questionTypes = ["mcq"],
-  description = ""
+  description = "",
+  examFormat = "general"
 ) => {
   return await executeWithFallback(async () => {
     const model = await getGeminiModel();
@@ -131,6 +132,8 @@ const generateQuestions = async (
       english: "",
       hindi:
         "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Hindi language (हिंदी में). Use Devanagari script for all text.",
+      bilingual:
+        "\n\nIMPORTANT: Generate questions in BILINGUAL format - each question should have both Hindi (हिंदी) and English versions. Format: Hindi version first, then English in parentheses or on next line.",
       sanskrit:
         "\n\nIMPORTANT: Generate ALL content (questions, options, and answers) in Sanskrit language (संस्कृत में). Use Devanagari script for all text.",
       spanish:
@@ -143,6 +146,78 @@ const generateQuestions = async (
 
     const languageNote = languageInstructions[language] || "";
 
+    // UP Board Science Format - Exact Paper Structure (70 Marks)
+    const upBoardScienceFormat = `
+YOU ARE GENERATING UP BOARD CLASS 10 SCIENCE PAPER (विज्ञान) - TOTAL 70 MARKS
+
+TOPIC(S) FOR THIS PAPER: "${topic}"
+
+TOPIC HANDLING RULES:
+- User may enter SINGLE topic (e.g., "प्रकाश") OR MULTIPLE topics (e.g., "प्रकाश, रासायनिक अभिक्रियाएं, जीवन प्रक्रियाएं")
+- If SINGLE topic: Generate ALL 31 questions from that ONE topic only
+- If MULTIPLE topics (comma-separated): Distribute questions EVENLY across ALL given topics
+  Example: 3 topics = ~10-11 questions per topic, 2 topics = ~15-16 questions per topic
+- Questions MUST be ONLY from the given topic(s) - do NOT add questions from other topics
+
+FIXED PAPER STRUCTURE (31 questions = 70 marks):
+
+खण्ड-अ / PART-A (बहुविकल्पीय प्रश्न / MCQ) - 20 Marks:
+- उप-भाग I: 7 MCQs × 1 mark = 7 marks (Q1-Q7)
+- उप-भाग II: 6 MCQs × 1 mark = 6 marks (Q8-Q13)
+- उप-भाग III: 7 MCQs × 1 mark = 7 marks (Q14-Q20)
+TOTAL: 20 MCQs = 20 marks
+
+खण्ड-ब / PART-B (वर्णनात्मक प्रश्न / Descriptive) - 50 Marks:
+- उप-भाग I: 4 questions × 4 marks (2+2 format with sub-parts) = 16 marks (Q21-Q24)
+- उप-भाग II: 4 questions × 4 marks = 16 marks (Q25-Q28)
+- उप-भाग III: 3 questions × 6 marks (with अथवा/OR option) = 18 marks (Q29-Q31)
+TOTAL: 11 descriptive questions = 50 marks
+
+GRAND TOTAL: 31 questions = 70 marks
+
+SECTION VALUES (MUST include in each question):
+- Q1-7 (MCQ): "section": "खण्ड-अ (Part-A) उप-भाग-I (1 अंक)"
+- Q8-13 (MCQ): "section": "खण्ड-अ (Part-A) उप-भाग-II (1 अंक)"
+- Q14-20 (MCQ): "section": "खण्ड-अ (Part-A) उप-भाग-III (1 अंक)"
+- Q21-24 (4 marks): "section": "खण्ड-ब (Part-B) उप-भाग-I (2+2=4 अंक)"
+- Q25-28 (4 marks): "section": "खण्ड-ब (Part-B) उप-भाग-II (4 अंक)"
+- Q29-31 (6 marks): "section": "खण्ड-ब (Part-B) उप-भाग-III (6 अंक)"
+
+FORMAT RULES:
+1. BILINGUAL FORMAT: "हिंदी में प्रश्न / Question in English" (both languages in same questionText)
+2. Chemical formulas with Unicode subscripts: H₂O, CO₂, H₂SO₄, CₙH₂ₙ₊₂, CₙH₂ₙ, CₙH₂ₙ₋₂, CH₄, C₂H₆
+3. 4-mark questions (उप-भाग I, Q21-24): MUST have sub-parts (i) and (ii), 2 marks each
+4. 4-mark questions (उप-भाग II, Q25-28): Can be single question or have sub-parts
+5. 6-mark questions (Q29-31): MUST have "अथवा / OR" with alternative question and answer
+
+ANSWER LENGTH REQUIREMENTS (VERY IMPORTANT):
+- 1-mark MCQ: Just correct option
+- 2-mark questions: 100-150 words answer
+- 4-mark questions: 300-400 words answer (approximately 1 page)
+- 6-mark questions: 600-800 words answer (approximately 2 pages)
+- Answers must include: key points, examples, diagrams description, chemical equations where applicable
+- For Science: Include formulas, reactions, labeled diagram descriptions, numerical examples
+`;
+
+    // For UP Board, override settings
+    let finalNumberOfQuestions = numberOfQuestions;
+    let finalQuestionTypes = questionTypes;
+    let finalLanguage = language;
+    
+    if (examFormat === "upboard_science") {
+      finalNumberOfQuestions = 31; // 20 MCQ + 4(4-mark) + 4(4-mark) + 3(6-mark) = 31
+      finalQuestionTypes = ["mcq", "written"];
+      finalLanguage = "bilingual";
+    }
+
+    // Exam format specific instructions
+    const examFormatInstructions = {
+      general: "",
+      upboard_science: upBoardScienceFormat,
+    };
+
+    const examFormatNote = examFormatInstructions[examFormat] || "";
+
     // Question type descriptions with detailed examples
     const typeDescriptions = {
       mcq: `MCQ (Multiple Choice Questions):
@@ -151,14 +226,20 @@ const generateQuestions = async (
 - "options": ["Option A", "Option B", "Option C", "Option D"] (exactly 4 options)
 - "correctOption": 0 (index 0-3 of correct answer)
 - "marks": 1-3 based on difficulty
+- "section": "physics" | "chemistry" | "biology" (for UP Board format)
+- "subSection": 1 | 2 | 3 (sub-section number)
 Example: {"questionType": "mcq", "questionText": "What is 2+2?", "options": ["3", "4", "5", "6"], "correctOption": 1, "marks": 1}`,
 
       written: `Written Answer Questions:
 - "questionType": "written" (MUST be exactly "written")
 - "questionText": "Descriptive question requiring explanation"
 - "correctAnswer": "Detailed expected answer with key points"
-- "marks": 2-5 based on complexity
-Example: {"questionType": "written", "questionText": "Explain photosynthesis.", "correctAnswer": "Photosynthesis is the process by which plants convert sunlight, water, and CO2 into glucose and oxygen.", "marks": 3}`,
+- "marks": 2-6 based on complexity
+- "subParts": [{"part": "(i)", "question": "...", "answer": "...", "marks": 2}] (optional for multi-part questions)
+- "hasAlternative": true/false (if question has "अथवा/OR" option)
+- "alternativeQuestion": "Alternative question text" (if hasAlternative is true)
+- "alternativeAnswer": "Alternative answer" (if hasAlternative is true)
+Example: {"questionType": "written", "questionText": "Explain photosynthesis.", "correctAnswer": "Photosynthesis is the process...", "marks": 3}`,
 
       fillblank: `Fill in the Blanks:
 - "questionType": "fillblank" (MUST be exactly "fillblank")
@@ -183,7 +264,7 @@ Example: {"questionType": "matching", "questionText": "Match countries with capi
 Example: {"questionType": "truefalse", "questionText": "The Earth is flat.", "options": ["True", "False"], "correctOption": 1, "marks": 1}`,
     };
 
-    const selectedTypes = questionTypes
+    const selectedTypes = finalQuestionTypes
       .map((type) => typeDescriptions[type])
       .filter(Boolean)
       .join("\n\n");
@@ -193,29 +274,108 @@ Example: {"questionType": "truefalse", "questionText": "The Earth is flat.", "op
       ? `\n\nADDITIONAL CONTEXT/INSTRUCTIONS:\n${description}\n`
       : "";
 
-    const prompt = `Generate exactly ${numberOfQuestions} quiz questions about "${topic}" at ${difficulty} difficulty level.${languageNote}${descriptionContext}
+    // Build the prompt based on exam format
+    let prompt;
+    
+    if (examFormat === "upboard_science") {
+      prompt = `${upBoardScienceFormat}
 
-REQUIRED QUESTION TYPES (distribute evenly): ${questionTypes.join(", ")}
+TOPIC(S) FOR THIS PAPER: "${topic}"
+DIFFICULTY LEVEL: ${difficulty}
+
+GENERATE EXACTLY 31 QUESTIONS IN THIS EXACT ORDER:
+
+MCQ SECTION (20 questions, 1 mark each):
+Q1-Q7: MCQs for section "खण्ड-अ (Part-A) उप-भाग-I (1 अंक)"
+Q8-Q13: MCQs for section "खण्ड-अ (Part-A) उप-भाग-II (1 अंक)"
+Q14-Q20: MCQs for section "खण्ड-अ (Part-A) उप-भाग-III (1 अंक)"
+
+DESCRIPTIVE SECTION (11 questions):
+Q21-Q24: Written (4 marks each, 2+2 format with sub-parts) - section "खण्ड-ब (Part-B) उप-भाग-I (2+2=4 अंक)"
+Q25-Q28: Written (4 marks each) - section "खण्ड-ब (Part-B) उप-भाग-II (4 अंक)"
+Q29-Q31: Written (6 marks each with अथवा/OR) - section "खण्ड-ब (Part-B) उप-भाग-III (6 अंक)"
+
+CRITICAL REQUIREMENTS:
+1. Generate EXACTLY 31 questions - no more, no less
+2. ALL questions must be from "${topic}" ONLY (if multiple topics given, distribute evenly)
+3. ALL questions must be BILINGUAL: "हिंदी प्रश्न / English question"
+4. Each question MUST have the correct "section" field as specified above
+5. Q21-Q24 MUST have "subParts" array with (i) and (ii) sub-questions
+6. Q29-Q31 MUST have "hasAlternative": true, "alternativeQuestion", and "alternativeAnswer"
+7. Use Unicode subscripts for chemical formulas: H₂O, CO₂, H₂SO₄, CH₄, C₂H₆
+
+JSON STRUCTURE FOR EACH QUESTION TYPE:
+
+MCQ (Q1-Q20):
+{
+  "questionType": "mcq",
+  "questionText": "हिंदी प्रश्न / English question?",
+  "options": ["विकल्प A / Option A", "विकल्प B / Option B", "विकल्प C / Option C", "विकल्प D / Option D"],
+  "correctOption": 0,
+  "marks": 1,
+  "section": "खण्ड-अ (Part-A) उप-भाग-I (1 अंक)"
+}
+
+Written with sub-parts (Q21-Q24):
+{
+  "questionType": "written",
+  "questionText": "हिंदी प्रश्न / English question",
+  "subParts": [
+    {"part": "(i)", "question": "उप-प्रश्न / Sub-question", "answer": "विस्तृत उत्तर (150-200 शब्द) / Detailed answer (150-200 words)", "marks": 2},
+    {"part": "(ii)", "question": "उप-प्रश्न / Sub-question", "answer": "विस्तृत उत्तर (150-200 शब्द) / Detailed answer (150-200 words)", "marks": 2}
+  ],
+  "correctAnswer": "Complete answer covering both parts (300-400 words total)",
+  "marks": 4,
+  "section": "खण्ड-ब (Part-B) उप-भाग-I (2+2=4 अंक)"
+}
+
+Written 4-mark (Q25-Q28):
+{
+  "questionType": "written",
+  "questionText": "हिंदी प्रश्न / English question",
+  "correctAnswer": "विस्तृत उत्तर - कम से कम 300-400 शब्द, मुख्य बिंदुओं के साथ / Detailed answer - minimum 300-400 words with key points, examples, diagrams description if applicable. This should be approximately 1 page worth of content.",
+  "marks": 4,
+  "section": "खण्ड-ब (Part-B) उप-भाग-II (4 अंक)"
+}
+
+Written 6-mark with OR (Q29-Q31):
+{
+  "questionType": "written",
+  "questionText": "हिंदी प्रश्न / English question",
+  "correctAnswer": "बहुत विस्तृत उत्तर - कम से कम 600-800 शब्द / Very detailed answer - minimum 600-800 words. Include: introduction, main explanation with multiple points, examples, diagrams description, chemical equations if applicable, and conclusion. This should be approximately 2 pages worth of content.",
+  "marks": 6,
+  "section": "खण्ड-ब (Part-B) उप-भाग-III (6 अंक)",
+  "hasAlternative": true,
+  "alternativeQuestion": "अथवा / OR: वैकल्पिक प्रश्न / Alternative question",
+  "alternativeAnswer": "वैकल्पिक उत्तर - 600-800 शब्द / Alternative answer - 600-800 words with same level of detail"
+}
+
+Return ONLY a valid JSON array with exactly 31 questions. No markdown, no explanation.`;
+    } else {
+      prompt = `Generate exactly ${finalNumberOfQuestions} quiz questions about "${topic}" at ${difficulty} difficulty level.${languageNote}${descriptionContext}
+
+REQUIRED QUESTION TYPES (distribute evenly): ${finalQuestionTypes.join(", ")}
 
 FORMAT SPECIFICATIONS:
 ${selectedTypes}
 
 STRICT RULES:
-1. Generate EXACTLY ${numberOfQuestions} questions
-2. Distribute questions across selected types: ${questionTypes.join(", ")}
+1. Generate EXACTLY ${finalNumberOfQuestions} questions
+2. Distribute questions across selected types: ${finalQuestionTypes.join(", ")}
 3. Use ONLY these exact questionType values: "mcq", "written", "fillblank", "matching", "truefalse"
 4. DO NOT use variations like "multiple_choice", "true_false", "fill_in_blank" etc.
-5. Marks: 1 for easy, 2 for medium, 3 for hard questions
+5. Marks: 1 for easy, 2 for medium, 3-6 for hard questions
 6. MCQ must have exactly 4 options with correctOption 0-3
 7. True/False must have options ["True", "False"] with correctOption 0 or 1
 8. Written must have a comprehensive correctAnswer
 9. Fill blank must have blanks array matching _____ count
 10. Matching must have 4-6 pairs with left and right values
-${language !== "english" ? `11. ALL text MUST be in ${language} language` : ""}
+${finalLanguage !== "english" ? `11. ALL text MUST be in ${finalLanguage} language` : ""}
 
 CRITICAL: Return ONLY a valid JSON array. No markdown, no explanation, no code blocks.
 
 [{"questionType": "...", ...}, ...]`;
+    }
 
     const result = await model.generateContent(prompt);
     const response = await result.response;

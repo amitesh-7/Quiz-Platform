@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -13,6 +13,8 @@ import {
   FiCheckCircle,
   FiAlertCircle,
   FiFileText,
+  FiDownload,
+  FiPrinter,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
@@ -42,6 +44,11 @@ const ManageQuiz = () => {
     blanks: [""],
     matchPairs: [{ left: "", right: "" }],
     marks: 1,
+    section: "",
+    subParts: [],
+    hasAlternative: false,
+    alternativeQuestion: "",
+    alternativeAnswer: "",
   });
 
   // Generate form state
@@ -52,6 +59,7 @@ const ManageQuiz = () => {
     language: "english",
     questionTypes: ["mcq"],
     description: "",
+    examFormat: "general",
   });
   const [generating, setGenerating] = useState(false);
   const [generatedQuestions, setGeneratedQuestions] = useState([]);
@@ -109,6 +117,11 @@ const ManageQuiz = () => {
       blanks: [""],
       matchPairs: [{ left: "", right: "" }],
       marks: 1,
+      section: "",
+      subParts: [],
+      hasAlternative: false,
+      alternativeQuestion: "",
+      alternativeAnswer: "",
     });
     setEditingQuestion(null);
   };
@@ -196,6 +209,11 @@ const ManageQuiz = () => {
       blanks: question.blanks || [""],
       matchPairs: question.matchPairs || [{ left: "", right: "" }],
       marks: question.marks,
+      section: question.section || "",
+      subParts: question.subParts || [],
+      hasAlternative: question.hasAlternative || false,
+      alternativeQuestion: question.alternativeQuestion || "",
+      alternativeAnswer: question.alternativeAnswer || "",
     });
     setEditingQuestion(question);
     setShowAddModal(true);
@@ -212,6 +230,278 @@ const ManageQuiz = () => {
       toast.success("Question deleted");
     } catch (error) {
       toast.error("Failed to delete question");
+    }
+  };
+
+  const handleDeleteAllQuestions = async () => {
+    if (questions.length === 0) {
+      toast.error("No questions to delete");
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to delete all ${questions.length} questions? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      // Delete all questions one by one
+      const deletePromises = questions.map((q) => questionAPI.delete(q._id));
+      await Promise.all(deletePromises);
+      
+      setQuestions([]);
+      setQuiz({ ...quiz, totalMarks: 0 });
+      toast.success(`Deleted all ${questions.length} questions`);
+    } catch (error) {
+      toast.error("Failed to delete some questions");
+      fetchQuizData(); // Refresh to get current state
+    }
+  };
+
+  // PDF Download Function - Direct download with board style
+  const handleDownloadPDF = async () => {
+    if (questions.length === 0) {
+      toast.error("No questions to download");
+      return;
+    }
+
+    toast.loading("PDF बन रहा है...", { id: "pdf-gen" });
+
+    // Group questions by section
+    const sections = {};
+    questions.forEach((q, idx) => {
+      const section = q.section || "General";
+      if (!sections[section]) sections[section] = [];
+      sections[section].push({ ...q, qNum: idx + 1 });
+    });
+
+    // Build questions HTML
+    let questionsHTML = "";
+    Object.entries(sections).forEach(([sectionName, sectionQuestions]) => {
+      if (sectionName !== "General") {
+        questionsHTML += `
+          <div class="section-break"></div>
+          <div class="section-header">${sectionName}</div>
+          <div class="section-gap"></div>
+        `;
+      }
+      sectionQuestions.forEach((q) => {
+        questionsHTML += `
+          <div class="question">
+            <div class="q-line">
+              <span class="q-num">प्रश्न ${q.qNum}.</span>
+              <span class="q-marks">[${q.marks} अंक]</span>
+            </div>
+            <div class="q-text">${q.questionText || ""}</div>
+        `;
+        
+        if (q.subParts && q.subParts.length > 0) {
+          q.subParts.forEach((part) => {
+            questionsHTML += `<div class="sub-part">${part.part} ${part.question} (${part.marks} अंक)</div>`;
+          });
+        }
+        
+        if ((q.questionType === "mcq" || q.questionType === "truefalse") && q.options) {
+          questionsHTML += `
+            <div class="options">
+              <div class="opt-row">
+                <span class="opt">(अ) ${q.options[0] || ""}</span>
+                <span class="opt">(ब) ${q.options[1] || ""}</span>
+              </div>
+              <div class="opt-row">
+                <span class="opt">(स) ${q.options[2] || ""}</span>
+                <span class="opt">(द) ${q.options[3] || ""}</span>
+              </div>
+            </div>
+          `;
+        }
+        
+        if (q.hasAlternative && q.alternativeQuestion) {
+          questionsHTML += `
+            <div class="or-section">
+              <div class="or-text">अथवा</div>
+              <div class="q-text">${q.alternativeQuestion}</div>
+            </div>
+          `;
+        }
+        
+        questionsHTML += `</div>`;
+      });
+    });
+
+    // Build answers HTML
+    let answersHTML = "";
+    Object.entries(sections).forEach(([sectionName, sectionQuestions]) => {
+      if (sectionName !== "General") {
+        answersHTML += `
+          <div class="section-break"></div>
+          <div class="ans-section-header">${sectionName}</div>
+          <div class="section-gap"></div>
+        `;
+      }
+      sectionQuestions.forEach((q) => {
+        answersHTML += `<div class="answer"><div class="ans-num">उत्तर ${q.qNum}. [${q.marks} अंक]</div>`;
+        
+        if ((q.questionType === "mcq" || q.questionType === "truefalse") && q.options) {
+          const optLabels = ["अ", "ब", "स", "द"];
+          answersHTML += `<div class="ans-text correct">(${optLabels[q.correctOption || 0]}) ${q.options[q.correctOption] || ""}</div>`;
+        }
+        
+        if (q.questionType === "written" && q.correctAnswer) {
+          answersHTML += `<div class="ans-text">${q.correctAnswer}</div>`;
+        }
+        
+        if (q.subParts && q.subParts.length > 0) {
+          q.subParts.forEach((part) => {
+            answersHTML += `<div class="sub-ans"><b>${part.part}</b> ${part.answer || ""}</div>`;
+          });
+        }
+        
+        if (q.questionType === "fillblank" && q.blanks) {
+          answersHTML += `<div class="ans-text correct">${q.blanks.join(", ")}</div>`;
+        }
+        
+        if (q.questionType === "matching" && q.matchPairs) {
+          answersHTML += `<div class="match-ans">`;
+          q.matchPairs.forEach((pair, idx) => {
+            answersHTML += `${idx + 1}. ${pair.left} → ${pair.right}<br/>`;
+          });
+          answersHTML += `</div>`;
+        }
+        
+        if (q.hasAlternative && q.alternativeAnswer) {
+          answersHTML += `<div class="or-ans"><b>अथवा:</b><br/>${q.alternativeAnswer}</div>`;
+        }
+        
+        answersHTML += `</div>`;
+      });
+    });
+
+    const fullHTML = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
+@page { size: A4; margin: 15mm 12mm; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Noto Sans Devanagari', serif; font-size: 12px; line-height: 1.5; color: #000; }
+.header { text-align: center; border: 2px solid #000; padding: 10px; margin-bottom: 15px; }
+.header h1 { font-size: 18px; font-weight: 700; margin-bottom: 5px; }
+.header h2 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.header-info { display: flex; justify-content: space-between; font-size: 11px; border-top: 1px solid #000; padding-top: 8px; margin-top: 8px; }
+.header-info div { text-align: left; }
+
+.section-break { height: 8px; }
+.section-gap { height: 12px; }
+.section-header { 
+  font-size: 13px; font-weight: 700; text-align: center; 
+  border: 1px solid #000; padding: 6px 10px; 
+  background: #f5f5f5; margin: 10px 0;
+}
+
+.question { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dotted #ccc; }
+.q-line { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.q-num { font-weight: 700; font-size: 12px; }
+.q-marks { font-size: 11px; color: #333; }
+.q-text { font-size: 12px; line-height: 1.6; margin: 4px 0 6px 20px; white-space: pre-wrap; }
+
+.options { margin: 6px 0 0 20px; }
+.opt-row { display: flex; margin-bottom: 3px; }
+.opt { width: 50%; font-size: 11px; padding: 2px 0; }
+
+.sub-part { font-size: 11px; margin: 4px 0 4px 30px; line-height: 1.5; }
+
+.or-section { margin: 10px 0 0 20px; padding: 8px; border: 1px dashed #666; background: #fafafa; }
+.or-text { font-weight: 700; text-align: center; margin-bottom: 5px; font-size: 12px; }
+
+.page-break { page-break-before: always; }
+
+.ans-header { text-align: center; border: 2px solid #000; padding: 10px; margin-bottom: 15px; background: #f0f0f0; }
+.ans-header h1 { font-size: 16px; font-weight: 700; }
+
+.ans-section-header { 
+  font-size: 12px; font-weight: 700; text-align: center; 
+  border: 1px solid #000; padding: 5px 10px; 
+  background: #e8f5e9; margin: 10px 0;
+}
+
+.answer { margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px dotted #ccc; }
+.ans-num { font-weight: 700; font-size: 11px; margin-bottom: 3px; }
+.ans-text { font-size: 11px; line-height: 1.6; margin-left: 15px; white-space: pre-wrap; text-align: justify; }
+.ans-text.correct { font-weight: 600; color: #1b5e20; background: #e8f5e9; padding: 3px 8px; display: inline-block; border-radius: 3px; }
+.sub-ans { font-size: 11px; margin: 4px 0 4px 25px; line-height: 1.5; }
+.match-ans { font-size: 11px; margin-left: 15px; line-height: 1.6; }
+.or-ans { margin: 8px 0 0 15px; padding: 6px; background: #fff8e1; border: 1px dashed #f9a825; font-size: 11px; line-height: 1.5; }
+
+@media print {
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .question, .answer { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>${quiz.title || "प्रश्न पत्र"}</h1>
+  <h2>विषय: विज्ञान</h2>
+  <div class="header-info">
+    <div><b>समय:</b> ${quiz.duration} मिनट</div>
+    <div><b>पूर्णांक:</b> ${quiz.totalMarks} अंक</div>
+    <div><b>प्रश्न:</b> ${questions.length}</div>
+  </div>
+</div>
+
+<div class="instructions" style="font-size:10px;margin-bottom:12px;padding:6px;border:1px solid #ddd;background:#fafafa;">
+  <b>निर्देश:</b> (i) सभी प्रश्न अनिवार्य हैं। (ii) प्रत्येक प्रश्न के अंक उसके सामने अंकित हैं।
+</div>
+
+${questionsHTML}
+
+<div class="page-break"></div>
+
+<div class="ans-header">
+  <h1>उत्तर कुंजी / Answer Key</h1>
+  <div style="font-size:11px;margin-top:5px;">${quiz.title || ""}</div>
+</div>
+
+${answersHTML}
+
+</body>
+</html>`;
+
+    try {
+      // Create blob and download
+      const blob = new Blob([fullHTML], { type: "text/html;charset=utf-8" });
+      
+      // Create iframe for printing to PDF
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.right = "0";
+      iframe.style.bottom = "0";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "none";
+      document.body.appendChild(iframe);
+
+      const iframeDoc = iframe.contentWindow.document;
+      iframeDoc.open();
+      iframeDoc.write(fullHTML);
+      iframeDoc.close();
+
+      // Wait for content and fonts to load
+      iframe.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow.print();
+          setTimeout(() => {
+            document.body.removeChild(iframe);
+          }, 1000);
+        }, 500);
+      };
+
+      toast.success("Print dialog opened - Save as PDF", { id: "pdf-gen" });
+    } catch (error) {
+      console.error("PDF Error:", error);
+      toast.error("PDF generation failed", { id: "pdf-gen" });
     }
   };
 
@@ -256,6 +546,7 @@ const ManageQuiz = () => {
         language: "english",
         questionTypes: ["mcq"],
         description: "",
+        examFormat: "general",
       });
       toast.success("Questions added successfully");
     } catch (error) {
@@ -442,6 +733,28 @@ const ManageQuiz = () => {
                   <FiAlertCircle className="w-4 h-4" />
                   <span>{questions.length} questions</span>
                 </div>
+                {questions.length > 0 && (
+                  <motion.button
+                    onClick={handleDeleteAllQuestions}
+                    className="text-red-400 hover:text-red-300 text-sm flex items-center gap-1 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FiTrash2 className="w-4 h-4" />
+                    Delete All
+                  </motion.button>
+                )}
+                {questions.length > 0 && (
+                  <motion.button
+                    onClick={handleDownloadPDF}
+                    className="text-green-400 hover:text-green-300 text-sm flex items-center gap-1 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <FiDownload className="w-4 h-4" />
+                    Download PDF
+                  </motion.button>
+                )}
               </div>
             </div>
 
@@ -540,19 +853,45 @@ const ManageQuiz = () => {
           </motion.div>
         ) : (
           <div className="space-y-4">
-            {questions.map((question, index) => (
+            {/* Group questions by section */}
+            {(() => {
+              const sections = {};
+              questions.forEach((q, idx) => {
+                const section = q.section || "Questions";
+                if (!sections[section]) sections[section] = [];
+                sections[section].push({ ...q, originalIndex: idx });
+              });
+              
+              return Object.entries(sections).map(([sectionName, sectionQuestions]) => (
+                <div key={sectionName}>
+                  {/* Section Header - only show if section exists and is not default */}
+                  {sectionName !== "Questions" && (
+                    <motion.div 
+                      className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-4 mb-4"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <p className="text-yellow-300 font-bold">{sectionName}</p>
+                      <p className="text-xs text-yellow-400/70 mt-1">
+                        {sectionQuestions.length} questions • {sectionQuestions.reduce((sum, q) => sum + q.marks, 0)} marks
+                      </p>
+                    </motion.div>
+                  )}
+                  
+                  {/* Questions in this section */}
+                  {sectionQuestions.map((question) => (
               <motion.div
                 key={question._id}
                 className="glass-card"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
+                transition={{ delay: question.originalIndex * 0.05 }}
               >
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
                       <span className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 font-bold">
-                        {index + 1}
+                        {question.originalIndex + 1}
                       </span>
                       <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
                         {question.marks} mark{question.marks > 1 ? "s" : ""}
@@ -566,8 +905,26 @@ const ManageQuiz = () => {
                         {question.questionType === "truefalse" &&
                           "✓✗ True/False"}
                       </span>
+                      {question.hasAlternative && (
+                        <span className="text-xs px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">
+                          अथवा/OR
+                        </span>
+                      )}
                     </div>
-                    <p className="text-white mb-4">{question.questionText}</p>
+                    <p className="text-white mb-4 whitespace-pre-line">{question.questionText}</p>
+
+                    {/* Sub-parts for multi-part questions */}
+                    {question.subParts && question.subParts.length > 0 && (
+                      <div className="mb-4 space-y-2">
+                        {question.subParts.map((part, idx) => (
+                          <div key={idx} className="p-3 bg-white/5 border border-white/10 rounded-lg">
+                            <p className="text-blue-400 font-medium">{part.part} ({part.marks} marks)</p>
+                            <p className="text-white text-sm mt-1">{part.question}</p>
+                            <p className="text-green-400 text-sm mt-1">Answer: {part.answer}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
                     {/* MCQ and True/False options */}
                     {(question.questionType === "mcq" ||
@@ -600,9 +957,23 @@ const ManageQuiz = () => {
                       question.correctAnswer && (
                         <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg text-green-300 text-sm">
                           <span className="font-medium">Expected Answer: </span>
-                          {question.correctAnswer}
+                          <span className="whitespace-pre-line">{question.correctAnswer}</span>
                         </div>
                       )}
+
+                    {/* Alternative question (OR) */}
+                    {question.hasAlternative && question.alternativeQuestion && (
+                      <div className="mt-4 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+                        <p className="text-orange-400 font-medium mb-2">अथवा / OR:</p>
+                        <p className="text-white text-sm whitespace-pre-line">{question.alternativeQuestion}</p>
+                        {question.alternativeAnswer && (
+                          <p className="text-green-400 text-sm mt-2">
+                            <span className="font-medium">Answer: </span>
+                            <span className="whitespace-pre-line">{question.alternativeAnswer}</span>
+                          </p>
+                        )}
+                      </div>
+                    )}
 
                     {/* Fill in blanks */}
                     {question.questionType === "fillblank" &&
@@ -659,7 +1030,10 @@ const ManageQuiz = () => {
                   </div>
                 </div>
               </motion.div>
-            ))}
+                  ))}
+                </div>
+              ));
+            })()}
           </div>
         )}
 
@@ -1097,81 +1471,198 @@ const ManageQuiz = () => {
 
                 {generatedQuestions.length === 0 ? (
                   <div className="space-y-4">
-                    {/* Topic */}
+                    {/* Exam Format Selection - First */}
                     <div className="form-group">
-                      <label className="input-label">Topic *</label>
-                      <input
-                        type="text"
-                        value={generateForm.topic}
-                        onChange={(e) =>
-                          setGenerateForm({
-                            ...generateForm,
-                            topic: e.target.value,
-                          })
-                        }
+                      <label className="input-label">Exam Format *</label>
+                      <select
+                        value={generateForm.examFormat || "general"}
+                        onChange={(e) => {
+                          const format = e.target.value;
+                          if (format === "upboard_science") {
+                            // Auto-configure for UP Board Science
+                            setGenerateForm({
+                              ...generateForm,
+                              examFormat: format,
+                              language: "bilingual",
+                              questionTypes: ["mcq", "written"],
+                              numberOfQuestions: 30, // 20 MCQ + 10 descriptive
+                            });
+                          } else {
+                            setGenerateForm({
+                              ...generateForm,
+                              examFormat: format,
+                            });
+                          }
+                        }}
                         className="glass-input"
-                        placeholder="e.g., JavaScript Arrays, World War II, Photosynthesis"
-                      />
+                      >
+                        <option value="general">General (Custom)</option>
+                        <option value="upboard_science">UP Board Science (Class 10)</option>
+                      </select>
                     </div>
 
-                    {/* Number, Difficulty, Language Row */}
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="form-group">
-                        <label className="input-label">No. of Questions</label>
-                        <input
-                          type="number"
-                          value={generateForm.numberOfQuestions}
-                          onChange={(e) =>
-                            setGenerateForm({
-                              ...generateForm,
-                              numberOfQuestions: parseInt(e.target.value) || 5,
-                            })
-                          }
-                          className="glass-input"
-                          min={1}
-                          max={50}
-                        />
-                      </div>
+                    {/* UP Board Science - Simplified UI */}
+                    {generateForm.examFormat === "upboard_science" ? (
+                      <>
+                        {/* UP Board Info Box */}
+                        <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-4">
+                          <p className="text-blue-300 font-medium mb-3">📋 UP Board Science Paper - 70 Marks (31 Questions)</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                            <div className="bg-white/5 rounded-lg p-3">
+                              <p className="text-yellow-400 font-medium mb-2">खण्ड-अ (Part A) - 20 Marks</p>
+                              <ul className="text-xs text-gray-400 space-y-1">
+                                <li>• उप-भाग I: 7 MCQs × 1 = 7 marks</li>
+                                <li>• उप-भाग II: 6 MCQs × 1 = 6 marks</li>
+                                <li>• उप-भाग III: 7 MCQs × 1 = 7 marks</li>
+                              </ul>
+                            </div>
+                            <div className="bg-white/5 rounded-lg p-3">
+                              <p className="text-green-400 font-medium mb-2">खण्ड-ब (Part B) - 50 Marks</p>
+                              <ul className="text-xs text-gray-400 space-y-1">
+                                <li>• उप-भाग I: 4 × (2+2) = 16 marks</li>
+                                <li>• उप-भाग II: 4 × 4 = 16 marks</li>
+                                <li>• उप-भाग III: 3 × 6 = 18 marks (OR)</li>
+                              </ul>
+                            </div>
+                          </div>
+                          <div className="mt-3 pt-3 border-t border-white/10">
+                            <p className="text-xs text-gray-400">
+                              ✓ 31 questions = 70 marks • ✓ Bilingual (Hindi/English) • ✓ Section headers • ✓ Single or multiple topics
+                            </p>
+                          </div>
+                        </div>
 
-                      <div className="form-group">
-                        <label className="input-label">Difficulty</label>
-                        <select
-                          value={generateForm.difficulty}
-                          onChange={(e) =>
-                            setGenerateForm({
-                              ...generateForm,
-                              difficulty: e.target.value,
-                            })
-                          }
-                          className="glass-input"
-                        >
-                          <option value="easy">Easy</option>
-                          <option value="medium">Medium</option>
-                          <option value="hard">Hard</option>
-                        </select>
-                      </div>
+                        {/* Topic Input */}
+                        <div className="form-group">
+                          <label className="input-label">Topic / Chapter(s) *</label>
+                          <input
+                            type="text"
+                            value={generateForm.topic}
+                            onChange={(e) =>
+                              setGenerateForm({
+                                ...generateForm,
+                                topic: e.target.value,
+                              })
+                            }
+                            className="glass-input"
+                            placeholder="e.g., प्रकाश - परावर्तन और अपवर्तन OR प्रकाश, रासायनिक अभिक्रियाएं, जीवन प्रक्रियाएं"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Enter single topic OR multiple topics (comma-separated) - questions will be distributed evenly
+                          </p>
+                        </div>
 
-                      <div className="form-group">
-                        <label className="input-label">Language</label>
-                        <select
-                          value={generateForm.language || "english"}
-                          onChange={(e) =>
-                            setGenerateForm({
-                              ...generateForm,
-                              language: e.target.value,
-                            })
-                          }
-                          className="glass-input"
-                        >
-                          <option value="english">English</option>
-                          <option value="hindi">हिंदी (Hindi)</option>
-                          <option value="sanskrit">संस्कृत (Sanskrit)</option>
-                          <option value="spanish">Español (Spanish)</option>
-                          <option value="french">Français (French)</option>
-                          <option value="german">Deutsch (German)</option>
-                        </select>
-                      </div>
-                    </div>
+                        {/* Difficulty Only */}
+                        <div className="form-group">
+                          <label className="input-label">Difficulty Level</label>
+                          <div className="grid grid-cols-3 gap-3">
+                            {[
+                              { value: "easy", label: "Easy", desc: "Basic concepts", icon: "🟢" },
+                              { value: "medium", label: "Medium", desc: "Board level", icon: "🟡" },
+                              { value: "hard", label: "Hard", desc: "Competitive", icon: "🔴" },
+                            ].map((level) => (
+                              <button
+                                key={level.value}
+                                type="button"
+                                onClick={() =>
+                                  setGenerateForm({
+                                    ...generateForm,
+                                    difficulty: level.value,
+                                  })
+                                }
+                                className={`p-3 rounded-lg border text-center transition-all ${
+                                  generateForm.difficulty === level.value
+                                    ? "bg-blue-500/30 border-blue-500 text-white"
+                                    : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                                }`}
+                              >
+                                <span className="text-xl">{level.icon}</span>
+                                <p className="font-medium mt-1">{level.label}</p>
+                                <p className="text-xs opacity-70">{level.desc}</p>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {/* General Format - Full Options */}
+                        {/* Topic */}
+                        <div className="form-group">
+                          <label className="input-label">Topic *</label>
+                          <input
+                            type="text"
+                            value={generateForm.topic}
+                            onChange={(e) =>
+                              setGenerateForm({
+                                ...generateForm,
+                                topic: e.target.value,
+                              })
+                            }
+                            className="glass-input"
+                            placeholder="e.g., JavaScript Arrays, World War II, Photosynthesis"
+                          />
+                        </div>
+
+                        {/* Number, Difficulty, Language Row */}
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="form-group">
+                            <label className="input-label">No. of Questions</label>
+                            <input
+                              type="number"
+                              value={generateForm.numberOfQuestions}
+                              onChange={(e) =>
+                                setGenerateForm({
+                                  ...generateForm,
+                                  numberOfQuestions: parseInt(e.target.value) || 5,
+                                })
+                              }
+                              className="glass-input"
+                              min={1}
+                              max={50}
+                            />
+                          </div>
+
+                          <div className="form-group">
+                            <label className="input-label">Difficulty</label>
+                            <select
+                              value={generateForm.difficulty}
+                              onChange={(e) =>
+                                setGenerateForm({
+                                  ...generateForm,
+                                  difficulty: e.target.value,
+                                })
+                              }
+                              className="glass-input"
+                            >
+                              <option value="easy">Easy</option>
+                              <option value="medium">Medium</option>
+                              <option value="hard">Hard</option>
+                            </select>
+                          </div>
+
+                          <div className="form-group">
+                            <label className="input-label">Language</label>
+                            <select
+                              value={generateForm.language || "english"}
+                              onChange={(e) =>
+                                setGenerateForm({
+                                  ...generateForm,
+                                  language: e.target.value,
+                                })
+                              }
+                              className="glass-input"
+                            >
+                              <option value="english">English</option>
+                              <option value="hindi">हिंदी (Hindi)</option>
+                              <option value="bilingual">द्विभाषी (Bilingual)</option>
+                              <option value="sanskrit">संस्कृत (Sanskrit)</option>
+                              <option value="spanish">Español (Spanish)</option>
+                              <option value="french">Français (French)</option>
+                              <option value="german">Deutsch (German)</option>
+                            </select>
+                          </div>
+                        </div>
 
                     {/* Question Types */}
                     <div className="form-group">
@@ -1233,6 +1724,8 @@ const ManageQuiz = () => {
                         Give specific instructions to guide AI question generation
                       </p>
                     </div>
+                      </>
+                    )}
 
                     <motion.button
                       onClick={handleGenerate}
@@ -1262,73 +1755,96 @@ const ManageQuiz = () => {
                     </div>
 
                     <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-                      {generatedQuestions.map((question, index) => (
-                        <div key={index} className="bg-white/5 rounded-lg p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-blue-400 font-bold">Q{index + 1}.</span>
-                            <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded-full">
-                              {question.questionType === "mcq" && "📝 MCQ"}
-                              {question.questionType === "written" && "✍️ Written"}
-                              {question.questionType === "fillblank" && "📄 Fill Blank"}
-                              {question.questionType === "matching" && "🔗 Matching"}
-                              {question.questionType === "truefalse" && "✓✗ True/False"}
-                            </span>
-                            <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full">
-                              {question.marks} mark{question.marks > 1 ? "s" : ""}
-                            </span>
+                      {/* Group questions by section for UP Board format */}
+                      {(() => {
+                        const sections = {};
+                        generatedQuestions.forEach((q, idx) => {
+                          const section = q.section || "Questions";
+                          if (!sections[section]) sections[section] = [];
+                          sections[section].push({ ...q, originalIndex: idx });
+                        });
+                        
+                        return Object.entries(sections).map(([sectionName, sectionQuestions]) => (
+                          <div key={sectionName} className="mb-4">
+                            {/* Section Header */}
+                            {sectionName !== "Questions" && (
+                              <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-3 mb-3">
+                                <p className="text-yellow-300 font-bold text-sm">{sectionName}</p>
+                              </div>
+                            )}
+                            
+                            {/* Questions in this section */}
+                            {sectionQuestions.map((question) => (
+                              <div key={question.originalIndex} className="bg-white/5 rounded-lg p-4 mb-2">
+                                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                  <span className="text-blue-400 font-bold">Q{question.originalIndex + 1}.</span>
+                                  <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded-full">
+                                    {question.questionType === "mcq" && "📝 MCQ"}
+                                    {question.questionType === "written" && "✍️ Written"}
+                                    {question.questionType === "fillblank" && "📄 Fill Blank"}
+                                    {question.questionType === "matching" && "🔗 Matching"}
+                                    {question.questionType === "truefalse" && "✓✗ True/False"}
+                                  </span>
+                                  <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full">
+                                    {question.marks} mark{question.marks > 1 ? "s" : ""}
+                                  </span>
+                                </div>
+                                <p className="text-white mb-2 whitespace-pre-line">{question.questionText}</p>
+                                
+                                {/* MCQ/TrueFalse Options */}
+                                {(question.questionType === "mcq" || question.questionType === "truefalse") && question.options && (
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                                    {question.options.map((opt, optIdx) => (
+                                      <div
+                                        key={optIdx}
+                                        className={`p-2 rounded ${
+                                          optIdx === question.correctOption
+                                            ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                                            : "bg-white/5 text-gray-400"
+                                        }`}
+                                      >
+                                        {String.fromCharCode(65 + optIdx)}. {opt}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Written Answer */}
+                                {question.questionType === "written" && question.correctAnswer && (
+                                  <div className="p-2 bg-green-500/10 border border-green-500/30 rounded text-green-300 text-sm mt-2">
+                                    <span className="font-medium">Expected: </span>
+                                    <span className="whitespace-pre-line">{question.correctAnswer}</span>
+                                  </div>
+                                )}
+
+                                {/* Fill Blanks */}
+                                {question.questionType === "fillblank" && question.blanks && (
+                                  <div className="flex flex-wrap gap-2 mt-2">
+                                    {question.blanks.map((blank, idx) => (
+                                      <span key={idx} className="px-2 py-1 bg-green-500/20 text-green-300 rounded text-sm">
+                                        Blank {idx + 1}: {blank}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Matching */}
+                                {question.questionType === "matching" && question.matchPairs && (
+                                  <div className="grid grid-cols-2 gap-2 text-sm mt-2">
+                                    {question.matchPairs.map((pair, idx) => (
+                                      <div key={idx} className="p-2 bg-white/5 rounded flex items-center gap-2">
+                                        <span className="text-blue-400">{pair.left}</span>
+                                        <span className="text-gray-500">→</span>
+                                        <span className="text-green-400">{pair.right}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
                           </div>
-                          <p className="text-white mb-2">{question.questionText}</p>
-                          
-                          {/* MCQ/TrueFalse Options */}
-                          {(question.questionType === "mcq" || question.questionType === "truefalse") && question.options && (
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              {question.options.map((opt, optIdx) => (
-                                <div
-                                  key={optIdx}
-                                  className={`p-2 rounded ${
-                                    optIdx === question.correctOption
-                                      ? "bg-green-500/20 text-green-300"
-                                      : "bg-white/5 text-gray-400"
-                                  }`}
-                                >
-                                  {String.fromCharCode(65 + optIdx)}. {opt}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
-                          {/* Written Answer */}
-                          {question.questionType === "written" && question.correctAnswer && (
-                            <div className="p-2 bg-green-500/10 border border-green-500/30 rounded text-green-300 text-sm">
-                              <span className="font-medium">Expected: </span>{question.correctAnswer}
-                            </div>
-                          )}
-
-                          {/* Fill Blanks */}
-                          {question.questionType === "fillblank" && question.blanks && (
-                            <div className="flex flex-wrap gap-2">
-                              {question.blanks.map((blank, idx) => (
-                                <span key={idx} className="px-2 py-1 bg-green-500/20 text-green-300 rounded text-sm">
-                                  Blank {idx + 1}: {blank}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-
-                          {/* Matching */}
-                          {question.questionType === "matching" && question.matchPairs && (
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              {question.matchPairs.map((pair, idx) => (
-                                <div key={idx} className="p-2 bg-white/5 rounded flex items-center gap-2">
-                                  <span className="text-blue-400">{pair.left}</span>
-                                  <span className="text-gray-500">→</span>
-                                  <span className="text-green-400">{pair.right}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                        ));
+                      })()}
                     </div>
 
                     <div className="flex gap-4">

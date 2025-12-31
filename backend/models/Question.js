@@ -18,7 +18,7 @@ const questionSchema = new mongoose.Schema(
       required: [true, "Question text is required"],
       trim: true,
       minlength: [5, "Question must be at least 5 characters"],
-      maxlength: [1000, "Question cannot exceed 1000 characters"],
+      maxlength: [2000, "Question cannot exceed 2000 characters"],
     },
     // For MCQ
     options: {
@@ -69,6 +69,33 @@ const questionSchema = new mongoose.Schema(
       min: [1, "Marks must be at least 1"],
       max: [10, "Marks cannot exceed 10"],
       default: 1,
+    },
+    // Section for organized display (e.g., UP Board format)
+    section: {
+      type: String,
+      trim: true,
+    },
+    // Sub-parts for multi-part questions (e.g., 2+2 format)
+    subParts: [
+      {
+        part: String,
+        question: String,
+        answer: String,
+        marks: Number,
+      },
+    ],
+    // Alternative question for OR type questions
+    hasAlternative: {
+      type: Boolean,
+      default: false,
+    },
+    alternativeQuestion: {
+      type: String,
+      trim: true,
+    },
+    alternativeAnswer: {
+      type: String,
+      trim: true,
     },
   },
   {

@@ -25,7 +25,7 @@ const generateValidation = [
     .withMessage("Difficulty must be easy, medium, or hard"),
   body("language")
     .optional()
-    .isIn(["english", "hindi", "sanskrit", "spanish", "french", "german"])
+    .isIn(["english", "hindi", "bilingual", "sanskrit", "spanish", "french", "german"])
     .withMessage("Invalid language selection"),
   body("questionTypes")
     .optional()
@@ -40,6 +40,10 @@ const generateValidation = [
     .trim()
     .isLength({ max: 1000 })
     .withMessage("Description cannot exceed 1000 characters"),
+  body("examFormat")
+    .optional()
+    .isIn(["general", "upboard_science"])
+    .withMessage("Invalid exam format"),
 ];
 
 // @desc    Generate questions using Gemini API
@@ -54,6 +58,7 @@ const generateQuestionsController = async (req, res) => {
       language = "english",
       questionTypes = ["mcq"],
       description = "",
+      examFormat = "general",
     } = req.body;
 
     // Check if Gemini API key is configured
@@ -71,7 +76,8 @@ const generateQuestionsController = async (req, res) => {
       difficulty,
       language,
       questionTypes,
-      description
+      description,
+      examFormat
     );
 
     res.status(200).json({
