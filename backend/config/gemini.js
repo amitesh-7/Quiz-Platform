@@ -673,89 +673,168 @@ Return ONLY the JSON object, nothing else.`;
   });
 };
 
-// Extract questions from an uploaded image
+// Extract questions from uploaded image(s) - supports multiple images
 const extractQuestionsFromImage = async (
-  imageBase64,
-  mimeType,
+  imagesData, // Array of {base64Data, mimeType} or single object for backward compatibility
   maxMarks,
   marksDistribution = "",
   additionalInstructions = "",
-  language = "english"
+  language = "english",
+  examFormat = "general",
+  difficulty = "medium"
 ) => {
   return await executeWithFallback(async () => {
     const model = await getGeminiModel("gemini-3-flash-preview");
 
     const languageInstructions = {
       english: "",
-      hindi:
-        "\n\nGenerate ALL content in Hindi (हिंदी). Use Devanagari script.",
-      sanskrit:
-        "\n\nGenerate ALL content in Sanskrit (संस्कृत). Use Devanagari script.",
+      hindi: "\n\nGenerate ALL content in Hindi (हिंदी). Use Devanagari script.",
+      bilingual: "\n\nGenerate in BILINGUAL format: Hindi first, then English. Example: 'हिंदी प्रश्न / English question'",
+      sanskrit: "\n\nGenerate ALL content in Sanskrit (संस्कृत). Use Devanagari script.",
+    };
+
+    const difficultyInstructions = {
+      easy: `
+DIFFICULTY: EASY - Board exam level questions
+- Direct NCERT/textbook questions, definitions, basic recall
+- Simple MCQs with clear correct answer
+- Written: definitions, list points, simple explanations`,
+      medium: `
+DIFFICULTY: MEDIUM - Competitive exam level
+- Application-based, understanding required
+- Tricky MCQs, some calculations needed
+- Written: explain with examples, compare/contrast, numerical problems`,
+      hard: `
+DIFFICULTY: HARD - JEE/NEET/Olympiad level
+- Complex scenarios, multiple concepts combined
+- Assertion-reason MCQs, multi-step numerical
+- Written: derivations, prove statements, HOTS questions, case studies`
     };
 
     const languageNote = languageInstructions[language] || "";
+    const difficultyNote = difficultyInstructions[difficulty] || difficultyInstructions.medium;
 
-    const prompt = `You are a quiz question extractor. Analyze this image and extract all questions visible in it.${languageNote}
+    let prompt;
+    
+    if (examFormat === "upboard_science") {
+      prompt = `You are extracting questions from image(s) to create UP BOARD CLASS 10 SCIENCE PAPER.
+
+IMPORTANT: You must ONLY extract questions that are VISIBLE in the images. Do NOT generate new questions. 
+If the images show a specific topic/chapter, extract questions ONLY from what is written in the images.
+
+${difficultyNote}
+
+FIXED STRUCTURE (31 questions = 70 marks):
+- Q1-Q7: MCQs, section "खण्ड-अ (Part-A) उप-भाग-I (1 अंक)"
+- Q8-Q13: MCQs, section "खण्ड-अ (Part-A) उप-भाग-II (1 अंक)"  
+- Q14-Q20: MCQs, section "खण्ड-अ (Part-A) उप-भाग-III (1 अंक)"
+- Q21-Q24: Written 4 marks, section "खण्ड-ब (Part-B) उप-भाग-I (2+2=4 अंक)"
+- Q25-Q28: Written 4 marks, section "खण्ड-ब (Part-B) उप-भाग-II (4 अंक)"
+- Q29-Q31: Written 6 marks with OR, section "खण्ड-ब (Part-B) उप-भाग-III (6 अंक)"
+
+CRITICAL JSON FORMAT - USE EXACTLY THESE FIELD NAMES:
+For MCQ:
+{
+  "questionText": "हिंदी प्रश्न / English question?",
+  "questionType": "mcq",
+  "options": ["विकल्प A / Option A", "विकल्प B / Option B", "विकल्प C / Option C", "विकल्प D / Option D"],
+  "correctOption": 0,
+  "marks": 1,
+  "section": "खण्ड-अ (Part-A) उप-भाग-I (1 अंक)"
+}
+
+For Written (4 marks):
+{
+  "questionText": "हिंदी प्रश्न / English question",
+  "questionType": "written",
+  "correctAnswer": "विस्तृत उत्तर 300-400 शब्दों में / Detailed answer in 300-400 words with key points, examples, diagrams description",
+  "marks": 4,
+  "section": "खण्ड-ब (Part-B) उप-भाग-II (4 अंक)"
+}
+
+For Written (6 marks with OR):
+{
+  "questionText": "हिंदी प्रश्न / English question",
+  "questionType": "written",
+  "correctAnswer": "बहुत विस्तृत उत्तर 600-800 शब्दों में / Very detailed answer in 600-800 words",
+  "marks": 6,
+  "section": "खण्ड-ब (Part-B) उप-भाग-III (6 अंक)",
+  "hasAlternative": true,
+  "alternativeQuestion": "अथवा / OR: वैकल्पिक प्रश्न",
+  "alternativeAnswer": "वैकल्पिक उत्तर 600-800 शब्द"
+}
+
+STRICT RULES:
+1. EXTRACT questions ONLY from what is visible in the images - DO NOT create new questions
+2. If images show questions, extract them exactly as shown
+3. ALL questions must be BILINGUAL: "हिंदी / English"
+4. MUST include "section" field for EVERY question
+5. MUST provide detailed "correctAnswer" for written questions (NOT "Answer not provided")
+6. For 4-mark: Answer should be 300-400 words with key points
+7. For 6-mark: Answer should be 600-800 words with introduction, explanation, examples, conclusion
+8. Q29-31 MUST have hasAlternative, alternativeQuestion, alternativeAnswer
+9. Use Unicode subscripts: H₂O, CO₂, CH₄
+
+Return ONLY valid JSON array. No markdown, no explanation.`;
+    } else {
+      prompt = `You are a quiz question extractor. EXTRACT questions ONLY from the provided image(s).
+
+IMPORTANT: Do NOT generate new questions. Only extract what is VISIBLE in the images.
+${languageNote}
+${difficultyNote}
 
 MAXIMUM TOTAL MARKS: ${maxMarks}
 
 MARKS DISTRIBUTION:
-${marksDistribution || "Distribute marks evenly based on question difficulty"}
+${marksDistribution || "Distribute marks based on question complexity"}
 
 ADDITIONAL INSTRUCTIONS:
-${additionalInstructions || "Extract all questions as they appear"}
+${additionalInstructions || "Extract questions exactly as they appear in the images"}
 
-RULES:
-1. Extract all questions visible in the image
-2. Determine the best format for each question:
-   - Multiple choice → mcq type with 4 options
-   - True/False → truefalse type
-   - Fill in the blank → fillblank type
-   - Matching → matching type
-   - Descriptive/Written → written type
-   - One word answer → Convert to mcq with 3 plausible wrong options
+CRITICAL JSON FORMAT - USE EXACTLY THESE FIELD NAMES:
+{
+  "questionText": "Your question here",
+  "questionType": "mcq" or "written" or "truefalse" or "fillblank" or "matching",
+  "options": ["A", "B", "C", "D"],
+  "correctOption": 0,
+  "correctAnswer": "Detailed answer text - NOT 'Answer not provided'",
+  "marks": 1
+}
 
-3. For questions without options shown:
-   - If it's a one-word answer, convert to MCQ with 4 plausible options
-   - If it's a definition/meaning, convert to MCQ with similar but wrong meanings
-   - If it's descriptive, keep as written type
+STRICT RULES:
+1. EXTRACT questions ONLY from what is visible in the images
+2. Do NOT generate or create new questions
+3. MUST use "questionText" field (not "question" or "text")
+4. MUST use "questionType" field
+5. MCQ: 4 options, correctOption 0-3
+6. Written: MUST include detailed correctAnswer (not "Answer not provided")
+7. Preserve Hindi/bilingual if present in images
 
-4. Preserve the original language if questions are in Hindi/other language
+Return ONLY a valid JSON array, no markdown, no explanation.`;
+    }
 
-5. Distribute marks according to instructions, ensuring total = ${maxMarks}
-
-6. Return ONLY a valid JSON array with each question having:
-   - questionType: "mcq" | "truefalse" | "fillblank" | "matching" | "written"
-   - questionText: The question text
-   - marks: Number based on distribution
-   - For mcq: options (array of 4), correctOption (0-3)
-   - For truefalse: options ["True", "False"], correctOption (0 or 1)
-   - For written: correctAnswer
-   - For fillblank: blanks (array of answers)
-   - For matching: matchPairs (array of {left, right})
-
-IMPORTANT: Return ONLY the JSON array, no markdown, no explanation.`;
-
-    const result = await model.generateContent([
-      prompt,
-      {
+    // Prepare content array with prompt and all images
+    const contentArray = [prompt];
+    
+    // Handle both array of images and single image (backward compatibility)
+    const images = Array.isArray(imagesData) ? imagesData : [{ base64Data: imagesData.base64Data || imagesData, mimeType: imagesData.mimeType || "image/jpeg" }];
+    
+    images.forEach((img, index) => {
+      contentArray.push({
         inlineData: {
-          mimeType: mimeType,
-          data: imageBase64,
+          mimeType: img.mimeType || "image/jpeg",
+          data: img.base64Data,
         },
-      },
-    ]);
+      });
+    });
+
+    const result = await model.generateContent(contentArray);
 
     const response = await result.response;
     let text = response.text();
 
-    // Clean up response - remove markdown and extra text
-    text = text
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
+    text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
-    // Extract only the JSON array part
     const jsonStart = text.indexOf("[");
     const jsonEnd = text.lastIndexOf("]");
 
@@ -764,26 +843,155 @@ IMPORTANT: Return ONLY the JSON array, no markdown, no explanation.`;
     }
 
     text = text.substring(jsonStart, jsonEnd + 1);
-
-    const questions = JSON.parse(text);
+    
+    let questions;
+    try {
+      questions = JSON.parse(text);
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError.message);
+      console.error("Raw text:", text.substring(0, 500));
+      throw new Error("Failed to parse AI response as JSON");
+    }
 
     if (!Array.isArray(questions)) {
       throw new Error("Response is not an array");
     }
 
-    // Validate and fix each question
-    questions.forEach((q, index) => {
-      if (!q.questionText || !q.questionType) {
-        throw new Error(`Invalid question at index ${index}`);
+    // Log first question to debug field names
+    if (questions.length > 0) {
+      console.log("Sample question structure:", JSON.stringify(questions[0], null, 2).substring(0, 500));
+    }
+
+    // Validate and normalize each question (same logic as generateQuestions)
+    const validatedQuestions = [];
+    
+    for (let index = 0; index < questions.length; index++) {
+      const q = questions[index];
+      
+      // Handle alternative field names for questionText
+      if (!q.questionText) {
+        // Try common alternative field names
+        q.questionText = q.question || q.text || q.Question || q.questiontext || 
+                         q.question_text || q.QuestionText || q.content || q.prompt;
+      }
+      
+      if (!q.questionText) {
+        console.warn(`Skipping question at index ${index}: missing questionText. Keys: ${Object.keys(q).join(', ')}`);
+        continue;
       }
 
-      // Ensure truefalse has proper options
-      if (q.questionType === "truefalse") {
-        q.options = ["True", "False"];
+      // Handle alternative field names for questionType
+      if (!q.questionType) {
+        q.questionType = q.type || q.Type || q.question_type || q.QuestionType || q.qtype;
       }
-    });
 
-    return questions;
+      // Normalize the question type
+      const originalType = q.questionType;
+      q.questionType = normalizeQuestionType(q.questionType);
+      
+      if (!q.questionType) {
+        console.warn(`Question at index ${index}: unknown type "${originalType}", trying to infer...`);
+        // Try to infer type from structure
+        if (q.options && q.options.length === 4 && typeof q.correctOption === "number") {
+          q.questionType = "mcq";
+        } else if (q.options && q.options.length === 2 && 
+                   (q.options[0]?.toLowerCase() === "true" || q.options[1]?.toLowerCase() === "false")) {
+          q.questionType = "truefalse";
+        } else if (q.correctAnswer || q.answer || q.Answer) {
+          q.questionType = "written";
+        } else if (q.blanks) {
+          q.questionType = "fillblank";
+        } else if (q.matchPairs) {
+          q.questionType = "matching";
+        } else {
+          q.questionType = "written"; // Default to written if can't determine
+        }
+      }
+
+      // Handle alternative field names for correctAnswer
+      if (!q.correctAnswer) {
+        q.correctAnswer = q.answer || q.Answer || q.correct_answer || q.expectedAnswer || q.expected_answer;
+      }
+
+      // Handle alternative field names for correctOption
+      if (q.correctOption === undefined) {
+        q.correctOption = q.correct_option ?? q.correctIndex ?? q.correct ?? q.answerIndex ?? 0;
+      }
+
+      // Ensure marks is set
+      if (!q.marks || typeof q.marks !== "number") {
+        q.marks = q.mark || q.points || q.score || 1;
+      }
+
+      // Validate and fix based on type
+      try {
+        switch (q.questionType) {
+          case "mcq":
+            if (!Array.isArray(q.options) || q.options.length < 4) {
+              q.options = q.options || [];
+              while (q.options.length < 4) {
+                q.options.push(`Option ${q.options.length + 1}`);
+              }
+            }
+            if (q.options.length > 4) {
+              q.options = q.options.slice(0, 4);
+            }
+            if (typeof q.correctOption !== "number" || q.correctOption < 0 || q.correctOption > 3) {
+              q.correctOption = 0;
+            }
+            break;
+
+          case "written":
+            if (!q.correctAnswer) {
+              q.correctAnswer = "Answer not provided";
+            }
+            break;
+
+          case "fillblank":
+            if (!Array.isArray(q.blanks) || q.blanks.length === 0) {
+              if (q.correctAnswer) {
+                q.blanks = [q.correctAnswer];
+              } else {
+                q.blanks = ["answer"];
+              }
+            }
+            break;
+
+          case "matching":
+            if (!Array.isArray(q.matchPairs) || q.matchPairs.length < 2) {
+              console.warn(`Skipping matching question at index ${index}: insufficient pairs`);
+              continue;
+            }
+            q.matchPairs = q.matchPairs.filter(pair => pair.left && pair.right);
+            if (q.matchPairs.length < 2) {
+              continue;
+            }
+            break;
+
+          case "truefalse":
+            q.options = ["True", "False"];
+            if (typeof q.correctOption !== "number" || (q.correctOption !== 0 && q.correctOption !== 1)) {
+              if (q.correctAnswer) {
+                const answer = q.correctAnswer.toString().toLowerCase();
+                q.correctOption = answer === "true" || answer === "yes" ? 0 : 1;
+              } else {
+                q.correctOption = 0;
+              }
+            }
+            break;
+        }
+
+        validatedQuestions.push(q);
+      } catch (validationError) {
+        console.warn(`Skipping question at index ${index}: ${validationError.message}`);
+      }
+    }
+
+    if (validatedQuestions.length === 0) {
+      throw new Error("No valid questions could be extracted. Please try again with clearer images.");
+    }
+
+    return validatedQuestions;
   });
 };
 
@@ -793,81 +1001,118 @@ const processRawQuestions = async (
   maxMarks,
   marksDistribution,
   language = "english",
-  numberOfQuestions = null
+  numberOfQuestions = null,
+  examFormat = "general",
+  difficulty = "medium"
 ) => {
   return await executeWithFallback(async () => {
     const model = await getGeminiModel();
 
     const languageInstructions = {
       english: "",
-      hindi:
-        "\n\nGenerate ALL content in Hindi (हिंदी). Use Devanagari script.",
-      sanskrit:
-        "\n\nGenerate ALL content in Sanskrit (संस्कृत). Use Devanagari script.",
+      hindi: "\n\nGenerate ALL content in Hindi (हिंदी). Use Devanagari script.",
+      bilingual: "\n\nGenerate in BILINGUAL format: Hindi first, then English. Example: 'हिंदी प्रश्न / English question'",
+      sanskrit: "\n\nGenerate ALL content in Sanskrit (संस्कृत). Use Devanagari script.",
+    };
+
+    const difficultyInstructions = {
+      easy: `
+DIFFICULTY: EASY - Board exam level
+- Direct textbook questions, definitions, basic recall
+- Simple MCQs with clear correct answer
+- Written: definitions, list 2-3 points, simple explanations
+- No complex calculations or multi-step reasoning`,
+      medium: `
+DIFFICULTY: MEDIUM - Competitive exam level
+- Application-based questions, understanding required
+- Tricky MCQs requiring careful analysis, some calculations
+- Written: explain with examples, compare/contrast, numerical problems
+- WHY and HOW questions, not just WHAT`,
+      hard: `
+DIFFICULTY: HARD - JEE/NEET/Olympiad level
+- Complex scenarios combining multiple concepts
+- Assertion-reason MCQs, multi-step numerical problems
+- Written: derivations, prove statements, HOTS questions, case studies
+- Critical thinking, advanced reasoning required`
     };
 
     const languageNote = languageInstructions[language] || "";
+    const difficultyNote = difficultyInstructions[difficulty] || difficultyInstructions.medium;
 
-    const prompt = `You are a quiz question processor. Convert the following raw questions/content into proper quiz questions.${languageNote}
+    let prompt;
+    
+    if (examFormat === "upboard_science") {
+      prompt = `You are generating UP BOARD CLASS 10 SCIENCE PAPER from the given topic/content.
 
-RAW QUESTIONS/CONTENT:
+INPUT TOPIC/CONTENT:
+"""
+${rawQuestions}
+"""
+
+${difficultyNote}
+
+GENERATE EXACTLY 31 QUESTIONS in UP Board format (70 marks total):
+
+STRUCTURE:
+- Q1-Q7: MCQs, section "खण्ड-अ (Part-A) उप-भाग-I (1 अंक)"
+- Q8-Q13: MCQs, section "खण्ड-अ (Part-A) उप-भाग-II (1 अंक)"
+- Q14-Q20: MCQs, section "खण्ड-अ (Part-A) उप-भाग-III (1 अंक)"
+- Q21-Q24: Written 4 marks (2+2 with subParts), section "खण्ड-ब (Part-B) उप-भाग-I (2+2=4 अंक)"
+- Q25-Q28: Written 4 marks, section "खण्ड-ब (Part-B) उप-भाग-II (4 अंक)"
+- Q29-Q31: Written 6 marks with OR, section "खण्ड-ब (Part-B) उप-भाग-III (6 अंक)"
+
+RULES:
+1. ALL questions from given topic ONLY
+2. ALL questions BILINGUAL: "हिंदी प्रश्न / English question"
+3. Each question MUST have "section" field
+4. Q21-24: "subParts" array with (i) and (ii)
+5. Q29-31: "hasAlternative": true, "alternativeQuestion", "alternativeAnswer"
+6. Chemical formulas: H₂O, CO₂, CH₄, C₂H₆
+
+ANSWER LENGTH:
+- 4-mark: 300-400 words minimum (1 page)
+- 6-mark: 600-800 words minimum (2 pages)
+- Include key points, examples, diagrams description, equations
+
+Return ONLY valid JSON array with exactly 31 questions.`;
+    } else {
+      prompt = `You are a quiz question processor. Convert the following content into quiz questions.${languageNote}
+
+${difficultyNote}
+
+INPUT CONTENT/TOPIC:
 """
 ${rawQuestions}
 """
 
 MAXIMUM TOTAL MARKS: ${maxMarks}
 
-MARKS DISTRIBUTION INSTRUCTIONS:
+MARKS DISTRIBUTION:
 """
-${marksDistribution}
+${marksDistribution || "Distribute marks based on question complexity"}
 """
 
-${
-  numberOfQuestions
-    ? `SELECT EXACTLY ${numberOfQuestions} QUESTIONS RANDOMLY from the input.`
-    : "Process ALL questions provided."
-}
+${numberOfQuestions ? `GENERATE EXACTLY ${numberOfQuestions} QUESTIONS.` : "Generate appropriate number of questions from the content."}
 
 RULES:
-1. Analyze each question and determine the best format:
-   - One word answers → Convert to MCQ with 4 plausible options (generate 3 wrong options using your knowledge)
-   - Word meanings → MCQ with 4 options (include correct meaning + 3 similar but wrong meanings)
-   - True/False statements → truefalse type
-   - Fill in the blank → fillblank type
-   - Matching pairs → matching type
-   - Descriptive questions → written type
-   - Multiple choice given → mcq type
+1. If input is a TOPIC: Generate questions on that topic matching the difficulty level
+2. If input is RAW QUESTIONS: Convert them to proper format
+3. Question types: mcq, truefalse, fillblank, matching, written
+4. MCQ: 4 options, correctOption 0-3
+5. Written answers must match difficulty level:
+   - Easy: 50-100 words
+   - Medium: 150-250 words  
+   - Hard: 300-500 words with derivations/proofs
 
-2. For MCQ conversions:
-   - Generate 3 plausible but incorrect options
-   - Randomize the position of correct answer
-   - Options should be similar in style/length
-
-3. Distribute marks according to the instructions, ensuring total = ${maxMarks}
-
-4. Return ONLY a valid JSON array with each question having:
-   - questionType: "mcq" | "truefalse" | "fillblank" | "matching" | "written"
-   - questionText: The question text
-   - marks: Number based on distribution
-   - For mcq: options (array of 4), correctOption (0-3)
-   - For truefalse: options ["True", "False"], correctOption (0 or 1)
-   - For written: correctAnswer
-   - For fillblank: blanks (array of answers)
-   - For matching: matchPairs (array of {left, right})
-
-IMPORTANT: Return ONLY the JSON array, no markdown, no explanation.`;
+Return ONLY a valid JSON array, no markdown.`;
+    }
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = response.text();
 
-    // Clean up response - remove markdown and extra text
-    text = text
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
+    text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
-    // Extract only the JSON array part (everything between [ and last ])
     const jsonStart = text.indexOf("[");
     const jsonEnd = text.lastIndexOf("]");
 
@@ -876,26 +1121,118 @@ IMPORTANT: Return ONLY the JSON array, no markdown, no explanation.`;
     }
 
     text = text.substring(jsonStart, jsonEnd + 1);
-
-    const questions = JSON.parse(text);
+    
+    let questions;
+    try {
+      questions = JSON.parse(text);
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError.message);
+      console.error("Raw text:", text.substring(0, 500));
+      throw new Error("Failed to parse AI response as JSON");
+    }
 
     if (!Array.isArray(questions)) {
       throw new Error("Response is not an array");
     }
 
-    // Validate and fix each question
-    questions.forEach((q, index) => {
-      if (!q.questionText || !q.questionType) {
-        throw new Error(`Invalid question at index ${index}`);
+    // Validate and normalize each question
+    const validatedQuestions = [];
+    
+    for (let index = 0; index < questions.length; index++) {
+      const q = questions[index];
+      
+      if (!q.questionText) {
+        console.warn(`Skipping question at index ${index}: missing questionText`);
+        continue;
       }
 
-      // Ensure truefalse has proper options
-      if (q.questionType === "truefalse") {
-        q.options = ["True", "False"];
+      // Normalize the question type
+      const originalType = q.questionType;
+      q.questionType = normalizeQuestionType(q.questionType);
+      
+      if (!q.questionType) {
+        console.warn(`Question at index ${index}: unknown type "${originalType}", trying to infer...`);
+        if (q.options && q.options.length === 4 && typeof q.correctOption === "number") {
+          q.questionType = "mcq";
+        } else if (q.options && q.options.length === 2 && 
+                   (q.options[0]?.toLowerCase() === "true" || q.options[1]?.toLowerCase() === "false")) {
+          q.questionType = "truefalse";
+        } else if (q.correctAnswer) {
+          q.questionType = "written";
+        } else if (q.blanks) {
+          q.questionType = "fillblank";
+        } else if (q.matchPairs) {
+          q.questionType = "matching";
+        } else {
+          q.questionType = "written";
+        }
       }
-    });
 
-    return questions;
+      if (!q.marks || typeof q.marks !== "number") {
+        q.marks = 1;
+      }
+
+      try {
+        switch (q.questionType) {
+          case "mcq":
+            if (!Array.isArray(q.options) || q.options.length < 4) {
+              q.options = q.options || [];
+              while (q.options.length < 4) {
+                q.options.push(`Option ${q.options.length + 1}`);
+              }
+            }
+            if (q.options.length > 4) {
+              q.options = q.options.slice(0, 4);
+            }
+            if (typeof q.correctOption !== "number" || q.correctOption < 0 || q.correctOption > 3) {
+              q.correctOption = 0;
+            }
+            break;
+
+          case "written":
+            if (!q.correctAnswer) {
+              q.correctAnswer = "Answer not provided";
+            }
+            break;
+
+          case "fillblank":
+            if (!Array.isArray(q.blanks) || q.blanks.length === 0) {
+              q.blanks = q.correctAnswer ? [q.correctAnswer] : ["answer"];
+            }
+            break;
+
+          case "matching":
+            if (!Array.isArray(q.matchPairs) || q.matchPairs.length < 2) {
+              continue;
+            }
+            q.matchPairs = q.matchPairs.filter(pair => pair.left && pair.right);
+            if (q.matchPairs.length < 2) continue;
+            break;
+
+          case "truefalse":
+            q.options = ["True", "False"];
+            if (typeof q.correctOption !== "number" || (q.correctOption !== 0 && q.correctOption !== 1)) {
+              if (q.correctAnswer) {
+                const answer = q.correctAnswer.toString().toLowerCase();
+                q.correctOption = answer === "true" || answer === "yes" ? 0 : 1;
+              } else {
+                q.correctOption = 0;
+              }
+            }
+            break;
+        }
+
+        validatedQuestions.push(q);
+      } catch (validationError) {
+        console.warn(`Skipping question at index ${index}: ${validationError.message}`);
+      }
+    }
+
+    if (validatedQuestions.length === 0) {
+      throw new Error("No valid questions could be processed. Please try again.");
+    }
+
+    return validatedQuestions;
   });
 };
 

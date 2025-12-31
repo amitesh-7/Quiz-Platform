@@ -71,18 +71,21 @@ const ManageQuiz = () => {
     marksDistribution: "",
     numberOfQuestions: "",
     language: "english",
+    examFormat: "general",
+    difficulty: "medium",
   });
   const [processingBulk, setProcessingBulk] = useState(false);
   const [processedQuestions, setProcessedQuestions] = useState([]);
 
   // Image extraction state
   const [imageForm, setImageForm] = useState({
-    image: null,
-    imagePreview: null,
+    images: [], // Array of {data: base64, preview: url}
     maxMarks: 50,
     marksDistribution: "",
     additionalInstructions: "",
     language: "english",
+    examFormat: "general",
+    difficulty: "medium",
   });
   const [extracting, setExtracting] = useState(false);
   const [extractedQuestions, setExtractedQuestions] = useState([]);
@@ -571,6 +574,8 @@ ${answersHTML}
           ? parseInt(bulkForm.numberOfQuestions)
           : null,
         language: bulkForm.language,
+        examFormat: bulkForm.examFormat,
+        difficulty: bulkForm.difficulty,
       });
       setProcessedQuestions(response.data.data.questions);
       toast.success(
@@ -603,6 +608,8 @@ ${answersHTML}
         marksDistribution: "",
         numberOfQuestions: "",
         language: "english",
+        examFormat: "general",
+        difficulty: "medium",
       });
       toast.success("Questions added to quiz");
     } catch (error) {
@@ -610,41 +617,84 @@ ${answersHTML}
     }
   };
 
-  // Handle image upload
+  // Handle image upload - supports multiple images (max 5)
   const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please upload an image file");
+    // Check current count + new files
+    const currentCount = imageForm.images?.length || 0;
+    const remainingSlots = 5 - currentCount;
+    
+    if (remainingSlots <= 0) {
+      toast.error("Maximum 5 images allowed");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImageForm({
-        ...imageForm,
-        image: reader.result,
-        imagePreview: reader.result,
+    const filesToProcess = files.slice(0, remainingSlots);
+    if (files.length > remainingSlots) {
+      toast.error(`Only ${remainingSlots} more image(s) can be added (max 5)`);
+    }
+
+    // Validate all files are images
+    const invalidFiles = filesToProcess.filter(f => !f.type.startsWith("image/"));
+    if (invalidFiles.length > 0) {
+      toast.error("Please upload only image files (JPG, PNG, JPEG)");
+      return;
+    }
+
+    // Process each file
+    const processFile = (file) => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve({
+            data: reader.result,
+            preview: reader.result,
+            name: file.name,
+          });
+        };
+        reader.readAsDataURL(file);
       });
     };
-    reader.readAsDataURL(file);
+
+    Promise.all(filesToProcess.map(processFile)).then((newImages) => {
+      setImageForm({
+        ...imageForm,
+        images: [...(imageForm.images || []), ...newImages],
+      });
+      toast.success(`Added ${newImages.length} image(s)`);
+    });
+
+    // Reset input to allow selecting same file again
+    e.target.value = "";
+  };
+
+  // Remove a specific image
+  const handleRemoveImage = (index) => {
+    const newImages = imageForm.images.filter((_, i) => i !== index);
+    setImageForm({
+      ...imageForm,
+      images: newImages,
+    });
   };
 
   const handleExtractFromImage = async () => {
-    if (!imageForm.image) {
-      toast.error("Please upload an image first");
+    if (!imageForm.images || imageForm.images.length === 0) {
+      toast.error("Please upload at least one image");
       return;
     }
 
     setExtracting(true);
     try {
       const response = await geminiAPI.extractQuestionsFromImage({
-        image: imageForm.image,
+        images: imageForm.images.map(img => img.data), // Send array of base64 images
         maxMarks: imageForm.maxMarks,
         marksDistribution: imageForm.marksDistribution,
         additionalInstructions: imageForm.additionalInstructions,
         language: imageForm.language,
+        examFormat: imageForm.examFormat,
+        difficulty: imageForm.difficulty,
       });
       setExtractedQuestions(response.data.data.questions);
       toast.success(
@@ -657,6 +707,224 @@ ${answersHTML}
       );
     } finally {
       setExtracting(false);
+    }
+  };
+
+  // PDF Download for Extracted Questions
+  const handleDownloadExtractedPDF = () => {
+    if (extractedQuestions.length === 0) {
+      toast.error("No questions to download");
+      return;
+    }
+
+    toast.loading("PDF बन रहा है...", { id: "pdf-gen" });
+
+    // Group questions by section
+    const sections = {};
+    extractedQuestions.forEach((q, idx) => {
+      const section = q.section || "General";
+      if (!sections[section]) sections[section] = [];
+      sections[section].push({ ...q, qNum: idx + 1 });
+    });
+
+    // Build questions HTML
+    let questionsHTML = "";
+    Object.entries(sections).forEach(([sectionName, sectionQuestions]) => {
+      if (sectionName !== "General") {
+        questionsHTML += `
+          <div class="section-break"></div>
+          <div class="section-header">${sectionName}</div>
+          <div class="section-gap"></div>
+        `;
+      }
+      sectionQuestions.forEach((q) => {
+        questionsHTML += `
+          <div class="question">
+            <div class="q-line">
+              <span class="q-num">प्रश्न ${q.qNum}.</span>
+              <span class="q-marks">[${q.marks} अंक]</span>
+            </div>
+            <div class="q-text">${q.questionText || ""}</div>
+        `;
+        
+        if ((q.questionType === "mcq" || q.questionType === "truefalse") && q.options) {
+          questionsHTML += `
+            <div class="options">
+              <div class="opt-row">
+                <span class="opt">(अ) ${q.options[0] || ""}</span>
+                <span class="opt">(ब) ${q.options[1] || ""}</span>
+              </div>
+              <div class="opt-row">
+                <span class="opt">(स) ${q.options[2] || ""}</span>
+                <span class="opt">(द) ${q.options[3] || ""}</span>
+              </div>
+            </div>
+          `;
+        }
+        
+        if (q.hasAlternative && q.alternativeQuestion) {
+          questionsHTML += `
+            <div class="or-section">
+              <div class="or-text">अथवा / OR</div>
+              <div class="q-text">${q.alternativeQuestion}</div>
+            </div>
+          `;
+        }
+        
+        questionsHTML += `</div>`;
+      });
+    });
+
+    // Build answers HTML
+    let answersHTML = "";
+    Object.entries(sections).forEach(([sectionName, sectionQuestions]) => {
+      if (sectionName !== "General") {
+        answersHTML += `
+          <div class="section-break"></div>
+          <div class="ans-section-header">${sectionName}</div>
+          <div class="section-gap"></div>
+        `;
+      }
+      sectionQuestions.forEach((q) => {
+        answersHTML += `<div class="answer"><div class="ans-num">उत्तर ${q.qNum}. [${q.marks} अंक]</div>`;
+        
+        if ((q.questionType === "mcq" || q.questionType === "truefalse") && q.options) {
+          const optLabels = ["अ", "ब", "स", "द"];
+          answersHTML += `<div class="ans-text correct">(${optLabels[q.correctOption || 0]}) ${q.options[q.correctOption] || ""}</div>`;
+        }
+        
+        if (q.questionType === "written" && q.correctAnswer) {
+          answersHTML += `<div class="ans-text">${q.correctAnswer}</div>`;
+        }
+        
+        if (q.questionType === "fillblank" && q.blanks) {
+          answersHTML += `<div class="ans-text correct">${q.blanks.join(", ")}</div>`;
+        }
+        
+        if (q.hasAlternative && q.alternativeAnswer) {
+          answersHTML += `<div class="or-ans"><b>अथवा:</b><br/>${q.alternativeAnswer}</div>`;
+        }
+        
+        answersHTML += `</div>`;
+      });
+    });
+
+    const totalMarks = extractedQuestions.reduce((sum, q) => sum + q.marks, 0);
+
+    const fullHTML = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
+@page { size: A4; margin: 15mm 12mm; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Noto Sans Devanagari', serif; font-size: 12px; line-height: 1.5; color: #000; }
+.header { text-align: center; border: 2px solid #000; padding: 10px; margin-bottom: 15px; }
+.header h1 { font-size: 18px; font-weight: 700; margin-bottom: 5px; }
+.header h2 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.header-info { display: flex; justify-content: space-between; font-size: 11px; border-top: 1px solid #000; padding-top: 8px; margin-top: 8px; }
+
+.section-break { height: 8px; }
+.section-gap { height: 12px; }
+.section-header { 
+  font-size: 13px; font-weight: 700; text-align: center; 
+  border: 1px solid #000; padding: 6px 10px; 
+  background: #f5f5f5; margin: 10px 0;
+}
+
+.question { margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dotted #ccc; }
+.q-line { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.q-num { font-weight: 700; font-size: 12px; }
+.q-marks { font-size: 11px; color: #333; }
+.q-text { font-size: 12px; line-height: 1.6; margin: 4px 0 6px 20px; white-space: pre-wrap; }
+
+.options { margin: 6px 0 0 20px; }
+.opt-row { display: flex; margin-bottom: 3px; }
+.opt { width: 50%; font-size: 11px; padding: 2px 0; }
+
+.or-section { margin: 10px 0 0 20px; padding: 8px; border: 1px dashed #666; background: #fafafa; }
+.or-text { font-weight: 700; text-align: center; margin-bottom: 5px; font-size: 12px; }
+
+.page-break { page-break-before: always; }
+
+.ans-header { text-align: center; border: 2px solid #000; padding: 10px; margin-bottom: 15px; background: #f0f0f0; }
+.ans-header h1 { font-size: 16px; font-weight: 700; }
+
+.ans-section-header { 
+  font-size: 12px; font-weight: 700; text-align: center; 
+  border: 1px solid #000; padding: 5px 10px; 
+  background: #e8f5e9; margin: 10px 0;
+}
+
+.answer { margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px dotted #ccc; }
+.ans-num { font-weight: 700; font-size: 11px; margin-bottom: 3px; }
+.ans-text { font-size: 11px; line-height: 1.6; margin-left: 15px; white-space: pre-wrap; text-align: justify; }
+.ans-text.correct { font-weight: 600; color: #1b5e20; background: #e8f5e9; padding: 3px 8px; display: inline-block; border-radius: 3px; }
+.or-ans { margin: 8px 0 0 15px; padding: 6px; background: #fff8e1; border: 1px dashed #f9a825; font-size: 11px; line-height: 1.5; }
+
+@media print {
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .question, .answer { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>प्रश्न पत्र / Question Paper</h1>
+  <h2>विषय: विज्ञान / Subject: Science</h2>
+  <div class="header-info">
+    <div><b>पूर्णांक:</b> ${totalMarks} अंक</div>
+    <div><b>प्रश्न:</b> ${extractedQuestions.length}</div>
+  </div>
+</div>
+
+<div class="instructions" style="font-size:10px;margin-bottom:12px;padding:6px;border:1px solid #ddd;background:#fafafa;">
+  <b>निर्देश:</b> (i) सभी प्रश्न अनिवार्य हैं। (ii) प्रत्येक प्रश्न के अंक उसके सामने अंकित हैं।
+</div>
+
+${questionsHTML}
+
+<div class="page-break"></div>
+
+<div class="ans-header">
+  <h1>उत्तर कुंजी / Answer Key</h1>
+</div>
+
+${answersHTML}
+
+</body>
+</html>`;
+
+    try {
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.right = "0";
+      iframe.style.bottom = "0";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "none";
+      document.body.appendChild(iframe);
+
+      const iframeDoc = iframe.contentWindow.document;
+      iframeDoc.open();
+      iframeDoc.write(fullHTML);
+      iframeDoc.close();
+
+      iframe.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow.print();
+          setTimeout(() => {
+            document.body.removeChild(iframe);
+          }, 1000);
+        }, 500);
+      };
+
+      toast.success("Print dialog opened - Save as PDF", { id: "pdf-gen" });
+    } catch (error) {
+      console.error("PDF Error:", error);
+      toast.error("PDF generation failed", { id: "pdf-gen" });
     }
   };
 
@@ -673,12 +941,13 @@ ${answersHTML}
       setShowImageModal(false);
       setExtractedQuestions([]);
       setImageForm({
-        image: null,
-        imagePreview: null,
+        images: [],
         maxMarks: 50,
         marksDistribution: "",
         additionalInstructions: "",
         language: "english",
+        examFormat: "general",
+        difficulty: "medium",
       });
       toast.success("Questions added to quiz");
     } catch (error) {
@@ -1917,6 +2186,95 @@ ${answersHTML}
 
                 {processedQuestions.length === 0 ? (
                   <div className="space-y-4">
+                    {/* Exam Format Selection */}
+                    <div className="form-group">
+                      <label className="input-label">Exam Format *</label>
+                      <select
+                        value={bulkForm.examFormat || "general"}
+                        onChange={(e) => {
+                          const format = e.target.value;
+                          if (format === "upboard_science") {
+                            setBulkForm({
+                              ...bulkForm,
+                              examFormat: format,
+                              language: "bilingual",
+                            });
+                          } else {
+                            setBulkForm({
+                              ...bulkForm,
+                              examFormat: format,
+                            });
+                          }
+                        }}
+                        className="glass-input"
+                      >
+                        <option value="general">General (Custom)</option>
+                        <option value="upboard_science">UP Board Science (Class 10)</option>
+                      </select>
+                    </div>
+
+                    {/* UP Board Info Box */}
+                    {bulkForm.examFormat === "upboard_science" && (
+                      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-4">
+                        <p className="text-blue-300 font-medium mb-3">📋 UP Board Science Paper - 70 Marks (31 Questions)</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-yellow-400 font-medium mb-2">खण्ड-अ (Part A) - 20 Marks</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• उप-भाग I: 7 MCQs × 1 = 7 marks</li>
+                              <li>• उप-भाग II: 6 MCQs × 1 = 6 marks</li>
+                              <li>• उप-भाग III: 7 MCQs × 1 = 7 marks</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-green-400 font-medium mb-2">खण्ड-ब (Part B) - 50 Marks</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• उप-भाग I: 4 × (2+2) = 16 marks</li>
+                              <li>• उप-भाग II: 4 × 4 = 16 marks</li>
+                              <li>• उप-भाग III: 3 × 6 = 18 marks (OR)</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-white/10">
+                          <p className="text-xs text-gray-400">
+                            ✓ 31 questions = 70 marks • ✓ Bilingual (Hindi/English) • ✓ Section headers
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Difficulty Selection */}
+                    <div className="form-group">
+                      <label className="input-label">Difficulty Level</label>
+                      <div className="grid grid-cols-3 gap-3">
+                        {[
+                          { value: "easy", label: "Easy", desc: "Board exam level", icon: "🟢" },
+                          { value: "medium", label: "Medium", desc: "Competitive level", icon: "🟡" },
+                          { value: "hard", label: "Hard", desc: "JEE/NEET/Olympiad", icon: "🔴" },
+                        ].map((level) => (
+                          <button
+                            key={level.value}
+                            type="button"
+                            onClick={() =>
+                              setBulkForm({
+                                ...bulkForm,
+                                difficulty: level.value,
+                              })
+                            }
+                            className={`p-3 rounded-lg border text-center transition-all ${
+                              bulkForm.difficulty === level.value
+                                ? "bg-blue-500/30 border-blue-500 text-white"
+                                : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                            }`}
+                          >
+                            <span className="text-xl">{level.icon}</span>
+                            <p className="font-medium mt-1">{level.label}</p>
+                            <p className="text-xs opacity-70">{level.desc}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                     <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-blue-300 text-sm">
                       <p className="font-semibold mb-2">📋 How it works:</p>
                       <ul className="list-disc list-inside space-y-1">
@@ -1933,7 +2291,7 @@ ${answersHTML}
                     </div>
 
                     <div className="form-group">
-                      <label className="input-label">Raw Questions</label>
+                      <label className="input-label">Raw Questions / Topic</label>
                       <textarea
                         value={bulkForm.rawQuestions}
                         onChange={(e) =>
@@ -1943,7 +2301,17 @@ ${answersHTML}
                           })
                         }
                         className="glass-input h-40 resize-none font-mono text-sm"
-                        placeholder={`Paste your questions here in any format...
+                        placeholder={bulkForm.examFormat === "upboard_science" 
+                          ? `Enter topic(s) for UP Board Science paper...
+
+Example (Single topic):
+प्रकाश - परावर्तन और अपवर्तन
+
+Example (Multiple topics - comma separated):
+प्रकाश, रासायनिक अभिक्रियाएं, जीवन प्रक्रियाएं
+
+OR paste raw questions in any format...`
+                          : `Paste your questions here in any format...
 
 Example:
 1. What is photosynthesis? (2 marks)
@@ -2033,7 +2401,8 @@ Example:
                         className="glass-input"
                       >
                         <option value="english">English</option>
-                        <option value="hindi">Hindi</option>
+                        <option value="hindi">हिंदी (Hindi)</option>
+                        <option value="bilingual">द्विभाषी (Bilingual)</option>
                         <option value="spanish">Spanish</option>
                         <option value="french">French</option>
                         <option value="german">German</option>
@@ -2228,6 +2597,95 @@ Example:
 
                 {extractedQuestions.length === 0 ? (
                   <div className="space-y-4">
+                    {/* Exam Format Selection */}
+                    <div className="form-group">
+                      <label className="input-label">Exam Format *</label>
+                      <select
+                        value={imageForm.examFormat || "general"}
+                        onChange={(e) => {
+                          const format = e.target.value;
+                          if (format === "upboard_science") {
+                            setImageForm({
+                              ...imageForm,
+                              examFormat: format,
+                              language: "bilingual",
+                            });
+                          } else {
+                            setImageForm({
+                              ...imageForm,
+                              examFormat: format,
+                            });
+                          }
+                        }}
+                        className="glass-input"
+                      >
+                        <option value="general">General (Custom)</option>
+                        <option value="upboard_science">UP Board Science (Class 10)</option>
+                      </select>
+                    </div>
+
+                    {/* UP Board Info Box */}
+                    {imageForm.examFormat === "upboard_science" && (
+                      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-4">
+                        <p className="text-blue-300 font-medium mb-3">📋 UP Board Science Paper - 70 Marks (31 Questions)</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-yellow-400 font-medium mb-2">खण्ड-अ (Part A) - 20 Marks</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• उप-भाग I: 7 MCQs × 1 = 7 marks</li>
+                              <li>• उप-भाग II: 6 MCQs × 1 = 6 marks</li>
+                              <li>• उप-भाग III: 7 MCQs × 1 = 7 marks</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-green-400 font-medium mb-2">खण्ड-ब (Part B) - 50 Marks</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• उप-भाग I: 4 × (2+2) = 16 marks</li>
+                              <li>• उप-भाग II: 4 × 4 = 16 marks</li>
+                              <li>• उप-भाग III: 3 × 6 = 18 marks (OR)</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-white/10">
+                          <p className="text-xs text-gray-400">
+                            ✓ 31 questions = 70 marks • ✓ Bilingual (Hindi/English) • ✓ Section headers
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Difficulty Selection */}
+                    <div className="form-group">
+                      <label className="input-label">Difficulty Level</label>
+                      <div className="grid grid-cols-3 gap-3">
+                        {[
+                          { value: "easy", label: "Easy", desc: "Board exam level", icon: "🟢" },
+                          { value: "medium", label: "Medium", desc: "Competitive level", icon: "🟡" },
+                          { value: "hard", label: "Hard", desc: "JEE/NEET/Olympiad", icon: "🔴" },
+                        ].map((level) => (
+                          <button
+                            key={level.value}
+                            type="button"
+                            onClick={() =>
+                              setImageForm({
+                                ...imageForm,
+                                difficulty: level.value,
+                              })
+                            }
+                            className={`p-3 rounded-lg border text-center transition-all ${
+                              imageForm.difficulty === level.value
+                                ? "bg-blue-500/30 border-blue-500 text-white"
+                                : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                            }`}
+                          >
+                            <span className="text-xl">{level.icon}</span>
+                            <p className="font-medium mt-1">{level.label}</p>
+                            <p className="text-xs opacity-70">{level.desc}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                     <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-blue-300 text-sm">
                       <p className="font-semibold mb-2">📸 How it works:</p>
                       <ul className="list-disc list-inside space-y-1">
@@ -2244,122 +2702,163 @@ Example:
                       </ul>
                     </div>
 
-                    {/* Image Upload */}
+                    {/* Image Upload - Multiple Images */}
                     <div className="form-group">
-                      <label className="input-label">Upload Image</label>
-                      <div className="relative">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                          id="image-upload"
-                        />
-                        <label
-                          htmlFor="image-upload"
-                          className="glass-input cursor-pointer flex items-center justify-center p-8 text-center hover:bg-white/10 transition-colors"
-                        >
-                          {imageForm.imagePreview ? (
-                            <img
-                              src={imageForm.imagePreview}
-                              alt="Preview"
-                              className="max-h-64 rounded-lg"
-                            />
-                          ) : (
+                      <label className="input-label">
+                        Upload Images 
+                        <span className="text-gray-500 ml-2">
+                          ({imageForm.images?.length || 0}/5 images)
+                        </span>
+                      </label>
+                      
+                      {/* Image Previews Grid */}
+                      {imageForm.images && imageForm.images.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-3">
+                          {imageForm.images.map((img, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={img.preview}
+                                alt={`Preview ${index + 1}`}
+                                className="w-full h-24 object-cover rounded-lg border border-white/20"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveImage(index)}
+                                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                              >
+                                ✕
+                              </button>
+                              <span className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
+                                {index + 1}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Upload Button */}
+                      {(!imageForm.images || imageForm.images.length < 5) && (
+                        <div className="relative">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={handleImageUpload}
+                            className="hidden"
+                            id="image-upload"
+                          />
+                          <label
+                            htmlFor="image-upload"
+                            className="glass-input cursor-pointer flex items-center justify-center p-6 text-center hover:bg-white/10 transition-colors border-2 border-dashed border-white/20 hover:border-blue-500/50"
+                          >
                             <div>
-                              <FiPlus className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                              <FiPlus className="w-10 h-10 mx-auto mb-2 text-gray-400" />
                               <p className="text-gray-400">
-                                Click to upload image
+                                {imageForm.images?.length > 0 
+                                  ? "Click to add more images" 
+                                  : "Click to upload images"}
                               </p>
                               <p className="text-gray-500 text-sm mt-1">
-                                Supports JPG, PNG, JPEG
+                                JPG, PNG, JPEG • Max 5 images
                               </p>
                             </div>
-                          )}
-                        </label>
-                      </div>
+                          </label>
+                        </div>
+                      )}
+
+                      {imageForm.images?.length === 5 && (
+                        <p className="text-yellow-400 text-sm mt-2">
+                          ✓ Maximum 5 images reached
+                        </p>
+                      )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="form-group">
-                        <label className="input-label">
-                          Maximum Total Marks
-                        </label>
-                        <input
-                          type="number"
-                          value={imageForm.maxMarks}
-                          onChange={(e) =>
-                            setImageForm({
-                              ...imageForm,
-                              maxMarks: parseInt(e.target.value) || 50,
-                            })
-                          }
-                          className="glass-input"
-                          min={10}
-                          max={200}
-                        />
-                      </div>
+                    {/* Show these fields only for General format, not for UP Board */}
+                    {imageForm.examFormat !== "upboard_science" && (
+                      <>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="form-group">
+                            <label className="input-label">
+                              Maximum Total Marks
+                            </label>
+                            <input
+                              type="number"
+                              value={imageForm.maxMarks}
+                              onChange={(e) =>
+                                setImageForm({
+                                  ...imageForm,
+                                  maxMarks: parseInt(e.target.value) || 50,
+                                })
+                              }
+                              className="glass-input"
+                              min={10}
+                              max={200}
+                            />
+                          </div>
 
-                      <div className="form-group">
-                        <label className="input-label">Language</label>
-                        <select
-                          value={imageForm.language}
-                          onChange={(e) =>
-                            setImageForm({
-                              ...imageForm,
-                              language: e.target.value,
-                            })
-                          }
-                          className="glass-input"
-                        >
-                          <option value="english">English</option>
-                          <option value="hindi">Hindi</option>
-                          <option value="spanish">Spanish</option>
-                          <option value="french">French</option>
-                          <option value="german">German</option>
-                        </select>
-                      </div>
-                    </div>
+                          <div className="form-group">
+                            <label className="input-label">Language</label>
+                            <select
+                              value={imageForm.language}
+                              onChange={(e) =>
+                                setImageForm({
+                                  ...imageForm,
+                                  language: e.target.value,
+                                })
+                              }
+                              className="glass-input"
+                            >
+                              <option value="english">English</option>
+                              <option value="hindi">हिंदी (Hindi)</option>
+                              <option value="bilingual">द्विभाषी (Bilingual)</option>
+                              <option value="spanish">Spanish</option>
+                              <option value="french">French</option>
+                              <option value="german">German</option>
+                            </select>
+                          </div>
+                        </div>
 
-                    <div className="form-group">
-                      <label className="input-label">
-                        Marks Distribution{" "}
-                        <span className="text-gray-500">(optional)</span>
-                      </label>
-                      <textarea
-                        value={imageForm.marksDistribution}
-                        onChange={(e) =>
-                          setImageForm({
-                            ...imageForm,
-                            marksDistribution: e.target.value,
-                          })
-                        }
-                        className="glass-input h-20 resize-none text-sm"
-                        placeholder="E.g., MCQs: 1 mark, Written: 3-5 marks, Easy: 1 mark, Hard: 3 marks"
-                      />
-                    </div>
+                        <div className="form-group">
+                          <label className="input-label">
+                            Marks Distribution{" "}
+                            <span className="text-gray-500">(optional)</span>
+                          </label>
+                          <textarea
+                            value={imageForm.marksDistribution}
+                            onChange={(e) =>
+                              setImageForm({
+                                ...imageForm,
+                                marksDistribution: e.target.value,
+                              })
+                            }
+                            className="glass-input h-20 resize-none text-sm"
+                            placeholder="E.g., MCQs: 1 mark, Written: 3-5 marks, Easy: 1 mark, Hard: 3 marks"
+                          />
+                        </div>
 
-                    <div className="form-group">
-                      <label className="input-label">
-                        Additional Instructions{" "}
-                        <span className="text-gray-500">(optional)</span>
-                      </label>
-                      <textarea
-                        value={imageForm.additionalInstructions}
-                        onChange={(e) =>
-                          setImageForm({
-                            ...imageForm,
-                            additionalInstructions: e.target.value,
-                          })
-                        }
-                        className="glass-input h-20 resize-none text-sm"
-                        placeholder="E.g., Convert one-word answers to MCQ, Skip diagram questions, etc."
-                      />
-                    </div>
+                        <div className="form-group">
+                          <label className="input-label">
+                            Additional Instructions{" "}
+                            <span className="text-gray-500">(optional)</span>
+                          </label>
+                          <textarea
+                            value={imageForm.additionalInstructions}
+                            onChange={(e) =>
+                              setImageForm({
+                                ...imageForm,
+                                additionalInstructions: e.target.value,
+                              })
+                            }
+                            className="glass-input h-20 resize-none text-sm"
+                            placeholder="E.g., Convert one-word answers to MCQ, Skip diagram questions, etc."
+                          />
+                        </div>
+                      </>
+                    )}
 
                     <motion.button
                       onClick={handleExtractFromImage}
-                      disabled={extracting || !imageForm.image}
+                      disabled={extracting || !imageForm.images || imageForm.images.length === 0}
                       className="btn-primary w-full flex items-center justify-center gap-2"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -2379,7 +2878,7 @@ Example:
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 text-green-300">
+                    <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 text-green-300 flex justify-between items-center">
                       <p className="font-semibold">
                         ✓ Extracted {extractedQuestions.length} questions (
                         {extractedQuestions.reduce(
@@ -2388,15 +2887,40 @@ Example:
                         )}{" "}
                         total marks)
                       </p>
+                      <motion.button
+                        onClick={() => handleDownloadExtractedPDF()}
+                        className="text-green-400 hover:text-green-300 text-sm flex items-center gap-1"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <FiDownload className="w-4 h-4" />
+                        Download PDF
+                      </motion.button>
                     </div>
 
                     <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-                      {extractedQuestions.map((question, index) => (
-                        <div key={index} className="bg-white/5 rounded-lg p-4">
+                      {/* Group by section if available */}
+                      {(() => {
+                        const sections = {};
+                        extractedQuestions.forEach((q, idx) => {
+                          const section = q.section || "Questions";
+                          if (!sections[section]) sections[section] = [];
+                          sections[section].push({ ...q, originalIndex: idx });
+                        });
+                        
+                        return Object.entries(sections).map(([sectionName, sectionQuestions]) => (
+                          <div key={sectionName}>
+                            {sectionName !== "Questions" && (
+                              <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-3 mb-3">
+                                <p className="text-yellow-300 font-bold text-sm">{sectionName}</p>
+                              </div>
+                            )}
+                            {sectionQuestions.map((question) => (
+                        <div key={question.originalIndex} className="bg-white/5 rounded-lg p-4 mb-2">
                           <div className="flex justify-between items-start mb-2">
                             <p className="text-white flex-1">
                               <span className="text-blue-400 font-bold">
-                                Q{index + 1}.
+                                Q{question.originalIndex + 1}.
                               </span>{" "}
                               {question.questionText}
                             </p>
@@ -2415,7 +2939,7 @@ Example:
                           {(question.questionType === "mcq" ||
                             question.questionType === "truefalse") && (
                             <div className="grid grid-cols-2 gap-2 text-sm">
-                              {question.options.map((opt, optIdx) => (
+                              {question.options?.map((opt, optIdx) => (
                                 <div
                                   key={optIdx}
                                   className={`p-2 rounded ${
@@ -2430,10 +2954,18 @@ Example:
                             </div>
                           )}
 
-                          {question.questionType === "written" && (
-                            <div className="text-sm text-gray-400 mt-2">
+                          {question.questionType === "written" && question.correctAnswer && (
+                            <div className="text-sm text-gray-400 mt-2 max-h-24 overflow-y-auto">
                               <span className="text-green-400">Answer: </span>
-                              {question.correctAnswer}
+                              <span className="whitespace-pre-line">{question.correctAnswer.substring(0, 200)}{question.correctAnswer.length > 200 ? "..." : ""}</span>
+                            </div>
+                          )}
+
+                          {/* Show alternative question if exists */}
+                          {question.hasAlternative && question.alternativeQuestion && (
+                            <div className="mt-2 p-2 bg-orange-500/10 border border-orange-500/30 rounded text-sm">
+                              <span className="text-orange-400 font-medium">अथवा/OR: </span>
+                              <span className="text-gray-300">{question.alternativeQuestion}</span>
                             </div>
                           )}
 
@@ -2463,7 +2995,10 @@ Example:
                             </div>
                           )}
                         </div>
-                      ))}
+                            ))}
+                          </div>
+                        ));
+                      })()}
                     </div>
 
                     <div className="flex gap-4">

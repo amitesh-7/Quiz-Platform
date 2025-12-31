@@ -149,16 +149,18 @@ const processQuestionsController = async (req, res) => {
       marksDistribution,
       language,
       numberOfQuestions,
+      examFormat,
+      difficulty,
     } = req.body;
 
     if (!rawQuestions || !rawQuestions.trim()) {
       return res.status(400).json({
         success: false,
-        message: "Raw questions are required",
+        message: "Raw questions/topic is required",
       });
     }
 
-    if (!maxMarks || maxMarks < 1) {
+    if (examFormat !== "upboard_science" && (!maxMarks || maxMarks < 1)) {
       return res.status(400).json({
         success: false,
         message: "Maximum marks must be at least 1",
@@ -173,13 +175,15 @@ const processQuestionsController = async (req, res) => {
       });
     }
 
-    // Process raw questions
+    // Process raw questions with exam format and difficulty
     const questions = await processRawQuestions(
       rawQuestions,
-      maxMarks,
+      examFormat === "upboard_science" ? 70 : maxMarks,
       marksDistribution || "Distribute marks evenly across questions",
-      language || "english",
-      numberOfQuestions || null
+      examFormat === "upboard_science" ? "bilingual" : (language || "english"),
+      examFormat === "upboard_science" ? 31 : (numberOfQuestions || null),
+      examFormat || "general",
+      difficulty || "medium"
     );
 
     res.status(200).json({
@@ -197,27 +201,46 @@ const processQuestionsController = async (req, res) => {
   }
 };
 
-// @desc    Extract questions from uploaded image
+// @desc    Extract questions from uploaded image(s)
 // @route   POST /api/gemini/extract-questions-from-image
 // @access  Private (Teacher only)
 const extractQuestionsFromImageController = async (req, res) => {
   try {
     const {
-      image,
+      image,  // Single image (backward compatibility)
+      images, // Multiple images array
       maxMarks,
       marksDistribution,
       additionalInstructions,
       language,
+      examFormat,
+      difficulty,
     } = req.body;
 
-    if (!image) {
+    // Support both single image and multiple images
+    let imageArray = [];
+    if (images && Array.isArray(images) && images.length > 0) {
+      imageArray = images;
+    } else if (image) {
+      imageArray = [image];
+    }
+
+    if (imageArray.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Image is required",
+        message: "At least one image is required",
       });
     }
 
-    if (!maxMarks || maxMarks < 1) {
+    // Limit to 5 images
+    if (imageArray.length > 5) {
+      return res.status(400).json({
+        success: false,
+        message: "Maximum 5 images allowed",
+      });
+    }
+
+    if (examFormat !== "upboard_science" && (!maxMarks || maxMarks < 1)) {
       return res.status(400).json({
         success: false,
         message: "Maximum marks must be at least 1",
@@ -232,19 +255,22 @@ const extractQuestionsFromImageController = async (req, res) => {
       });
     }
 
-    // Parse image data
-    const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-    const mimeType =
-      image.match(/data:(image\/\w+);base64,/)?.[1] || "image/jpeg";
+    // Parse all images
+    const parsedImages = imageArray.map(img => {
+      const base64Data = img.replace(/^data:image\/\w+;base64,/, "");
+      const mimeType = img.match(/data:(image\/\w+);base64,/)?.[1] || "image/jpeg";
+      return { base64Data, mimeType };
+    });
 
-    // Extract questions from image
+    // Extract questions from image(s) with exam format and difficulty
     const questions = await extractQuestionsFromImage(
-      base64Data,
-      mimeType,
-      maxMarks,
+      parsedImages,
+      examFormat === "upboard_science" ? 70 : maxMarks,
       marksDistribution || "Distribute marks based on question difficulty",
       additionalInstructions || "",
-      language || "english"
+      examFormat === "upboard_science" ? "bilingual" : (language || "english"),
+      examFormat || "general",
+      difficulty || "medium"
     );
 
     res.status(200).json({
