@@ -2324,93 +2324,98 @@ Example:
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="form-group">
-                        <label className="input-label">
-                          Maximum Total Marks
-                        </label>
-                        <input
-                          type="number"
-                          value={bulkForm.maxMarks}
-                          onChange={(e) =>
-                            setBulkForm({
-                              ...bulkForm,
-                              maxMarks: parseInt(e.target.value) || 50,
-                            })
-                          }
-                          className="glass-input"
-                          min={10}
-                          max={200}
-                        />
-                      </div>
+                    {/* Show these fields only for General format, not for UP Board */}
+                    {bulkForm.examFormat !== "upboard_science" && (
+                      <>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="form-group">
+                            <label className="input-label">
+                              Maximum Total Marks
+                            </label>
+                            <input
+                              type="number"
+                              value={bulkForm.maxMarks}
+                              onChange={(e) =>
+                                setBulkForm({
+                                  ...bulkForm,
+                                  maxMarks: parseInt(e.target.value) || 50,
+                                })
+                              }
+                              className="glass-input"
+                              min={10}
+                              max={200}
+                            />
+                          </div>
 
-                      <div className="form-group">
-                        <label className="input-label">
-                          Questions to Pick{" "}
-                          <span className="text-gray-500">
-                            (optional, leave empty for all)
-                          </span>
-                        </label>
-                        <input
-                          type="number"
-                          value={bulkForm.numberOfQuestions}
-                          onChange={(e) =>
-                            setBulkForm({
-                              ...bulkForm,
-                              numberOfQuestions: e.target.value,
-                            })
-                          }
-                          className="glass-input"
-                          min={1}
-                          placeholder="All questions"
-                        />
-                      </div>
-                    </div>
+                          <div className="form-group">
+                            <label className="input-label">
+                              Questions to Pick{" "}
+                              <span className="text-gray-500">
+                                (optional, leave empty for all)
+                              </span>
+                            </label>
+                            <input
+                              type="number"
+                              value={bulkForm.numberOfQuestions}
+                              onChange={(e) =>
+                                setBulkForm({
+                                  ...bulkForm,
+                                  numberOfQuestions: e.target.value,
+                                })
+                              }
+                              className="glass-input"
+                              min={1}
+                              placeholder="All questions"
+                            />
+                          </div>
+                        </div>
 
-                    <div className="form-group">
-                      <label className="input-label">
-                        Marks Distribution Instructions{" "}
-                        <span className="text-gray-500">(optional)</span>
-                      </label>
-                      <textarea
-                        value={bulkForm.marksDistribution}
-                        onChange={(e) =>
-                          setBulkForm({
-                            ...bulkForm,
-                            marksDistribution: e.target.value,
-                          })
-                        }
-                        className="glass-input h-20 resize-none text-sm"
-                        placeholder={`Examples:
+                        <div className="form-group">
+                          <label className="input-label">
+                            Marks Distribution Instructions{" "}
+                            <span className="text-gray-500">(optional)</span>
+                          </label>
+                          <textarea
+                            value={bulkForm.marksDistribution}
+                            onChange={(e) =>
+                              setBulkForm({
+                                ...bulkForm,
+                                marksDistribution: e.target.value,
+                              })
+                            }
+                            className="glass-input h-20 resize-none text-sm"
+                            placeholder={`Examples:
 - MCQs: 1 mark each, Written: 3-5 marks each
 - Easy questions: 1 mark, Medium: 2 marks, Hard: 3 marks
 - Distribute marks equally among all questions`}
-                      />
-                    </div>
+                          />
+                        </div>
 
-                    <div className="form-group">
-                      <label className="input-label">Language</label>
-                      <select
-                        value={bulkForm.language}
-                        onChange={(e) =>
-                          setBulkForm({
-                            ...bulkForm,
-                            language: e.target.value,
-                          })
-                        }
-                        className="glass-input"
-                      >
-                        <option value="english">English</option>
-                        <option value="hindi">हिंदी (Hindi)</option>
-                        <option value="bilingual">द्विभाषी (Bilingual)</option>
-                        <option value="spanish">Spanish</option>
-                        <option value="french">French</option>
-                        <option value="german">German</option>
-                        <option value="chinese">Chinese</option>
-                        <option value="japanese">Japanese</option>
-                        <option value="arabic">Arabic</option>
-                      </select>
-                    </div>
+                        <div className="form-group">
+                          <label className="input-label">Language</label>
+                          <select
+                            value={bulkForm.language}
+                            onChange={(e) =>
+                              setBulkForm({
+                                ...bulkForm,
+                                language: e.target.value,
+                              })
+                            }
+                            className="glass-input"
+                          >
+                            <option value="english">English</option>
+                            <option value="hindi">हिंदी (Hindi)</option>
+                            <option value="bilingual">द्विभाषी (Bilingual)</option>
+                            <option value="spanish">Spanish</option>
+                            <option value="french">French</option>
+                            <option value="german">German</option>
+                            <option value="chinese">Chinese</option>
+                            <option value="japanese">Japanese</option>
+                            <option value="arabic">Arabic</option>
+                          </select>
+                        </div>
+                      </>
+                    )}
 
                     <motion.button
                       onClick={handleProcessBulk}

@@ -536,54 +536,218 @@ const AttemptQuiz = () => {
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                <span className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 font-bold text-sm sm:text-base">
+              {/* Section Header - if available */}
+              {question.section && (
+                <div className="mb-4 -mx-6 -mt-6 px-6 py-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-b border-yellow-500/30 rounded-t-xl">
+                  <p className="text-yellow-300 font-semibold text-sm">{question.section}</p>
+                </div>
+              )}
+
+              <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <span className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg flex-shrink-0">
                   {currentQuestion + 1}
                 </span>
-                <div className="flex-1">
-                  <span className="text-xs sm:text-sm text-gray-400">
-                    Question {currentQuestion + 1} of {questions.length}
-                  </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs sm:text-sm text-gray-400">
+                      प्रश्न {currentQuestion + 1} / {questions.length}
+                    </span>
+                    <span className="px-2 sm:px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs sm:text-sm font-medium">
+                      {question.marks} अंक
+                    </span>
+                  </div>
                 </div>
-                <span className="px-2 sm:px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs sm:text-sm">
-                  {question.marks} mark{question.marks > 1 ? "s" : ""}
-                </span>
               </div>
 
-              <p className="text-base sm:text-lg md:text-xl text-white mb-6 sm:mb-8">
-                {question.questionText}
-              </p>
+              {/* Question Text - Formatted for bilingual with clear separation */}
+              <div className="mb-6 sm:mb-8">
+                {(() => {
+                  // Split bilingual text by " / " to separate Hindi and English
+                  const questionText = question.questionText || "";
+                  const parts = questionText.split(" / ");
+                  
+                  // Check if it's bilingual (has both Hindi and English)
+                  const isBilingual = parts.length >= 2 && /[\u0900-\u097F]/.test(parts[0]);
+                  
+                  // Function to format text with sub-parts on new lines
+                  const formatWithSubParts = (text) => {
+                    if (!text) return text;
+                    
+                    let formatted = text;
+                    
+                    // Handle Roman numerals: i), ii), iii), iv), v) - with or without space before
+                    formatted = formatted.replace(/(?:^|\s)(i\))/gim, '\n\n$1');
+                    formatted = formatted.replace(/(?:^|\s)(ii\))/gim, '\n\n$1');
+                    formatted = formatted.replace(/(?:^|\s)(iii\))/gim, '\n\n$1');
+                    formatted = formatted.replace(/(?:^|\s)(iv\))/gim, '\n\n$1');
+                    formatted = formatted.replace(/(?:^|\s)(v\))/gim, '\n\n$1');
+                    
+                    // Handle Hindi sub-parts: (क), (ख), (ग), (घ), क), ख), ग), घ)
+                    formatted = formatted.replace(/(?:^|\s)(\(क\))/gm, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(\(ख\))/gm, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(\(ग\))/gm, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(\(घ\))/gm, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(क\))/gm, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(ख\))/gm, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(ग\))/gm, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(घ\))/gm, '\n\n   $1');
+                    
+                    // Handle English sub-parts: (a), (b), (c), (d), a), b), c), d)
+                    formatted = formatted.replace(/(?:^|\s)(\(a\))/gim, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(\(b\))/gim, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(\(c\))/gim, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(\(d\))/gim, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(a\))/gim, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(b\))/gim, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(c\))/gim, '\n\n   $1');
+                    formatted = formatted.replace(/(?:^|\s)(d\))/gim, '\n\n   $1');
+                    
+                    // Clean up multiple newlines
+                    formatted = formatted.replace(/\n{3,}/g, '\n\n');
+                    
+                    return formatted.trim();
+                  };
+                  
+                  if (isBilingual) {
+                    return (
+                      <div className="space-y-4">
+                        {/* Hindi Part */}
+                        <div className="p-4 sm:p-5 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-xl border-l-4 border-orange-400">
+                          <p className="text-xs text-orange-400 mb-3 font-medium uppercase tracking-wide">हिंदी में</p>
+                          <p className="text-base sm:text-lg text-white leading-loose whitespace-pre-line">
+                            {formatWithSubParts(parts[0].trim())}
+                          </p>
+                        </div>
+                        
+                        {/* English Part */}
+                        <div className="p-4 sm:p-5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl border-l-4 border-blue-400">
+                          <p className="text-xs text-blue-400 mb-3 font-medium uppercase tracking-wide">In English</p>
+                          <p className="text-base sm:text-lg text-white leading-loose whitespace-pre-line">
+                            {formatWithSubParts(parts.slice(1).join(" / ").trim())}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    // Single language - just display normally
+                    return (
+                      <div className="p-4 sm:p-5 bg-white/5 rounded-xl border border-white/10">
+                        <p className="text-base sm:text-lg text-white leading-loose whitespace-pre-line">
+                          {formatWithSubParts(questionText)}
+                        </p>
+                      </div>
+                    );
+                  }
+                })()}
+              </div>
+
+              {/* Sub-parts if available */}
+              {question.subParts && question.subParts.length > 0 && (
+                <div className="mb-6 space-y-3">
+                  <p className="text-sm text-gray-400 font-medium">उप-प्रश्न / Sub-questions:</p>
+                  {question.subParts.map((part, idx) => {
+                    const subText = part.question || "";
+                    const subParts = subText.split(" / ");
+                    const isSubBilingual = subParts.length >= 2 && /[\u0900-\u097F]/.test(subParts[0]);
+                    
+                    return (
+                      <div key={idx} className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="w-8 h-8 bg-blue-500/30 rounded-lg flex items-center justify-center text-blue-300 font-bold text-sm">
+                            {part.part}
+                          </span>
+                          <span className="text-blue-400 text-sm font-medium">({part.marks} अंक / marks)</span>
+                        </div>
+                        {isSubBilingual ? (
+                          <div className="space-y-2 ml-10">
+                            <p className="text-white text-sm leading-relaxed">{subParts[0].trim()}</p>
+                            <p className="text-gray-300 text-sm leading-relaxed">{subParts.slice(1).join(" / ").trim()}</p>
+                          </div>
+                        ) : (
+                          <p className="text-white text-sm ml-10 leading-relaxed">{subText}</p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Alternative Question (OR) if available */}
+              {question.hasAlternative && question.alternativeQuestion && (
+                <div className="mb-6 p-4 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-xl">
+                  <div className="flex items-center justify-center gap-4 mb-4">
+                    <div className="h-px flex-1 bg-orange-500/30"></div>
+                    <span className="text-orange-400 font-bold px-4 py-1 bg-orange-500/20 rounded-full">अथवा / OR</span>
+                    <div className="h-px flex-1 bg-orange-500/30"></div>
+                  </div>
+                  {(() => {
+                    const altText = question.alternativeQuestion || "";
+                    const altParts = altText.split(" / ");
+                    const isAltBilingual = altParts.length >= 2 && /[\u0900-\u097F]/.test(altParts[0]);
+                    
+                    if (isAltBilingual) {
+                      return (
+                        <div className="space-y-3">
+                          <p className="text-white leading-relaxed">{altParts[0].trim()}</p>
+                          <p className="text-gray-300 leading-relaxed">{altParts.slice(1).join(" / ").trim()}</p>
+                        </div>
+                      );
+                    } else {
+                      return <p className="text-white leading-relaxed whitespace-pre-line">{altText}</p>;
+                    }
+                  })()}
+                </div>
+              )}
 
               {/* Render based on question type */}
-              {(question.questionType === "mcq" || !question.questionType) && (
-                <div className="space-y-2 sm:space-y-3">
-                  {question.options.map((option, index) => (
+              {(question.questionType === "mcq" || question.questionType === "truefalse" || !question.questionType) && (
+                <div className="space-y-3 sm:space-y-4">
+                  {question.options?.map((option, index) => {
+                    const hindiLabels = ["अ", "ब", "स", "द"];
+                    const englishLabels = ["A", "B", "C", "D"];
+                    
+                    // Split option text for bilingual
+                    const optionParts = (option || "").split(" / ");
+                    const isOptionBilingual = optionParts.length >= 2 && /[\u0900-\u097F]/.test(optionParts[0]);
+                    
+                    return (
                     <motion.button
                       key={index}
                       onClick={() => handleSelectOption(question._id, index)}
-                      className={`w-full p-3 sm:p-4 rounded-xl text-left transition-all flex items-center gap-2 sm:gap-3 text-sm sm:text-base ${
+                      className={`w-full p-4 sm:p-5 rounded-xl text-left transition-all flex items-start gap-3 sm:gap-4 ${
                         answers[question._id] === index
-                          ? "bg-blue-500/20 border-2 border-blue-500 text-white"
-                          : "bg-white/5 border-2 border-white/10 text-gray-300 hover:border-white/30 hover:bg-white/10"
+                          ? "bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-2 border-green-400 text-white shadow-lg shadow-green-500/10"
+                          : "bg-white/5 border-2 border-white/10 text-gray-300 hover:border-blue-400/50 hover:bg-blue-500/5"
                       }`}
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                     >
                       <span
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${
+                        className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex flex-col items-center justify-center font-bold flex-shrink-0 ${
                           answers[question._id] === index
-                            ? "bg-blue-500 text-white"
+                            ? "bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg"
                             : "bg-white/10 text-gray-400"
                         }`}
                       >
-                        {String.fromCharCode(65 + index)}
+                        <span className="text-sm sm:text-base">{hindiLabels[index] || englishLabels[index]}</span>
+                        <span className="text-xs opacity-60">{englishLabels[index]}</span>
                       </span>
-                      <span className="flex-1">{option}</span>
+                      <div className="flex-1 pt-1">
+                        {isOptionBilingual ? (
+                          <div className="space-y-1">
+                            <p className="text-sm sm:text-base leading-relaxed">{optionParts[0].trim()}</p>
+                            <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">({optionParts.slice(1).join(" / ").trim()})</p>
+                          </div>
+                        ) : (
+                          <p className="text-sm sm:text-base leading-relaxed">{option}</p>
+                        )}
+                      </div>
                       {answers[question._id] === index && (
-                        <FiCheck className="w-5 h-5 text-blue-400" />
+                        <FiCheck className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" />
                       )}
                     </motion.button>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 

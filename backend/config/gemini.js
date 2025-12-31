@@ -1057,24 +1057,53 @@ STRUCTURE:
 - Q1-Q7: MCQs, section "खण्ड-अ (Part-A) उप-भाग-I (1 अंक)"
 - Q8-Q13: MCQs, section "खण्ड-अ (Part-A) उप-भाग-II (1 अंक)"
 - Q14-Q20: MCQs, section "खण्ड-अ (Part-A) उप-भाग-III (1 अंक)"
-- Q21-Q24: Written 4 marks (2+2 with subParts), section "खण्ड-ब (Part-B) उप-भाग-I (2+2=4 अंक)"
+- Q21-Q24: Written 4 marks, section "खण्ड-ब (Part-B) उप-भाग-I (2+2=4 अंक)"
 - Q25-Q28: Written 4 marks, section "खण्ड-ब (Part-B) उप-भाग-II (4 अंक)"
 - Q29-Q31: Written 6 marks with OR, section "खण्ड-ब (Part-B) उप-भाग-III (6 अंक)"
 
-RULES:
+CRITICAL JSON FORMAT - USE EXACTLY THESE FIELD NAMES:
+For MCQ:
+{
+  "questionText": "हिंदी प्रश्न / English question?",
+  "questionType": "mcq",
+  "options": ["विकल्प A / Option A", "विकल्प B / Option B", "विकल्प C / Option C", "विकल्प D / Option D"],
+  "correctOption": 0,
+  "marks": 1,
+  "section": "खण्ड-अ (Part-A) उप-भाग-I (1 अंक)"
+}
+
+For Written (4 marks):
+{
+  "questionText": "हिंदी प्रश्न / English question",
+  "questionType": "written",
+  "correctAnswer": "विस्तृत उत्तर 300-400 शब्दों में / Detailed answer in 300-400 words",
+  "marks": 4,
+  "section": "खण्ड-ब (Part-B) उप-भाग-II (4 अंक)"
+}
+
+For Written (6 marks with OR):
+{
+  "questionText": "हिंदी प्रश्न / English question",
+  "questionType": "written",
+  "correctAnswer": "बहुत विस्तृत उत्तर 600-800 शब्दों में / Very detailed answer in 600-800 words",
+  "marks": 6,
+  "section": "खण्ड-ब (Part-B) उप-भाग-III (6 अंक)",
+  "hasAlternative": true,
+  "alternativeQuestion": "अथवा / OR: वैकल्पिक प्रश्न",
+  "alternativeAnswer": "वैकल्पिक उत्तर 600-800 शब्द"
+}
+
+STRICT RULES:
 1. ALL questions from given topic ONLY
 2. ALL questions BILINGUAL: "हिंदी प्रश्न / English question"
-3. Each question MUST have "section" field
-4. Q21-24: "subParts" array with (i) and (ii)
-5. Q29-31: "hasAlternative": true, "alternativeQuestion", "alternativeAnswer"
-6. Chemical formulas: H₂O, CO₂, CH₄, C₂H₆
+3. MUST use "questionText" field (not "question" or "text")
+4. MUST use "questionType" field with value "mcq" or "written"
+5. Each question MUST have "section" field
+6. Q29-31 MUST have hasAlternative, alternativeQuestion, alternativeAnswer
+7. MUST provide detailed "correctAnswer" for written questions (NOT "Answer not provided")
+8. Chemical formulas: H₂O, CO₂, CH₄, C₂H₆
 
-ANSWER LENGTH:
-- 4-mark: 300-400 words minimum (1 page)
-- 6-mark: 600-800 words minimum (2 pages)
-- Include key points, examples, diagrams description, equations
-
-Return ONLY valid JSON array with exactly 31 questions.`;
+Return ONLY valid JSON array with exactly 31 questions. No markdown, no explanation.`;
     } else {
       prompt = `You are a quiz question processor. Convert the following content into quiz questions.${languageNote}
 
@@ -1094,12 +1123,23 @@ ${marksDistribution || "Distribute marks based on question complexity"}
 
 ${numberOfQuestions ? `GENERATE EXACTLY ${numberOfQuestions} QUESTIONS.` : "Generate appropriate number of questions from the content."}
 
+CRITICAL JSON FORMAT - USE EXACTLY THESE FIELD NAMES:
+{
+  "questionText": "Your question here",
+  "questionType": "mcq" or "written" or "truefalse" or "fillblank" or "matching",
+  "options": ["A", "B", "C", "D"],
+  "correctOption": 0,
+  "correctAnswer": "Detailed answer text",
+  "marks": 1
+}
+
 RULES:
 1. If input is a TOPIC: Generate questions on that topic matching the difficulty level
 2. If input is RAW QUESTIONS: Convert them to proper format
-3. Question types: mcq, truefalse, fillblank, matching, written
-4. MCQ: 4 options, correctOption 0-3
-5. Written answers must match difficulty level:
+3. MUST use "questionText" field (not "question" or "text")
+4. MUST use "questionType" field
+5. MCQ: 4 options, correctOption 0-3
+6. Written answers must match difficulty level:
    - Easy: 50-100 words
    - Medium: 150-250 words  
    - Hard: 300-500 words with derivations/proofs
@@ -1117,6 +1157,7 @@ Return ONLY a valid JSON array, no markdown.`;
     const jsonEnd = text.lastIndexOf("]");
 
     if (jsonStart === -1 || jsonEnd === -1) {
+      console.error("No JSON array found. Raw response:", text.substring(0, 500));
       throw new Error("No JSON array found in response");
     }
 
@@ -1135,15 +1176,31 @@ Return ONLY a valid JSON array, no markdown.`;
       throw new Error("Response is not an array");
     }
 
+    // Log first question to debug field names
+    if (questions.length > 0) {
+      console.log("Sample question structure:", JSON.stringify(questions[0], null, 2).substring(0, 500));
+    }
+
     // Validate and normalize each question
     const validatedQuestions = [];
     
     for (let index = 0; index < questions.length; index++) {
       const q = questions[index];
       
+      // Handle alternative field names for questionText
       if (!q.questionText) {
-        console.warn(`Skipping question at index ${index}: missing questionText`);
+        q.questionText = q.question || q.text || q.Question || q.questiontext || 
+                         q.question_text || q.QuestionText || q.content || q.prompt;
+      }
+      
+      if (!q.questionText) {
+        console.warn(`Skipping question at index ${index}: missing questionText. Keys: ${Object.keys(q).join(', ')}`);
         continue;
+      }
+
+      // Handle alternative field names for questionType
+      if (!q.questionType) {
+        q.questionType = q.type || q.Type || q.question_type || q.QuestionType || q.qtype;
       }
 
       // Normalize the question type
@@ -1152,24 +1209,35 @@ Return ONLY a valid JSON array, no markdown.`;
       
       if (!q.questionType) {
         console.warn(`Question at index ${index}: unknown type "${originalType}", trying to infer...`);
-        if (q.options && q.options.length === 4 && typeof q.correctOption === "number") {
+        if (q.options && q.options.length === 4 && (typeof q.correctOption === "number" || typeof q.correct_option === "number")) {
           q.questionType = "mcq";
         } else if (q.options && q.options.length === 2 && 
                    (q.options[0]?.toLowerCase() === "true" || q.options[1]?.toLowerCase() === "false")) {
           q.questionType = "truefalse";
-        } else if (q.correctAnswer) {
+        } else if (q.correctAnswer || q.answer || q.Answer || q.correct_answer) {
           q.questionType = "written";
         } else if (q.blanks) {
           q.questionType = "fillblank";
-        } else if (q.matchPairs) {
+        } else if (q.matchPairs || q.match_pairs) {
           q.questionType = "matching";
         } else {
           q.questionType = "written";
         }
       }
 
+      // Handle alternative field names for correctAnswer
+      if (!q.correctAnswer) {
+        q.correctAnswer = q.answer || q.Answer || q.correct_answer || q.expectedAnswer || q.expected_answer;
+      }
+
+      // Handle alternative field names for correctOption
+      if (q.correctOption === undefined) {
+        q.correctOption = q.correct_option ?? q.correctIndex ?? q.correct ?? q.answerIndex ?? 0;
+      }
+
+      // Handle alternative field names for marks
       if (!q.marks || typeof q.marks !== "number") {
-        q.marks = 1;
+        q.marks = q.mark || q.points || q.score || 1;
       }
 
       try {
