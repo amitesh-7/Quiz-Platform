@@ -42,7 +42,7 @@ const generateValidation = [
     .withMessage("Description cannot exceed 1000 characters"),
   body("examFormat")
     .optional()
-    .isIn(["general", "upboard_science", "upboard_english"])
+    .isIn(["general", "upboard_science", "upboard_english", "upboard_hindi"])
     .withMessage("Invalid exam format"),
 ];
 
@@ -160,7 +160,7 @@ const processQuestionsController = async (req, res) => {
       });
     }
 
-    if (examFormat !== "upboard_science" && examFormat !== "upboard_english" && (!maxMarks || maxMarks < 1)) {
+    if (examFormat !== "upboard_science" && examFormat !== "upboard_english" && examFormat !== "upboard_hindi" && (!maxMarks || maxMarks < 1)) {
       return res.status(400).json({
         success: false,
         message: "Maximum marks must be at least 1",
@@ -188,6 +188,10 @@ const processQuestionsController = async (req, res) => {
       finalMaxMarks = 70;
       finalLanguage = "english";
       finalNumberOfQuestions = 31;
+    } else if (examFormat === "upboard_hindi") {
+      finalMaxMarks = 70;
+      finalLanguage = "hindi";
+      finalNumberOfQuestions = 30;
     }
 
     // Process raw questions with exam format and difficulty
@@ -255,7 +259,7 @@ const extractQuestionsFromImageController = async (req, res) => {
       });
     }
 
-    if (examFormat !== "upboard_science" && examFormat !== "upboard_english" && (!maxMarks || maxMarks < 1)) {
+    if (examFormat !== "upboard_science" && examFormat !== "upboard_english" && examFormat !== "upboard_hindi" && (!maxMarks || maxMarks < 1)) {
       return res.status(400).json({
         success: false,
         message: "Maximum marks must be at least 1",
@@ -287,6 +291,9 @@ const extractQuestionsFromImageController = async (req, res) => {
     } else if (examFormat === "upboard_english") {
       finalMaxMarks = 70;
       finalLanguage = "english";
+    } else if (examFormat === "upboard_hindi") {
+      finalMaxMarks = 70;
+      finalLanguage = "hindi";
     }
 
     // Extract questions from image(s) with exam format and difficulty

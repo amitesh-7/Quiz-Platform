@@ -1754,7 +1754,7 @@ ${answersHTML}
                               examFormat: format,
                               language: "bilingual",
                               questionTypes: ["mcq", "written"],
-                              numberOfQuestions: 30, // 20 MCQ + 10 descriptive
+                              numberOfQuestions: 31,
                             });
                           } else if (format === "upboard_english") {
                             // Auto-configure for UP Board English
@@ -1762,6 +1762,15 @@ ${answersHTML}
                               ...generateForm,
                               examFormat: format,
                               language: "english",
+                              questionTypes: ["mcq", "written"],
+                              numberOfQuestions: 31,
+                            });
+                          } else if (format === "upboard_hindi") {
+                            // Auto-configure for UP Board Hindi
+                            setGenerateForm({
+                              ...generateForm,
+                              examFormat: format,
+                              language: "hindi",
                               questionTypes: ["mcq", "written"],
                               numberOfQuestions: 30,
                             });
@@ -1777,11 +1786,79 @@ ${answersHTML}
                         <option value="general">General (Custom)</option>
                         <option value="upboard_science">UP Board Science (Class 10)</option>
                         <option value="upboard_english">UP Board English (Class 10)</option>
+                        <option value="upboard_hindi">UP Board Hindi (Class 10)</option>
                       </select>
                     </div>
 
-                    {/* UP Board Science - Simplified UI */}
-                    {generateForm.examFormat === "upboard_science" ? (
+                    {/* UP Board Hindi - Simplified UI */}
+                    {generateForm.examFormat === "upboard_hindi" ? (
+                      <>
+                        {/* UP Board Hindi Info Box */}
+                        <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-lg p-4">
+                          <p className="text-orange-300 font-medium mb-3">📋 UP Board Hindi Paper - 70 अंक (30 प्रश्न)</p>
+                          <p className="text-xs text-gray-400 mb-2">Paper Code: 801(BA)</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                            <div className="bg-white/5 rounded-lg p-3">
+                              <p className="text-yellow-400 font-medium mb-2">खण्ड 'अ' - 20 अंक</p>
+                              <ul className="text-xs text-gray-400 space-y-1">
+                                <li>• प्र.1-20: 20 MCQs × 1 = 20 अंक</li>
+                                <li>• साहित्य, व्याकरण, रस, अलंकार, छंद, समास</li>
+                              </ul>
+                            </div>
+                            <div className="bg-white/5 rounded-lg p-3">
+                              <p className="text-green-400 font-medium mb-2">खण्ड 'ब' - 50 अंक</p>
+                              <ul className="text-xs text-gray-400 space-y-1">
+                                <li>• गद्यांश (6), पद्यांश (6)</li>
+                                <li>• संस्कृत अनुवाद (5+5)</li>
+                                <li>• खण्डकाव्य (3), लेखक/कवि (10)</li>
+                                <li>• श्लोक (2), पत्र (4), संस्कृत प्रश्न (2)</li>
+                                <li>• निबन्ध (7)</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Topic Input for Hindi */}
+                        <div className="form-group">
+                          <label className="input-label">विषय / Topic *</label>
+                          <input
+                            type="text"
+                            value={generateForm.topic}
+                            onChange={(e) =>
+                              setGenerateForm({
+                                ...generateForm,
+                                topic: e.target.value,
+                              })
+                            }
+                            placeholder="जैसे: काव्य खण्ड, गद्य खण्ड, व्याकरण..."
+                            className="glass-input"
+                            required
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            एक या अधिक विषय दर्ज करें (comma से अलग करें)
+                          </p>
+                        </div>
+
+                        {/* Difficulty for Hindi */}
+                        <div className="form-group">
+                          <label className="input-label">कठिनाई स्तर</label>
+                          <select
+                            value={generateForm.difficulty || "medium"}
+                            onChange={(e) =>
+                              setGenerateForm({
+                                ...generateForm,
+                                difficulty: e.target.value,
+                              })
+                            }
+                            className="glass-input"
+                          >
+                            <option value="easy">सरल (Board Level)</option>
+                            <option value="medium">मध्यम (Competitive)</option>
+                            <option value="hard">कठिन (Advanced)</option>
+                          </select>
+                        </div>
+                      </>
+                    ) : generateForm.examFormat === "upboard_science" ? (
                       <>
                         {/* UP Board Info Box */}
                         <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-4">
@@ -2297,6 +2374,12 @@ ${answersHTML}
                               examFormat: format,
                               language: "english",
                             });
+                          } else if (format === "upboard_hindi") {
+                            setBulkForm({
+                              ...bulkForm,
+                              examFormat: format,
+                              language: "hindi",
+                            });
                           } else {
                             setBulkForm({
                               ...bulkForm,
@@ -2309,8 +2392,39 @@ ${answersHTML}
                         <option value="general">General (Custom)</option>
                         <option value="upboard_science">UP Board Science (Class 10)</option>
                         <option value="upboard_english">UP Board English (Class 10)</option>
+                        <option value="upboard_hindi">UP Board Hindi (Class 10)</option>
                       </select>
                     </div>
+
+                    {/* UP Board Hindi Info Box */}
+                    {bulkForm.examFormat === "upboard_hindi" && (
+                      <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-lg p-4">
+                        <p className="text-orange-300 font-medium mb-3">📋 UP Board Hindi Paper - 70 अंक (30 प्रश्न)</p>
+                        <p className="text-xs text-gray-400 mb-2">Paper Code: 801(BA)</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-yellow-400 font-medium mb-2">खण्ड 'अ' - 20 अंक</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• प्र.1-20: 20 MCQs × 1 = 20 अंक</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-green-400 font-medium mb-2">खण्ड 'ब' - 50 अंक</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• गद्यांश (6), पद्यांश (6)</li>
+                              <li>• संस्कृत अनुवाद (5+5), खण्डकाव्य (3)</li>
+                              <li>• लेखक/कवि (10), श्लोक (2), पत्र (4)</li>
+                              <li>• संस्कृत प्रश्न (2), निबन्ध (7)</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-white/10">
+                          <p className="text-xs text-gray-400">
+                            ✓ 30 प्रश्न = 70 अंक • ✓ हिन्दी में • ✓ अथवा विकल्प सहित
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                     {/* UP Board Info Box */}
                     {bulkForm.examFormat === "upboard_science" && (
@@ -2450,6 +2564,16 @@ Example (Multiple topics - comma separated):
 Grammar, Letter Writing, First Flight Chapter 1
 
 OR paste raw questions in any format...`
+                          : bulkForm.examFormat === "upboard_hindi"
+                          ? `UP Board Hindi Paper के लिए विषय दर्ज करें...
+
+उदाहरण (एक विषय):
+काव्य खण्ड - तुलसीदास
+
+उदाहरण (अनेक विषय - comma से अलग):
+गद्य खण्ड, काव्य खण्ड, व्याकरण, संस्कृत
+
+या कच्चे प्रश्न paste करें...`
                           : `Paste your questions here in any format...
 
 Example:
@@ -2464,7 +2588,7 @@ Example:
                     </div>
 
                     {/* Show these fields only for General format, not for UP Board */}
-                    {bulkForm.examFormat !== "upboard_science" && bulkForm.examFormat !== "upboard_english" && (
+                    {bulkForm.examFormat !== "upboard_science" && bulkForm.examFormat !== "upboard_english" && bulkForm.examFormat !== "upboard_hindi" && (
                       <>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="form-group">
@@ -2760,6 +2884,12 @@ Example:
                               examFormat: format,
                               language: "english",
                             });
+                          } else if (format === "upboard_hindi") {
+                            setImageForm({
+                              ...imageForm,
+                              examFormat: format,
+                              language: "hindi",
+                            });
                           } else {
                             setImageForm({
                               ...imageForm,
@@ -2772,6 +2902,7 @@ Example:
                         <option value="general">General (Custom)</option>
                         <option value="upboard_science">UP Board Science (Class 10)</option>
                         <option value="upboard_english">UP Board English (Class 10)</option>
+                        <option value="upboard_hindi">UP Board Hindi (Class 10)</option>
                       </select>
                     </div>
 
@@ -2830,6 +2961,36 @@ Example:
                         <div className="mt-3 pt-3 border-t border-white/10">
                           <p className="text-xs text-gray-400">
                             ✓ 31 questions = 70 marks • ✓ English only • ✓ Long passages • ✓ Full letter format
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* UP Board Hindi Info Box */}
+                    {imageForm.examFormat === "upboard_hindi" && (
+                      <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-lg p-4">
+                        <p className="text-orange-300 font-medium mb-3">📋 UP Board Hindi Paper - 70 अंक (30 प्रश्न)</p>
+                        <p className="text-xs text-gray-400 mb-2">Paper Code: 801(BA)</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-yellow-400 font-medium mb-2">खण्ड 'अ' - 20 अंक</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• प्र.1-20: 20 MCQs × 1 = 20 अंक</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-green-400 font-medium mb-2">खण्ड 'ब' - 50 अंक</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• गद्यांश (6), पद्यांश (6)</li>
+                              <li>• संस्कृत अनुवाद (5+5), खण्डकाव्य (3)</li>
+                              <li>• लेखक/कवि (10), श्लोक (2), पत्र (4)</li>
+                              <li>• संस्कृत प्रश्न (2), निबन्ध (7)</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-white/10">
+                          <p className="text-xs text-gray-400">
+                            ✓ 30 प्रश्न = 70 अंक • ✓ हिन्दी में • ✓ अथवा विकल्प सहित
                           </p>
                         </div>
                       </div>
@@ -2955,7 +3116,7 @@ Example:
                     </div>
 
                     {/* Show these fields only for General format, not for UP Board */}
-                    {imageForm.examFormat !== "upboard_science" && imageForm.examFormat !== "upboard_english" && (
+                    {imageForm.examFormat !== "upboard_science" && imageForm.examFormat !== "upboard_english" && imageForm.examFormat !== "upboard_hindi" && (
                       <>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="form-group">
