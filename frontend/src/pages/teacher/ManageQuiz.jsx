@@ -14,7 +14,6 @@ import {
   FiAlertCircle,
   FiFileText,
   FiDownload,
-  FiPrinter,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
@@ -1906,6 +1905,15 @@ ${answersHTML}
                               questionTypes: ["mcq", "written"],
                               numberOfQuestions: 20,
                             });
+                          } else if (format === "upboard_chemistryclass12") {
+                            // Auto-configure for UP Board Chemistry (Class 12)
+                            setGenerateForm({
+                              ...generateForm,
+                              examFormat: format,
+                              language: "bilingual",
+                              questionTypes: ["mcq", "written"],
+                              numberOfQuestions: 12,
+                            });
                           } else if (format === "upboard_sanskrit") {
                             // Auto-configure for UP Board Sanskrit
                             setGenerateForm({
@@ -1951,6 +1959,9 @@ ${answersHTML}
                         </option>
                         <option value="upboard_hindiclass12">
                           UP Board Hindi (Class 12)
+                        </option>
+                        <option value="upboard_chemistryclass12">
+                          UP Board Chemistry (Class 12) - 70 Marks
                         </option>
                       </select>
                     </div>
@@ -2043,6 +2054,43 @@ ${answersHTML}
                           <p className="text-xs mt-2 text-orange-700 dark:text-orange-300">
                             💡 Enter "Hindi" for variety or specific "कामायनी"
                             or "जैनेन्द्रकुमार"
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {/* UP Board Chemistry Class 12 Info Box */}
+                    {generateForm.examFormat === "upboard_chemistryclass12" && (
+                      <div className="rounded-lg bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 p-4 border border-green-200 dark:border-green-700">
+                        <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2 flex items-center gap-2">
+                          🧪 UP Board Chemistry Paper (Class 12) - 70 Marks | 12
+                          Questions
+                        </h4>
+                        <div className="text-sm text-green-800 dark:text-green-200 space-y-1">
+                          <p>📋 Paper Code: 347(JZ)</p>
+                          <p>
+                            ✓ Q1-Q6: Individual MCQs (1 mark each) = 6 marks -
+                            Physical, Organic, Inorganic
+                          </p>
+                          <p>
+                            ✓ Q7-Q8: Short answers (8 marks each) = 16 marks
+                          </p>
+                          <p>
+                            ✓ Q9-Q10: Numerical & theory (12 marks each) = 24
+                            marks
+                          </p>
+                          <p>
+                            ✓ Q11-Q12: Organic chemistry (12 marks each) = 24
+                            marks
+                          </p>
+                          <p className="font-medium mt-2 text-green-900 dark:text-green-100">
+                            Topics: Solutions, Electrochemistry, Kinetics,
+                            Coordination Compounds, Haloalkanes, Aldehydes,
+                            Amines, Biomolecules
+                          </p>
+                          <p className="text-xs mt-2 text-green-700 dark:text-green-300">
+                            💡 Enter "Chemistry" for variety or specific
+                            "Electrochemistry", "Coordination Compounds",
+                            "Aldehydes and Ketones"
                           </p>
                         </div>
                       </div>
@@ -2143,9 +2191,13 @@ ${answersHTML}
                                 खण्ड 'ब' - 50 अंक
                               </p>
                               <ul className="text-xs text-gray-400 space-y-1">
-                                <li>• गद्यांश/श्लोक/सारांश/चरित्र (23 अंक)</li>
-                                <li>• विभक्ति/प्रत्यय (4), वाच्य (3)</li>
-                                <li>• अनुवाद (6), निबन्ध (8), पद प्रयोग (4)</li>
+                                <li>
+                                  • गद्यांश • श्लोक • सारांश • चरित्र (23 अंक)
+                                </li>
+                                <li>• विभक्ति • प्रत्यय (4) • वाच्य (3)</li>
+                                <li>
+                                  • अनुवाद (6) • निबन्ध (8) • पद प्रयोग (4)
+                                </li>
                               </ul>
                             </div>
                           </div>
@@ -2989,6 +3041,12 @@ ${answersHTML}
                               examFormat: format,
                               language: "hindi",
                             });
+                          } else if (format === "upboard_chemistryclass12") {
+                            setBulkForm({
+                              ...bulkForm,
+                              examFormat: format,
+                              language: "bilingual",
+                            });
                           } else {
                             setBulkForm({
                               ...bulkForm,
@@ -3025,6 +3083,9 @@ ${answersHTML}
                         </option>
                         <option value="upboard_hindiclass12">
                           UP Board Hindi (Class 12)
+                        </option>
+                        <option value="upboard_chemistryclass12">
+                          UP Board Chemistry (Class 12) - 70 Marks
                         </option>
                       </select>
                     </div>
@@ -3105,6 +3166,30 @@ ${answersHTML}
                       </div>
                     )}
 
+                    {/* UP Board Chemistry Class 12 Info Box */}
+                    {bulkForm.examFormat === "upboard_chemistryclass12" && (
+                      <div className="rounded-lg bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 p-4 border border-green-200 dark:border-green-700">
+                        <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2 flex items-center gap-2">
+                          🧪 UP Board Chemistry Paper (Class 12) - 70 Marks | 12
+                          Questions
+                        </h4>
+                        <div className="text-sm text-green-800 dark:text-green-200 space-y-1">
+                          <p>📋 Paper Code: 347(JZ)</p>
+                          <p>
+                            ✓ Q1-Q6: Individual MCQs (1m each) = 6m - Physical,
+                            Organic, Inorganic
+                          </p>
+                          <p>✓ Q7-Q8: Short answers (8m each) = 16m</p>
+                          <p>✓ Q9-Q10: Numerical & theory (12m each) = 24m</p>
+                          <p>✓ Q11-Q12: Organic chemistry (12m each) = 24m</p>
+                          <p className="text-xs mt-2 text-green-700 dark:text-green-300">
+                            💡 Paste questions with chemical equations and
+                            formulas
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     {/* UP Board Social Science Info Box */}
                     {bulkForm.examFormat === "upboard_socialscience" && (
                       <div className="bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/30 rounded-lg p-4">
@@ -3176,8 +3261,10 @@ ${answersHTML}
                               खण्ड 'ब' - 50 अंक
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
-                              <li>• गद्यांश/श्लोक/सारांश/चरित्र (23 अंक)</li>
-                              <li>• व्याकरण/अनुवाद/निबन्ध (27 अंक)</li>
+                              <li>
+                                • गद्यांश • श्लोक • सारांश • चरित्र (23 अंक)
+                              </li>
+                              <li>• व्याकरण • अनुवाद • निबन्ध (27 अंक)</li>
                             </ul>
                           </div>
                         </div>
@@ -3778,6 +3865,12 @@ Example:
                               examFormat: format,
                               language: "hindi",
                             });
+                          } else if (format === "upboard_chemistryclass12") {
+                            setImageForm({
+                              ...imageForm,
+                              examFormat: format,
+                              language: "bilingual",
+                            });
                           } else {
                             setImageForm({
                               ...imageForm,
@@ -3814,6 +3907,9 @@ Example:
                         </option>
                         <option value="upboard_hindiclass12">
                           UP Board Hindi (Class 12)
+                        </option>
+                        <option value="upboard_chemistryclass12">
+                          UP Board Chemistry (Class 12) - 70 Marks
                         </option>
                       </select>
                     </div>
@@ -3895,6 +3991,37 @@ Example:
                       </div>
                     )}
 
+                    {/* UP Board Chemistry Class 12 Info Box */}
+                    {imageForm.examFormat === "upboard_chemistryclass12" && (
+                      <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
+                        <p className="text-green-300 font-medium mb-3">
+                          🧪 UP Board Class 12 Chemistry - 70 Marks
+                        </p>
+                        <div className="text-xs text-gray-400 space-y-2">
+                          <p>📋 Paper Code: 347(JZ) | 12 Questions Total</p>
+                          <p>
+                            ✓ Q1-Q6: Individual MCQs (1 mark each) = 6 marks
+                          </p>
+                          <p>
+                            ✓ Q7-Q8: Short answers (8m each) - Brief
+                            explanations & numericals
+                          </p>
+                          <p>
+                            ✓ Q9-Q10: Numerical & theory (12m each) -
+                            Electrochemistry, kinetics
+                          </p>
+                          <p>
+                            ✓ Q11-Q12: Organic chemistry (12m each) - IUPAC
+                            names, reactions, mechanisms
+                          </p>
+                          <p className="text-xs mt-2 text-green-700 dark:text-green-300">
+                            💡 Upload clear images showing all chemical
+                            equations and structural formulas
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     {/* UP Board Social Science Info Box */}
                     {imageForm.examFormat === "upboard_socialscience" && (
                       <div className="bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/30 rounded-lg p-4">
@@ -3966,8 +4093,10 @@ Example:
                               खण्ड 'ब' - 50 अंक
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
-                              <li>• गद्यांश/श्लोक/सारांश/चरित्र (23 अंक)</li>
-                              <li>• व्याकरण/अनुवाद/निबन्ध (27 अंक)</li>
+                              <li>
+                                • गद्यांश • श्लोक • सारांश • चरित्र (23 अंक)
+                              </li>
+                              <li>• व्याकरण • अनुवाद • निबन्ध (27 अंक)</li>
                             </ul>
                           </div>
                         </div>

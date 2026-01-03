@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -10,6 +10,8 @@ import {
   FiUpload,
   FiImage,
   FiXCircle,
+  FiCamera,
+  FiX,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
@@ -28,9 +30,15 @@ const AttemptQuiz = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [answerImages, setAnswerImages] = useState({}); // Store image URLs
+  const [questionImages, setQuestionImages] = useState({}); // Store multiple images per question
   const [answerSheets, setAnswerSheets] = useState([]); // Store multiple answer sheet images
   const [uploadingOCR, setUploadingOCR] = useState(false);
   const [uploadingQuestionId, setUploadingQuestionId] = useState(null); // Track which question is uploading
+  const [showCamera, setShowCamera] = useState(false);
+  const [currentCameraQuestion, setCurrentCameraQuestion] = useState(null);
+  const [stream, setStream] = useState(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
@@ -182,7 +190,7 @@ const AttemptQuiz = () => {
     try {
       // Convert image to base64
       const reader = new FileReader();
-      
+
       reader.onload = async () => {
         try {
           const base64 = reader.result.split(",")[1];
@@ -225,6 +233,162 @@ const AttemptQuiz = () => {
     }
   };
 
+  // Open camera for capturing images
+  const openCamera = async (questionId) => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" }, // Use back camera on mobile
+        audio: false,
+      });
+
+      setStream(mediaStream);
+      setShowCamera(true);
+      setCurrentCameraQuestion(questionId);
+
+      // Wait for video element to be ready
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+        }
+      }, 100);
+    } catch (error) {
+      console.error("Camera access error:", error);
+      toast.error("Failed to access camera. Please check permissions.");
+    }
+  };
+
+  // Close camera and stop stream
+  const closeCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+    }
+    setShowCamera(false);
+    setCurrentCameraQuestion(null);
+  };
+
+  // Capture photo from camera
+  const capturePhoto = async () => {
+    if (!videoRef.current || !canvasRef.current || !currentCameraQuestion)
+      return;
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Draw video frame to canvas
+    const context = canvas.getContext("2d");
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Convert canvas to blob
+    canvas.toBlob(
+      async (blob) => {
+        if (!blob) {
+          toast.error("Failed to capture image");
+          return;
+        }
+
+        // Create file from blob
+        const file = new File([blob], `capture_${Date.now()}.jpg`, {
+          type: "image/jpeg",
+        });
+
+        // Store the captured image
+        const reader = new FileReader();
+        reader.onload = () => {
+          const imageData = reader.result;
+
+          // Add to questionImages array
+          setQuestionImages((prev) => ({
+            ...prev,
+            [currentCameraQuestion]: [
+              ...(prev[currentCameraQuestion] || []),
+              imageData,
+            ],
+          }));
+
+          toast.success("Photo captured! Take another or continue.");
+        };
+        reader.readAsDataURL(file);
+      },
+      "image/jpeg",
+      0.95
+    );
+  };
+
+  // Process all captured images for a question
+  const processCapturedImages = async (questionId) => {
+    const images = questionImages[questionId];
+    if (!images || images.length === 0) {
+      toast.error("No images captured");
+      return;
+    }
+
+    closeCamera();
+    setUploadingOCR(true);
+    setUploadingQuestionId(questionId);
+
+    try {
+      let allExtractedText = "";
+
+      // Process each image
+      for (let i = 0; i < images.length; i++) {
+        const base64 = images[i].split(",")[1];
+
+        try {
+          const response = await geminiAPI.ocr(base64, "image/jpeg");
+          const extractedText = response.data.data.text;
+
+          if (extractedText.trim()) {
+            allExtractedText +=
+              (allExtractedText ? "\n\n" : "") + extractedText;
+          }
+        } catch (error) {
+          console.error(`Error processing image ${i + 1}:`, error);
+        }
+      }
+
+      if (allExtractedText) {
+        handleTextAnswer(questionId, allExtractedText);
+        setAnswerImages((prev) => ({
+          ...prev,
+          [questionId]: images[0], // Store first image as thumbnail
+        }));
+        toast.success(
+          `Text extracted from ${images.length} image(s) successfully!`
+        );
+      } else {
+        toast.error("No text could be extracted from the images");
+      }
+    } catch (error) {
+      console.error("OCR error:", error);
+      toast.error("Failed to extract text from images");
+    } finally {
+      setUploadingOCR(false);
+      setUploadingQuestionId(null);
+    }
+  };
+
+  // Remove a captured image
+  const removeImage = (questionId, imageIndex) => {
+    setQuestionImages((prev) => ({
+      ...prev,
+      [questionId]: prev[questionId].filter((_, idx) => idx !== imageIndex),
+    }));
+  };
+
+  // Cleanup camera on unmount
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [stream]);
+
   // Handle image upload for fill in the blanks
   const handleFillBlankImageUpload = async (questionId, blankIndex, file) => {
     if (!file) return;
@@ -246,7 +410,7 @@ const AttemptQuiz = () => {
 
     try {
       const reader = new FileReader();
-      
+
       reader.onload = async () => {
         try {
           const base64 = reader.result.split(",")[1];
@@ -254,14 +418,19 @@ const AttemptQuiz = () => {
           // Call OCR API
           const response = await geminiAPI.ocr(base64, file.type);
           let extractedText = response.data.data.text;
-          
+
           // Clean up the extracted text - remove extra whitespace and newlines
-          extractedText = extractedText.trim().replace(/\n/g, ' ').replace(/\s+/g, ' ');
+          extractedText = extractedText
+            .trim()
+            .replace(/\n/g, " ")
+            .replace(/\s+/g, " ");
 
           // Set the extracted text for this blank
           handleFillBlank(questionId, blankIndex, extractedText);
 
-          toast.success(`Blank ${blankIndex + 1}: Text extracted successfully!`);
+          toast.success(
+            `Blank ${blankIndex + 1}: Text extracted successfully!`
+          );
         } catch (error) {
           console.error("OCR error:", error);
           toast.error("Failed to extract text from image");
@@ -612,7 +781,9 @@ const AttemptQuiz = () => {
               {/* Section Header - if available */}
               {question.section && (
                 <div className="mb-4 -mx-6 -mt-6 px-6 py-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-b border-yellow-500/30 rounded-t-xl">
-                  <p className="text-yellow-300 font-semibold text-sm">{question.section}</p>
+                  <p className="text-yellow-300 font-semibold text-sm">
+                    {question.section}
+                  </p>
                 </div>
               )}
 
@@ -638,65 +809,129 @@ const AttemptQuiz = () => {
                   // Split bilingual text by " / " to separate Hindi and English
                   const questionText = question.questionText || "";
                   const parts = questionText.split(" / ");
-                  
+
                   // Check if it's bilingual (has both Hindi and English)
-                  const isBilingual = parts.length >= 2 && /[\u0900-\u097F]/.test(parts[0]);
-                  
+                  const isBilingual =
+                    parts.length >= 2 && /[\u0900-\u097F]/.test(parts[0]);
+
                   // Function to format text with sub-parts on new lines
                   const formatWithSubParts = (text) => {
                     if (!text) return text;
-                    
+
                     let formatted = text;
-                    
+
                     // Handle Roman numerals: i), ii), iii), iv), v) - with or without space before
-                    formatted = formatted.replace(/(?:^|\s)(i\))/gim, '\n\n$1');
-                    formatted = formatted.replace(/(?:^|\s)(ii\))/gim, '\n\n$1');
-                    formatted = formatted.replace(/(?:^|\s)(iii\))/gim, '\n\n$1');
-                    formatted = formatted.replace(/(?:^|\s)(iv\))/gim, '\n\n$1');
-                    formatted = formatted.replace(/(?:^|\s)(v\))/gim, '\n\n$1');
-                    
+                    formatted = formatted.replace(/(?:^|\s)(i\))/gim, "\n\n$1");
+                    formatted = formatted.replace(
+                      /(?:^|\s)(ii\))/gim,
+                      "\n\n$1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(iii\))/gim,
+                      "\n\n$1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(iv\))/gim,
+                      "\n\n$1"
+                    );
+                    formatted = formatted.replace(/(?:^|\s)(v\))/gim, "\n\n$1");
+
                     // Handle Hindi sub-parts: (क), (ख), (ग), (घ), क), ख), ग), घ)
-                    formatted = formatted.replace(/(?:^|\s)(\(क\))/gm, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(\(ख\))/gm, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(\(ग\))/gm, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(\(घ\))/gm, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(क\))/gm, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(ख\))/gm, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(ग\))/gm, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(घ\))/gm, '\n\n   $1');
-                    
+                    formatted = formatted.replace(
+                      /(?:^|\s)(\(क\))/gm,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(\(ख\))/gm,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(\(ग\))/gm,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(\(घ\))/gm,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(क\))/gm,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(ख\))/gm,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(ग\))/gm,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(घ\))/gm,
+                      "\n\n   $1"
+                    );
+
                     // Handle English sub-parts: (a), (b), (c), (d), a), b), c), d)
-                    formatted = formatted.replace(/(?:^|\s)(\(a\))/gim, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(\(b\))/gim, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(\(c\))/gim, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(\(d\))/gim, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(a\))/gim, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(b\))/gim, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(c\))/gim, '\n\n   $1');
-                    formatted = formatted.replace(/(?:^|\s)(d\))/gim, '\n\n   $1');
-                    
+                    formatted = formatted.replace(
+                      /(?:^|\s)(\(a\))/gim,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(\(b\))/gim,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(\(c\))/gim,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(\(d\))/gim,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(a\))/gim,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(b\))/gim,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(c\))/gim,
+                      "\n\n   $1"
+                    );
+                    formatted = formatted.replace(
+                      /(?:^|\s)(d\))/gim,
+                      "\n\n   $1"
+                    );
+
                     // Clean up multiple newlines
-                    formatted = formatted.replace(/\n{3,}/g, '\n\n');
-                    
+                    formatted = formatted.replace(/\n{3,}/g, "\n\n");
+
                     return formatted.trim();
                   };
-                  
+
                   if (isBilingual) {
                     return (
                       <div className="space-y-4">
                         {/* Hindi Part */}
                         <div className="p-4 sm:p-5 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-xl border-l-4 border-orange-400">
-                          <p className="text-xs text-orange-400 mb-3 font-medium uppercase tracking-wide">हिंदी में</p>
+                          <p className="text-xs text-orange-400 mb-3 font-medium uppercase tracking-wide">
+                            हिंदी में
+                          </p>
                           <p className="text-base sm:text-lg text-white leading-loose whitespace-pre-line">
                             {formatWithSubParts(parts[0].trim())}
                           </p>
                         </div>
-                        
+
                         {/* English Part */}
                         <div className="p-4 sm:p-5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl border-l-4 border-blue-400">
-                          <p className="text-xs text-blue-400 mb-3 font-medium uppercase tracking-wide">In English</p>
+                          <p className="text-xs text-blue-400 mb-3 font-medium uppercase tracking-wide">
+                            In English
+                          </p>
                           <p className="text-base sm:text-lg text-white leading-loose whitespace-pre-line">
-                            {formatWithSubParts(parts.slice(1).join(" / ").trim())}
+                            {formatWithSubParts(
+                              parts.slice(1).join(" / ").trim()
+                            )}
                           </p>
                         </div>
                       </div>
@@ -717,27 +952,42 @@ const AttemptQuiz = () => {
               {/* Sub-parts if available */}
               {question.subParts && question.subParts.length > 0 && (
                 <div className="mb-6 space-y-3">
-                  <p className="text-sm text-gray-400 font-medium">उप-प्रश्न / Sub-questions:</p>
+                  <p className="text-sm text-gray-400 font-medium">
+                    उप-प्रश्न / Sub-questions:
+                  </p>
                   {question.subParts.map((part, idx) => {
                     const subText = part.question || "";
                     const subParts = subText.split(" / ");
-                    const isSubBilingual = subParts.length >= 2 && /[\u0900-\u097F]/.test(subParts[0]);
-                    
+                    const isSubBilingual =
+                      subParts.length >= 2 &&
+                      /[\u0900-\u097F]/.test(subParts[0]);
+
                     return (
-                      <div key={idx} className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                      <div
+                        key={idx}
+                        className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl"
+                      >
                         <div className="flex items-center gap-2 mb-3">
                           <span className="w-8 h-8 bg-blue-500/30 rounded-lg flex items-center justify-center text-blue-300 font-bold text-sm">
                             {part.part}
                           </span>
-                          <span className="text-blue-400 text-sm font-medium">({part.marks} अंक / marks)</span>
+                          <span className="text-blue-400 text-sm font-medium">
+                            ({part.marks} अंक / marks)
+                          </span>
                         </div>
                         {isSubBilingual ? (
                           <div className="space-y-2 ml-10">
-                            <p className="text-white text-sm leading-relaxed">{subParts[0].trim()}</p>
-                            <p className="text-gray-300 text-sm leading-relaxed">{subParts.slice(1).join(" / ").trim()}</p>
+                            <p className="text-white text-sm leading-relaxed">
+                              {subParts[0].trim()}
+                            </p>
+                            <p className="text-gray-300 text-sm leading-relaxed">
+                              {subParts.slice(1).join(" / ").trim()}
+                            </p>
                           </div>
                         ) : (
-                          <p className="text-white text-sm ml-10 leading-relaxed">{subText}</p>
+                          <p className="text-white text-sm ml-10 leading-relaxed">
+                            {subText}
+                          </p>
                         )}
                       </div>
                     );
@@ -750,75 +1000,101 @@ const AttemptQuiz = () => {
                 <div className="mb-6 p-4 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-xl">
                   <div className="flex items-center justify-center gap-4 mb-4">
                     <div className="h-px flex-1 bg-orange-500/30"></div>
-                    <span className="text-orange-400 font-bold px-4 py-1 bg-orange-500/20 rounded-full">अथवा / OR</span>
+                    <span className="text-orange-400 font-bold px-4 py-1 bg-orange-500/20 rounded-full">
+                      अथवा / OR
+                    </span>
                     <div className="h-px flex-1 bg-orange-500/30"></div>
                   </div>
                   {(() => {
                     const altText = question.alternativeQuestion || "";
                     const altParts = altText.split(" / ");
-                    const isAltBilingual = altParts.length >= 2 && /[\u0900-\u097F]/.test(altParts[0]);
-                    
+                    const isAltBilingual =
+                      altParts.length >= 2 &&
+                      /[\u0900-\u097F]/.test(altParts[0]);
+
                     if (isAltBilingual) {
                       return (
                         <div className="space-y-3">
-                          <p className="text-white leading-relaxed">{altParts[0].trim()}</p>
-                          <p className="text-gray-300 leading-relaxed">{altParts.slice(1).join(" / ").trim()}</p>
+                          <p className="text-white leading-relaxed">
+                            {altParts[0].trim()}
+                          </p>
+                          <p className="text-gray-300 leading-relaxed">
+                            {altParts.slice(1).join(" / ").trim()}
+                          </p>
                         </div>
                       );
                     } else {
-                      return <p className="text-white leading-relaxed whitespace-pre-line">{altText}</p>;
+                      return (
+                        <p className="text-white leading-relaxed whitespace-pre-line">
+                          {altText}
+                        </p>
+                      );
                     }
                   })()}
                 </div>
               )}
 
               {/* Render based on question type */}
-              {(question.questionType === "mcq" || question.questionType === "truefalse" || !question.questionType) && (
+              {(question.questionType === "mcq" ||
+                question.questionType === "truefalse" ||
+                !question.questionType) && (
                 <div className="space-y-3 sm:space-y-4">
                   {question.options?.map((option, index) => {
                     const hindiLabels = ["अ", "ब", "स", "द"];
                     const englishLabels = ["A", "B", "C", "D"];
-                    
+
                     // Split option text for bilingual
                     const optionParts = (option || "").split(" / ");
-                    const isOptionBilingual = optionParts.length >= 2 && /[\u0900-\u097F]/.test(optionParts[0]);
-                    
+                    const isOptionBilingual =
+                      optionParts.length >= 2 &&
+                      /[\u0900-\u097F]/.test(optionParts[0]);
+
                     return (
-                    <motion.button
-                      key={index}
-                      onClick={() => handleSelectOption(question._id, index)}
-                      className={`w-full p-4 sm:p-5 rounded-xl text-left transition-all flex items-start gap-3 sm:gap-4 ${
-                        answers[question._id] === index
-                          ? "bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-2 border-green-400 text-white shadow-lg shadow-green-500/10"
-                          : "bg-white/5 border-2 border-white/10 text-gray-300 hover:border-blue-400/50 hover:bg-blue-500/5"
-                      }`}
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
-                    >
-                      <span
-                        className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex flex-col items-center justify-center font-bold flex-shrink-0 ${
+                      <motion.button
+                        key={index}
+                        onClick={() => handleSelectOption(question._id, index)}
+                        className={`w-full p-4 sm:p-5 rounded-xl text-left transition-all flex items-start gap-3 sm:gap-4 ${
                           answers[question._id] === index
-                            ? "bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg"
-                            : "bg-white/10 text-gray-400"
+                            ? "bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-2 border-green-400 text-white shadow-lg shadow-green-500/10"
+                            : "bg-white/5 border-2 border-white/10 text-gray-300 hover:border-blue-400/50 hover:bg-blue-500/5"
                         }`}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
                       >
-                        <span className="text-sm sm:text-base">{hindiLabels[index] || englishLabels[index]}</span>
-                        <span className="text-xs opacity-60">{englishLabels[index]}</span>
-                      </span>
-                      <div className="flex-1 pt-1">
-                        {isOptionBilingual ? (
-                          <div className="space-y-1">
-                            <p className="text-sm sm:text-base leading-relaxed">{optionParts[0].trim()}</p>
-                            <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">({optionParts.slice(1).join(" / ").trim()})</p>
-                          </div>
-                        ) : (
-                          <p className="text-sm sm:text-base leading-relaxed">{option}</p>
+                        <span
+                          className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex flex-col items-center justify-center font-bold flex-shrink-0 ${
+                            answers[question._id] === index
+                              ? "bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg"
+                              : "bg-white/10 text-gray-400"
+                          }`}
+                        >
+                          <span className="text-sm sm:text-base">
+                            {hindiLabels[index] || englishLabels[index]}
+                          </span>
+                          <span className="text-xs opacity-60">
+                            {englishLabels[index]}
+                          </span>
+                        </span>
+                        <div className="flex-1 pt-1">
+                          {isOptionBilingual ? (
+                            <div className="space-y-1">
+                              <p className="text-sm sm:text-base leading-relaxed">
+                                {optionParts[0].trim()}
+                              </p>
+                              <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
+                                ({optionParts.slice(1).join(" / ").trim()})
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-sm sm:text-base leading-relaxed">
+                              {option}
+                            </p>
+                          )}
+                        </div>
+                        {answers[question._id] === index && (
+                          <FiCheck className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" />
                         )}
-                      </div>
-                      {answers[question._id] === index && (
-                        <FiCheck className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" />
-                      )}
-                    </motion.button>
+                      </motion.button>
                     );
                   })}
                 </div>
@@ -834,49 +1110,76 @@ const AttemptQuiz = () => {
                         <div className="w-full h-full border-4 border-blue-500/30 rounded-full"></div>
                         <div className="w-full h-full border-4 border-transparent border-t-blue-500 rounded-full absolute top-0 left-0 animate-spin"></div>
                       </div>
-                      <p className="text-white font-medium text-base sm:text-lg">Extracting text...</p>
-                      <p className="text-gray-400 text-sm mt-1">Please wait while AI reads your answer</p>
+                      <p className="text-white font-medium text-base sm:text-lg">
+                        Extracting text...
+                      </p>
+                      <p className="text-gray-400 text-sm mt-1">
+                        Please wait while AI reads your answer
+                      </p>
                     </div>
                   )}
 
                   {/* Image Upload Section */}
-                  <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                    <label className={`flex items-center gap-3 cursor-pointer group ${uploadingQuestionId === question._id ? 'pointer-events-none opacity-50' : ''}`}>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) handleImageUpload(question._id, file);
-                          e.target.value = ''; // Reset input
-                        }}
-                        className="hidden"
-                        disabled={uploadingOCR}
-                      />
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-500/20 rounded-lg flex items-center justify-center group-hover:bg-blue-500/30 transition-colors flex-shrink-0">
-                        {uploadingQuestionId === question._id ? (
-                          <div className="w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-                        ) : (
-                          <FiUpload className="w-6 h-6 text-blue-400" />
-                        )}
+                  <div className="p-3 sm:p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg space-y-3">
+                    {/* Camera Capture Button */}
+                    <button
+                      type="button"
+                      onClick={() => openCamera(question._id)}
+                      className={`w-full flex items-center justify-center gap-3 p-3 sm:p-4 bg-green-500/20 active:bg-green-500/40 border border-green-500/30 rounded-lg transition-all group touch-manipulation ${
+                        uploadingQuestionId === question._id
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }`}
+                      disabled={uploadingOCR}
+                    >
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500/20 rounded-lg flex items-center justify-center group-active:bg-green-500/30 transition-colors flex-shrink-0">
+                        <FiCamera className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 text-left min-w-0">
                         <p className="text-white font-medium text-sm sm:text-base">
-                          {uploadingQuestionId === question._id ? "Extracting text..." : "Upload Answer Image"}
+                          Take Photo
                         </p>
                         <p className="text-xs sm:text-sm text-gray-400 truncate">
-                          {uploadingQuestionId === question._id
-                            ? "AI is reading your handwritten answer..."
-                            : "Take a photo of your handwritten answer"}
+                          Use camera to capture your answer
                         </p>
                       </div>
-                    </label>
+                    </button>
+
+                    {/* Captured Images Preview */}
+                    {questionImages[question._id] &&
+                      questionImages[question._id].length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-blue-500/30">
+                          <p className="text-sm text-gray-300 mb-2">
+                            Captured Images (
+                            {questionImages[question._id].length})
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {questionImages[question._id].map((img, idx) => (
+                              <div key={idx} className="relative group">
+                                <img
+                                  src={img}
+                                  alt={`Capture ${idx + 1}`}
+                                  className="w-20 h-20 object-cover rounded-lg border border-blue-500/30"
+                                />
+                                <button
+                                  onClick={() => removeImage(question._id, idx)}
+                                  className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <FiX className="w-4 h-4 text-white" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                     {answerImages[question._id] && !uploadingQuestionId && (
                       <div className="mt-3 pt-3 border-t border-blue-500/30">
                         <div className="flex items-center gap-2 text-green-400">
                           <FiCheck className="w-4 h-4" />
-                          <span className="text-sm">Image uploaded & text extracted</span>
+                          <span className="text-sm">
+                            Images processed & text extracted
+                          </span>
                         </div>
                       </div>
                     )}
@@ -909,63 +1212,50 @@ const AttemptQuiz = () => {
                 <div className="space-y-4">
                   <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg mb-4">
                     <p className="text-sm text-blue-300">
-                      💡 Tip: You can upload an image of your handwritten answer for each blank
+                      💡 Tip: You can upload an image of your handwritten answer
+                      for each blank
                     </p>
                   </div>
-                  
+
                   {Array.from({ length: question.blanksCount || 1 }).map(
                     (_, index) => {
-                      const isUploadingThisBlank = uploadingQuestionId === `${question._id}_blank_${index}`;
-                      
+                      const isUploadingThisBlank =
+                        uploadingQuestionId ===
+                        `${question._id}_blank_${index}`;
+
                       return (
-                      <div key={index} className="p-4 bg-white/5 rounded-xl border border-white/10">
-                        <div className="flex items-center justify-between mb-3">
-                          <label className="text-sm sm:text-base text-gray-300 font-medium">
+                        <div
+                          key={index}
+                          className="p-4 bg-white/5 rounded-xl border border-white/10"
+                        >
+                          <label className="text-sm sm:text-base text-gray-300 font-medium mb-3 block">
                             Blank {index + 1}
                           </label>
-                          
-                          {/* Image Upload Button */}
-                          <label className={`flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg cursor-pointer transition-colors ${isUploadingThisBlank ? 'opacity-50 pointer-events-none' : ''}`}>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                const file = e.target.files[0];
-                                if (file) handleFillBlankImageUpload(question._id, index, file);
-                                e.target.value = '';
-                              }}
-                              className="hidden"
-                              disabled={uploadingOCR}
-                            />
-                            {isUploadingThisBlank ? (
-                              <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-                            ) : (
-                              <FiUpload className="w-4 h-4 text-blue-400" />
-                            )}
-                            <span className="text-xs sm:text-sm text-blue-400">
-                              {isUploadingThisBlank ? "Extracting..." : "Upload Image"}
-                            </span>
-                          </label>
+
+                          <input
+                            type="text"
+                            value={(answers[question._id] || [])[index] || ""}
+                            onChange={(e) =>
+                              handleFillBlank(
+                                question._id,
+                                index,
+                                e.target.value
+                              )
+                            }
+                            className="glass-input w-full text-sm sm:text-base"
+                            placeholder={`Type your answer for blank ${
+                              index + 1
+                            }`}
+                            disabled={isUploadingThisBlank}
+                          />
+
+                          {(answers[question._id] || [])[index] && (
+                            <div className="mt-2 flex items-center gap-2 text-green-400 text-xs sm:text-sm">
+                              <FiCheck className="w-4 h-4" />
+                              <span>Answer filled</span>
+                            </div>
+                          )}
                         </div>
-                        
-                        <input
-                          type="text"
-                          value={(answers[question._id] || [])[index] || ""}
-                          onChange={(e) =>
-                            handleFillBlank(question._id, index, e.target.value)
-                          }
-                          className="glass-input w-full text-sm sm:text-base"
-                          placeholder={`Type or upload image for blank ${index + 1}`}
-                          disabled={isUploadingThisBlank}
-                        />
-                        
-                        {(answers[question._id] || [])[index] && (
-                          <div className="mt-2 flex items-center gap-2 text-green-400 text-xs sm:text-sm">
-                            <FiCheck className="w-4 h-4" />
-                            <span>Answer filled</span>
-                          </div>
-                        )}
-                      </div>
                       );
                     }
                   )}
@@ -1002,37 +1292,41 @@ const AttemptQuiz = () => {
               )}
 
               {/* Navigation */}
-              <div className="flex gap-4 mt-8 pt-6 border-t border-white/10">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-white/10">
                 <motion.button
                   onClick={() =>
                     setCurrentQuestion(Math.max(0, currentQuestion - 1))
                   }
                   disabled={currentQuestion === 0}
-                  className="btn-secondary flex-1 flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="btn-secondary flex-1 flex items-center justify-center gap-2 disabled:opacity-50 touch-manipulation py-3 sm:py-2"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <FiArrowLeft className="w-5 h-5" />
-                  Previous
+                  <FiArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-sm sm:text-base">Previous</span>
                 </motion.button>
 
                 {isLastQuestion ? (
                   <motion.button
                     onClick={handleConfirmSubmit}
                     disabled={submitting}
-                    className="btn-success flex-1 flex items-center justify-center gap-2"
+                    className="btn-success flex-1 flex items-center justify-center gap-2 touch-manipulation py-3 sm:py-2"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     {submitting ? (
                       <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Submitting...
+                        <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <span className="text-sm sm:text-base">
+                          Submitting...
+                        </span>
                       </>
                     ) : (
                       <>
-                        <FiCheck className="w-5 h-5" />
-                        Submit Quiz
+                        <FiCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span className="text-sm sm:text-base">
+                          Submit Quiz
+                        </span>
                       </>
                     )}
                   </motion.button>
@@ -1043,12 +1337,12 @@ const AttemptQuiz = () => {
                         Math.min(questions.length - 1, currentQuestion + 1)
                       )
                     }
-                    className="btn-primary flex-1 flex items-center justify-center gap-2"
+                    className="btn-primary flex-1 flex items-center justify-center gap-2 touch-manipulation py-3 sm:py-2"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    Next
-                    <FiArrowRight className="w-5 h-5" />
+                    <span className="text-sm sm:text-base">Next</span>
+                    <FiArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                   </motion.button>
                 )}
               </div>
@@ -1056,6 +1350,104 @@ const AttemptQuiz = () => {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Camera Modal */}
+      {showCamera && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-2 sm:p-4">
+          <div className="w-full h-full sm:h-auto sm:max-w-4xl bg-gray-900 sm:rounded-xl overflow-hidden flex flex-col">
+            {/* Camera Header */}
+            <div className="flex items-center justify-between p-3 sm:p-4 bg-gray-800 border-b border-gray-700 flex-shrink-0">
+              <h3 className="text-white font-semibold text-base sm:text-lg">
+                Capture Answer Photo
+              </h3>
+              <button
+                onClick={closeCamera}
+                className="p-2 hover:bg-gray-700 rounded-lg transition-colors touch-manipulation"
+              >
+                <FiX className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
+              </button>
+            </div>
+
+            {/* Camera View */}
+            <div className="relative bg-black flex-1 flex items-center justify-center overflow-hidden">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover sm:object-contain sm:max-h-[60vh]"
+              />
+              <canvas ref={canvasRef} className="hidden" />
+
+              {/* Image Counter */}
+              {questionImages[currentCameraQuestion]?.length > 0 && (
+                <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-green-500/90 px-2 sm:px-3 py-1 rounded-full shadow-lg">
+                  <span className="text-white text-xs sm:text-sm font-medium">
+                    {questionImages[currentCameraQuestion].length} photo
+                    {questionImages[currentCameraQuestion].length > 1
+                      ? "s"
+                      : ""}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Camera Controls */}
+            <div className="p-3 sm:p-6 bg-gray-800 space-y-3 sm:space-y-4 flex-shrink-0 max-h-[40vh] sm:max-h-none overflow-y-auto">
+              {/* Captured Images Preview */}
+              {questionImages[currentCameraQuestion]?.length > 0 && (
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+                  {questionImages[currentCameraQuestion].map((img, idx) => (
+                    <div key={idx} className="relative flex-shrink-0 group">
+                      <img
+                        src={img}
+                        alt={`Capture ${idx + 1}`}
+                        className="w-16 h-16 sm:w-24 sm:h-24 object-cover rounded-lg border-2 border-green-500"
+                      />
+                      <button
+                        onClick={() => removeImage(currentCameraQuestion, idx)}
+                        className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-red-500 rounded-full flex items-center justify-center active:scale-95 transition-transform touch-manipulation"
+                      >
+                        <FiX className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                      </button>
+                      <div className="absolute bottom-1 left-1 bg-black/70 px-1.5 py-0.5 rounded text-xs text-white font-medium">
+                        {idx + 1}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <button
+                  onClick={capturePhoto}
+                  className="flex-1 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 active:scale-95 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base touch-manipulation"
+                >
+                  <FiCamera className="w-4 h-4 sm:w-5 sm:h-5" />
+                  Capture Photo
+                </button>
+
+                {questionImages[currentCameraQuestion]?.length > 0 && (
+                  <button
+                    onClick={() => processCapturedImages(currentCameraQuestion)}
+                    className="flex-1 py-3 sm:py-4 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 active:scale-95 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base touch-manipulation"
+                  >
+                    <FiCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                    Done ({questionImages[currentCameraQuestion].length})
+                  </button>
+                )}
+              </div>
+
+              <p className="text-center text-xs sm:text-sm text-gray-400 leading-relaxed">
+                {questionImages[currentCameraQuestion]?.length > 0
+                  ? "Capture more photos or click Done to process all images"
+                  : "Position your answer sheet clearly in the camera view"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

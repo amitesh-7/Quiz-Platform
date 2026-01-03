@@ -1280,6 +1280,158 @@ STRICT RULES:
 Return ONLY valid JSON array with all questions. No markdown, no explanation.
 `;
 
+    // UP Board Chemistry Class 12 Format - Exact Paper Structure (70 Marks) - Paper Code 347(JZ)
+    const upBoardChemistryClass12Format = `
+⚠️ CONTENT GENERATION INSTRUCTIONS:
+====================================
+- Reference NCERT Chemistry textbook (Class 12) and previous UP Board papers
+- Use similar question patterns from standard materials
+- Include proper chemical equations, formulas, and nomenclature
+- Maintain difficulty level appropriate for Class 12
+
+UP BOARD CLASS 12 CHEMISTRY PAPER (रसायन विज्ञान) - TOTAL 70 MARKS
+Paper Code: 347(JZ)
+
+TOPIC(S) FOR THIS PAPER: "${topic}"
+
+⚠️⚠️⚠️ CRITICAL - SMART TOPIC INTERPRETATION ⚠️⚠️⚠️
+=================================================================
+
+MANDATORY TOPIC HANDLING RULES:
+1. ✓ IF GENERAL TOPIC (topic is "Chemistry" or "Chemistry Class 12"):
+   → USE VARIETY from ALL units
+   → Mix questions from Physical, Organic, and Inorganic Chemistry
+   → Cover different chapters: Solutions, Electrochemistry, Chemical Kinetics, d-f block, Coordination Compounds, Haloalkanes, Alcohols, Aldehydes, Amines, Biomolecules, Polymers
+   
+2. ✗ IF SPECIFIC CHAPTER/TOPIC (e.g., "Electrochemistry", "Coordination Compounds", "Aldehydes and Ketones"):
+   → Focus primarily on THAT TOPIC
+   → Can include related concepts but emphasize the specified topic
+
+=== PAPER STRUCTURE (Total 70 Marks, 7 Questions) ===
+
+**Questions 1-6: Individual MCQs (6 marks total)**
+- Question 1: MCQ (1 mark)
+- Question 2: MCQ (1 mark)
+- Question 3: MCQ (1 mark)
+- Question 4: MCQ (1 mark)
+- Question 5: MCQ (1 mark)
+- Question 6: MCQ (1 mark)
+- Each MCQ has four options (A), (B), (C), (D)
+- Topics: Solid solutions, magnetic moment, coordination complexes, organic reactions, IUPAC nomenclature, sugars, reagents, etc.
+
+**Question 7: Short Answer Questions (8 marks)**
+- 4 sub-parts × 2 marks = 8 marks
+- (क), (ख), (ग), (घ)
+- Calculate molality, solubility concepts, oxidation states, geometrical isomers
+- Numerical problems and conceptual questions
+- Brief answers with proper units and calculations
+
+**Question 8: Short Answer Questions (8 marks)**
+- 4 sub-parts × 2 marks = 8 marks (with OR options)
+- (क), (ख), (ग), (घ)
+- Explain chemical reactions, distinguish between compounds, name reactions
+- Give examples of vitamins and deficiency diseases
+- Conceptual understanding questions
+
+**Question 9: Numerical/Theory Questions (12 marks)**
+- 4 parts with calculations and theory
+- Raoult's Law calculations
+- Electrochemistry: resistance, conductivity, molar conductivity
+- Explain chemical concepts with proper reasoning
+- Order of reaction calculations
+
+**Question 10: Theory Questions (12 marks)**
+- 4 parts with detailed explanations
+- Kohlrausch Law calculations
+- Conductivity concepts
+- Chemical kinetics
+- Differentiate between concepts
+- IUPAC nomenclature of complexes
+- Oxidation states and coordination chemistry
+- DNA and RNA differences
+
+**Question 11: Organic Chemistry (12 marks)**
+- Structure and IUPAC names (5 compounds)
+- OR: Explain chemical reactions/mechanisms
+- Conversion reactions with equations (5 conversions)
+- OR: Synthesis reactions
+- Chemical equations must be balanced and accurate
+
+**Question 12: Organic Chemistry Concepts (12 marks)**
+- Define terms with examples (5 terms like Aldol, Schiff's base, Cannizaro's reaction, Oxime, Acetal)
+- OR: Write reaction products (5 reactions with proper chemical equations)
+- Arrange in order (5 comparisons): pKb, basic strength, boiling point, solubility
+- OR: Give reasons for chemical properties (3 reasons)
+
+=== MARKS DISTRIBUTION ===
+- Questions 1-6: 6 marks total (Individual MCQs, 1 mark each)
+- Question 7: 8 marks (Short answers - 4 sub-parts × 2 marks)
+- Question 8: 8 marks (Short answers with OR - 4 sub-parts × 2 marks)
+- Question 9: 12 marks (Numerical/calculations)
+- Question 10: 12 marks (Theory/concepts)
+- Question 11: 12 marks (Organic - structures/conversions with OR)
+- Question 12: 12 marks (Organic - definitions/orders with OR)
+TOTAL: 70 marks
+
+=== MAJOR TOPICS (Class 12 Chemistry) ===
+
+**Physical Chemistry:**
+- Solutions: Molality, molarity, mole fraction, Raoult's Law, colligative properties
+- Electrochemistry: Conductivity, molar conductivity, Kohlrausch Law, electrochemical cells
+- Chemical Kinetics: Rate of reaction, order of reaction, molecularity, rate constant
+- Surface Chemistry: Adsorption, catalysis, colloids
+
+**Inorganic Chemistry:**
+- d and f Block Elements: Electronic configuration, oxidation states, magnetic properties
+- Coordination Compounds: IUPAC nomenclature, isomerism (geometrical, optical), magnetic moment, hybridization, VBT, CFT
+- Lanthanides and Actinides: Properties, oxidation states
+
+**Organic Chemistry:**
+- Haloalkanes and Haloarenes: IUPAC names, reactions, SN1, SN2 mechanisms
+- Alcohols, Phenols and Ethers: Preparation, reactions, acidity
+- Aldehydes and Ketones: Preparation, nucleophilic addition, Aldol, Cannizaro, Clemmensen, Wolf-Kishner
+- Amines: Classification, basicity, Gabriel phthalimide synthesis, diazotization
+- Biomolecules: Carbohydrates, proteins, vitamins, nucleic acids
+- Polymers: Types, preparation, examples
+
+=== ANSWER LENGTH GUIDELINES ===
+- 1 mark (MCQ): Select correct option only
+- 2 marks: 30-40 words, brief explanation with equations where needed
+- 3 marks: 50-60 words, detailed explanation
+- 4 marks: 80-100 words, comprehensive answer with examples/equations
+- Chemical equations must be balanced and complete
+- Include structural formulas where necessary
+- Use proper IUPAC nomenclature
+
+=== JSON STRUCTURE EXAMPLES ===
+
+MCQ (1 mark):
+{"questionType":"mcq","questionText":"एक ऐसे ठोस विलयन का उदाहरण दीजिए जिसमें विलेय गैस हो।","options":["(A) जल में घुली हुई ऑक्सीजन","(B) नाइट्रोजन में कपूर का विलयन","(C) पैलेडियम में हाइड्रोजन का विलयन","(D) जल में घुला हुआ ग्लूकोज"],"correctOption":2,"marks":1,"section":"Question 1 - MCQ"}
+
+Short Answer (2 marks):
+{"questionType":"written","questionText":"5.0 g एथेनोइक अम्ल (CH₃COOH) के 150.0 g बेन्जीन में विलयन की मोललता की गणना कीजिए।","correctAnswer":"दिया है:\\nएथेनोइक अम्ल का द्रव्यमान = 5.0 g\\nबेन्जीन का द्रव्यमान = 150.0 g = 0.150 kg\\nCH₃COOH का मोलर द्रव्यमान = 60 g/mol\\n\\nमोलों की संख्या = 5.0/60 = 0.0833 mol\\n\\nमोललता (m) = मोलों की संख्या / विलायक का द्रव्यमान (kg)\\nm = 0.0833 / 0.150 = 0.555 mol/kg\\n\\nउत्तर: मोललता = 0.555 m या 0.56 m","marks":2,"section":"Question 2"}
+
+Numerical Problem (3 marks):
+{"questionType":"written","questionText":"राउल्ट का नियम समझाइए। 298 K पर क्लोरोफॉर्म (CHCl₃) एवं डाइक्लोरोमेथेन (CH₂Cl₂) के वाष्पदाब क्रमशः 200 mm Hg व 4.5 mm Hg हैं। 51 g CHCl₃ व 20 g CH₂Cl₂ को मिलाकर बने विलयन के वाष्पदाब की गणना 298 K पर कीजिए।","correctAnswer":"राउल्ट का नियम: किसी विलयन में वाष्पशील विलायक का आंशिक वाष्पदाब, विलयन में उसके मोल अंश के समानुपाती होता है।\\nP = P° × X\\n\\nगणना:\\nCHCl₃ का मोलर द्रव्यमान = 119.5 g/mol\\nCH₂Cl₂ का मोलर द्रव्यमान = 85 g/mol\\n\\nn₁ (CHCl₃) = 51/119.5 = 0.427 mol\\nn₂ (CH₂Cl₂) = 20/85 = 0.235 mol\\nकुल मोल = 0.662 mol\\n\\nX₁ = 0.427/0.662 = 0.645\\nX₂ = 0.235/0.662 = 0.355\\n\\nP₁ = 200 × 0.645 = 129 mm Hg\\nP₂ = 4.5 × 0.355 = 1.6 mm Hg\\n\\nकुल वाष्पदाब = P₁ + P₂ = 129 + 1.6 = 130.6 mm Hg","marks":3,"section":"Question 4"}
+
+Organic Structure (2 marks per compound):
+{"questionType":"written","questionText":"sec-butyl chloride का संरचनात्मक सूत्र तथा IUPAC नाम लिखिए।","correctAnswer":"संरचनात्मक सूत्र:\\n    CH₃\\n    |\\nCH₃-CH-CH₂Cl\\n\\nIUPAC नाम: 2-क्लोरोब्यूटेन (2-Chlorobutane)","marks":2,"section":"Question 6"}
+
+Chemical Reaction (1 mark):
+{"questionType":"written","questionText":"Wurtz अभिक्रिया को उपयुक्त रासायनिक समीकरण द्वारा समझाइए।","correctAnswer":"Wurtz अभिक्रिया: ऐल्किल हैलाइड की सोडियम धातु के साथ शुष्क ईथर में अभिक्रिया से उच्च ऐल्केन बनता है।\\n\\n2R-X + 2Na ---शुष्क ईथर---> R-R + 2NaX\\n\\nउदाहरण:\\n2CH₃-Cl + 2Na ---शुष्क ईथर---> CH₃-CH₃ + 2NaCl\\n         (मेथिल क्लोराइड)        (एथेन)","marks":1,"section":"Question 3"}
+
+=== IMPORTANT REMINDERS ===
+1. All chemical equations must be balanced
+2. Use proper chemical formulas and IUPAC nomenclature
+3. Include units in all numerical answers
+4. Show step-by-step calculations
+5. Structural formulas should be clear
+6. Include proper reaction conditions
+7. OR options should be of similar difficulty
+
+Return ONLY valid JSON array with all questions. No markdown, no explanation.
+`;
+
     // UP Board English Class 12 Format - Exact Paper Structure (100 Marks) - Paper Code 316(HV)
     const upBoardEnglishClass12Format = `
 ⚠️ CONTENT GENERATION INSTRUCTIONS:
@@ -2825,6 +2977,59 @@ STRICT RULES:
 4. Proper word limits
 
 Return ONLY valid JSON array.`;
+    } else if (examFormat === "upboard_chemistryclass12") {
+      prompt = `UP BOARD CLASS 12 CHEMISTRY PAPER (रसायन विज्ञान) - 70 अंक बनाएं।
+Paper Code: 347(JZ)
+
+विषय/Topic: "${topic}"
+
+${upBoardChemistryClass12Format}
+
+⚠️⚠️⚠️ CRITICAL: GENERATE EXACTLY 12 QUESTIONS = 70 MARKS ⚠️⚠️⚠️
+
+**QUESTION BREAKDOWN:**
+
+Questions 1-6: Individual MCQs (6 marks total)
+- Question 1: MCQ (1 mark) - Solid solutions
+- Question 2: MCQ (1 mark) - Magnetic moment
+- Question 3: MCQ (1 mark) - Coordination complexes
+- Question 4: MCQ (1 mark) - Organic reactions
+- Question 5: MCQ (1 mark) - IUPAC nomenclature
+- Question 6: MCQ (1 mark) - Sugars/Biomolecules
+- Each as SEPARATE JSON object with section "Question 1", "Question 2", etc.
+
+Question 7 (8 marks): Short answers
+- 4 sub-parts (क), (ख), (ग), (घ) × 2 marks each
+- Numerical calculations and brief explanations
+
+Question 8 (8 marks): Short answers with OR
+- 4 sub-parts (क), (ख), (ग), (घ) × 2 marks each
+- Explain reactions, distinguish compounds, OR options
+
+Question 9 (12 marks): Numerical/calculations
+- Raoult's Law, electrochemistry calculations (resistance, conductivity)
+- Explain concepts with reasoning
+- Order of reaction calculations
+
+Question 10 (12 marks): Theory questions  
+- Kohlrausch Law, conductivity concepts
+- Chemical kinetics
+- IUPAC nomenclature of complexes
+- DNA and RNA differences
+
+Question 11 (12 marks): Organic chemistry
+- Part (a): 5 structures with IUPAC names OR explain reactions
+- Part (b): 5 conversion reactions with equations OR synthesis reactions
+
+Question 12 (12 marks): Organic concepts
+- Part (a): Define 5 terms with examples OR write reaction products
+- Part (b): Arrange in order (5 comparisons) OR give reasons (3 reasons)
+
+**LANGUAGE:** Mix of Hindi and English (technical terms in English)
+**EQUATIONS:** Balanced chemical equations required
+**FORMAT:** Include proper chemical formulas and structures
+
+Return ONLY valid JSON array with 12 questions.`;
     } else if (examFormat === "upboard_biology") {
       prompt = `UP BOARD CLASS 12 BIOLOGY PAPER (जीव विज्ञान) - 70 अंक बनाएं।
 Paper Code: 348(KH)
@@ -3600,6 +3805,30 @@ BREAKDOWN:
 TOTAL: 20 JSON objects = 100 marks
 
 Return ONLY valid JSON array.`;
+    } else if (examFormat === "upboard_chemistryclass12") {
+      prompt = `Extract questions from images for UP BOARD CLASS 12 CHEMISTRY PAPER (रसायन विज्ञान) - 70 marks.
+Paper Code: 347(JZ)
+
+EXTRACT ONLY what is visible in images. Do NOT generate new questions.
+
+${upBoardChemistryClass12Format}
+
+⚠️⚠️⚠️ EXTRACT EXACTLY 7 QUESTIONS FROM IMAGES ⚠️⚠️⚠️
+
+BREAKDOWN:
+- Question 1: 6 MCQs (6m)
+- Question 2: 4 short answers (8m)
+- Question 3: 4 short answers with OR (8m)
+- Question 4: Numerical problems (12m)
+- Question 5: Theory questions (12m)
+- Question 6: Organic chemistry - structures/conversions with OR (12m)
+- Question 7: Organic concepts - definitions/orders with OR (12m)
+
+TOTAL: 7 questions = 70 marks
+
+**IMPORTANT:** Include all chemical equations, formulas, and structures exactly as shown in images.
+
+Return ONLY valid JSON array.`;
     } else if (examFormat === "upboard_biology") {
       prompt = `Extract questions from images for UP BOARD CLASS 12 BIOLOGY PAPER (जीव विज्ञान) - 70 marks.
 Paper Code: 348(KH)
@@ -4302,6 +4531,32 @@ STRICT RULES:
 4. Complete answers with proper formatting
 
 Return ONLY valid JSON array.`;
+    } else if (examFormat === "upboard_chemistryclass12") {
+      prompt = `UP BOARD CLASS 12 CHEMISTRY PAPER (रसायन विज्ञान) - 70 अंक बनाएं।
+Paper Code: 347(JZ)
+
+INPUT विषय/सामग्री: "${rawQuestions}"
+
+${upBoardChemistryClass12Format}
+
+⚠️⚠️⚠️ CRITICAL: GENERATE EXACTLY 7 QUESTIONS = 70 MARKS ⚠️⚠️⚠️
+
+BREAKDOWN:
+- Question 1: 6 MCQs (6m)
+- Question 2: Short answers (8m)
+- Question 3: Short answers with OR (8m)
+- Question 4: Numerical/calculations (12m)
+- Question 5: Theory questions (12m)
+- Question 6: Organic - structures/conversions with OR (12m)
+- Question 7: Organic - definitions/orders with OR (12m)
+
+TOTAL: 7 questions = 70 marks
+
+**LANGUAGE:** Mix of Hindi/English (technical terms in English)
+**EQUATIONS:** Include balanced chemical equations
+**FORMAT:** Proper chemical formulas and structures
+
+Return ONLY valid JSON array with 7 questions.`;
     } else if (examFormat === "upboard_hindiclass12") {
       prompt = `UP BOARD CLASS 12 HINDI PAPER (हिंदी) - 100 अंक बनाएं।
 Paper Code: 301(HA)
