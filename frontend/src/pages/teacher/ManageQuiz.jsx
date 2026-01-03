@@ -1787,11 +1787,77 @@ ${answersHTML}
                         <option value="upboard_science">UP Board Science (Class 10)</option>
                         <option value="upboard_english">UP Board English (Class 10)</option>
                         <option value="upboard_hindi">UP Board Hindi (Class 10)</option>
+                        <option value="upboard_sanskrit">UP Board Sanskrit (Class 10)</option>
                       </select>
                     </div>
+                    {/* UP Board Sanskrit - Simplified UI */}
+                    {generateForm.examFormat === "upboard_sanskrit" ? (
+                      <>
+                        {/* UP Board Sanskrit Info Box */}
+                        <div className="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-lg p-4">
+                          <p className="text-amber-300 font-medium mb-3">📋 UP Board Sanskrit Paper - 70 अंक (31 प्रश्न)</p>
+                          <p className="text-xs text-gray-400 mb-2">Paper Code: 818(BP)</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                            <div className="bg-white/5 rounded-lg p-3">
+                              <p className="text-yellow-400 font-medium mb-2">खण्ड 'अ' - 20 अंक</p>
+                              <ul className="text-xs text-gray-400 space-y-1">
+                                <li>• प्र.1-6: गद्यांश MCQs (6 अंक)</li>
+                                <li>• प्र.7-20: व्याकरण MCQs (14 अंक)</li>
+                                <li>• संधि, समास, विभक्ति, लकार, प्रत्याहार</li>
+                              </ul>
+                            </div>
+                            <div className="bg-white/5 rounded-lg p-3">
+                              <p className="text-green-400 font-medium mb-2">खण्ड 'ब' - 50 अंक</p>
+                              <ul className="text-xs text-gray-400 space-y-1">
+                                <li>• गद्यांश/श्लोक/सारांश/चरित्र (23 अंक)</li>
+                                <li>• विभक्ति/प्रत्यय (4), वाच्य (3)</li>
+                                <li>• अनुवाद (6), निबन्ध (8), पद प्रयोग (4)</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
 
-                    {/* UP Board Hindi - Simplified UI */}
-                    {generateForm.examFormat === "upboard_hindi" ? (
+                        {/* Topic Input for Sanskrit */}
+                        <div className="form-group">
+                          <label className="input-label">विषय / Topic *</label>
+                          <input
+                            type="text"
+                            value={generateForm.topic}
+                            onChange={(e) =>
+                              setGenerateForm({
+                                ...generateForm,
+                                topic: e.target.value,
+                              })
+                            }
+                            placeholder="जैसे: व्याकरण, गद्य, पद्य, निबन्ध..."
+                            className="glass-input"
+                            required
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            एक या अधिक विषय दर्ज करें (comma से अलग करें)
+                          </p>
+                        </div>
+
+                        {/* Difficulty for Sanskrit */}
+                        <div className="form-group">
+                          <label className="input-label">कठिनाई स्तर</label>
+                          <select
+                            value={generateForm.difficulty || "medium"}
+                            onChange={(e) =>
+                              setGenerateForm({
+                                ...generateForm,
+                                difficulty: e.target.value,
+                              })
+                            }
+                            className="glass-input"
+                          >
+                            <option value="easy">सरल (Board Level)</option>
+                            <option value="medium">मध्यम (Competitive)</option>
+                            <option value="hard">कठिन (Advanced)</option>
+                          </select>
+                        </div>
+                      </>
+                    ) : generateForm.examFormat === "upboard_hindi" ? (
                       <>
                         {/* UP Board Hindi Info Box */}
                         <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-lg p-4">
@@ -2393,8 +2459,33 @@ ${answersHTML}
                         <option value="upboard_science">UP Board Science (Class 10)</option>
                         <option value="upboard_english">UP Board English (Class 10)</option>
                         <option value="upboard_hindi">UP Board Hindi (Class 10)</option>
+                        <option value="upboard_sanskrit">UP Board Sanskrit (Class 10)</option>
                       </select>
                     </div>
+
+                    {/* UP Board Sanskrit Info Box */}
+                    {bulkForm.examFormat === "upboard_sanskrit" && (
+                      <div className="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-lg p-4">
+                        <p className="text-amber-300 font-medium mb-3">📋 UP Board Sanskrit Paper - 70 अंक (31 प्रश्न)</p>
+                        <p className="text-xs text-gray-400 mb-2">Paper Code: 818(BP)</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-yellow-400 font-medium mb-2">खण्ड 'अ' - 20 अंक</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• प्र.1-6: गद्यांश MCQs (6 अंक)</li>
+                              <li>• प्र.7-20: व्याकरण MCQs (14 अंक)</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-green-400 font-medium mb-2">खण्ड 'ब' - 50 अंक</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• गद्यांश/श्लोक/सारांश/चरित्र (23 अंक)</li>
+                              <li>• व्याकरण/अनुवाद/निबन्ध (27 अंक)</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* UP Board Hindi Info Box */}
                     {bulkForm.examFormat === "upboard_hindi" && (
@@ -2574,6 +2665,16 @@ OR paste raw questions in any format...`
 गद्य खण्ड, काव्य खण्ड, व्याकरण, संस्कृत
 
 या कच्चे प्रश्न paste करें...`
+                          : bulkForm.examFormat === "upboard_sanskrit"
+                          ? `UP Board Sanskrit Paper के लिए विषय दर्ज करें...
+
+उदाहरण (एक विषय):
+व्याकरण - संधि, समास
+
+उदाहरण (अनेक विषय - comma से अलग):
+गद्य, पद्य, व्याकरण, निबन्ध
+
+या कच्चे प्रश्न paste करें...`
                           : `Paste your questions here in any format...
 
 Example:
@@ -2588,7 +2689,7 @@ Example:
                     </div>
 
                     {/* Show these fields only for General format, not for UP Board */}
-                    {bulkForm.examFormat !== "upboard_science" && bulkForm.examFormat !== "upboard_english" && bulkForm.examFormat !== "upboard_hindi" && (
+                    {bulkForm.examFormat !== "upboard_science" && bulkForm.examFormat !== "upboard_english" && bulkForm.examFormat !== "upboard_hindi" && bulkForm.examFormat !== "upboard_sanskrit" && (
                       <>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="form-group">
@@ -2890,6 +2991,12 @@ Example:
                               examFormat: format,
                               language: "hindi",
                             });
+                          } else if (format === "upboard_sanskrit") {
+                            setImageForm({
+                              ...imageForm,
+                              examFormat: format,
+                              language: "sanskrit",
+                            });
                           } else {
                             setImageForm({
                               ...imageForm,
@@ -2903,8 +3010,38 @@ Example:
                         <option value="upboard_science">UP Board Science (Class 10)</option>
                         <option value="upboard_english">UP Board English (Class 10)</option>
                         <option value="upboard_hindi">UP Board Hindi (Class 10)</option>
+                        <option value="upboard_sanskrit">UP Board Sanskrit (Class 10)</option>
                       </select>
                     </div>
+
+                    {/* UP Board Sanskrit Info Box */}
+                    {imageForm.examFormat === "upboard_sanskrit" && (
+                      <div className="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-lg p-4">
+                        <p className="text-amber-300 font-medium mb-3">📋 UP Board Sanskrit Paper - 70 अंक (31 प्रश्न)</p>
+                        <p className="text-xs text-gray-400 mb-2">Paper Code: 818(BP)</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-yellow-400 font-medium mb-2">खण्ड 'अ' - 20 अंक</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• प्र.1-6: गद्यांश MCQs (6 अंक)</li>
+                              <li>• प्र.7-20: व्याकरण MCQs (14 अंक)</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-green-400 font-medium mb-2">खण्ड 'ब' - 50 अंक</p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• गद्यांश/श्लोक/सारांश/चरित्र (23 अंक)</li>
+                              <li>• व्याकरण/अनुवाद/निबन्ध (27 अंक)</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-white/10">
+                          <p className="text-xs text-gray-400">
+                            ✓ 31 प्रश्न = 70 अंक • ✓ संस्कृत/हिन्दी • ✓ अथवा विकल्प सहित
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                     {/* UP Board Info Box */}
                     {imageForm.examFormat === "upboard_science" && (
@@ -3116,7 +3253,7 @@ Example:
                     </div>
 
                     {/* Show these fields only for General format, not for UP Board */}
-                    {imageForm.examFormat !== "upboard_science" && imageForm.examFormat !== "upboard_english" && imageForm.examFormat !== "upboard_hindi" && (
+                    {imageForm.examFormat !== "upboard_science" && imageForm.examFormat !== "upboard_english" && imageForm.examFormat !== "upboard_hindi" && imageForm.examFormat !== "upboard_sanskrit" && (
                       <>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="form-group">

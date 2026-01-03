@@ -42,7 +42,7 @@ const generateValidation = [
     .withMessage("Description cannot exceed 1000 characters"),
   body("examFormat")
     .optional()
-    .isIn(["general", "upboard_science", "upboard_english", "upboard_hindi"])
+    .isIn(["general", "upboard_science", "upboard_english", "upboard_hindi", "upboard_sanskrit"])
     .withMessage("Invalid exam format"),
 ];
 
@@ -160,7 +160,7 @@ const processQuestionsController = async (req, res) => {
       });
     }
 
-    if (examFormat !== "upboard_science" && examFormat !== "upboard_english" && examFormat !== "upboard_hindi" && (!maxMarks || maxMarks < 1)) {
+    if (examFormat !== "upboard_science" && examFormat !== "upboard_english" && examFormat !== "upboard_hindi" && examFormat !== "upboard_sanskrit" && (!maxMarks || maxMarks < 1)) {
       return res.status(400).json({
         success: false,
         message: "Maximum marks must be at least 1",
@@ -192,6 +192,10 @@ const processQuestionsController = async (req, res) => {
       finalMaxMarks = 70;
       finalLanguage = "hindi";
       finalNumberOfQuestions = 30;
+    } else if (examFormat === "upboard_sanskrit") {
+      finalMaxMarks = 70;
+      finalLanguage = "sanskrit";
+      finalNumberOfQuestions = 31;
     }
 
     // Process raw questions with exam format and difficulty
@@ -259,7 +263,7 @@ const extractQuestionsFromImageController = async (req, res) => {
       });
     }
 
-    if (examFormat !== "upboard_science" && examFormat !== "upboard_english" && examFormat !== "upboard_hindi" && (!maxMarks || maxMarks < 1)) {
+    if (examFormat !== "upboard_science" && examFormat !== "upboard_english" && examFormat !== "upboard_hindi" && examFormat !== "upboard_sanskrit" && (!maxMarks || maxMarks < 1)) {
       return res.status(400).json({
         success: false,
         message: "Maximum marks must be at least 1",
@@ -294,6 +298,9 @@ const extractQuestionsFromImageController = async (req, res) => {
     } else if (examFormat === "upboard_hindi") {
       finalMaxMarks = 70;
       finalLanguage = "hindi";
+    } else if (examFormat === "upboard_sanskrit") {
+      finalMaxMarks = 70;
+      finalLanguage = "sanskrit";
     }
 
     // Extract questions from image(s) with exam format and difficulty
