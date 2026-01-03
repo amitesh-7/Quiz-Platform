@@ -80,6 +80,10 @@ const submissionSchema = new mongoose.Schema(
       min: 0,
       default: 0,
     },
+    attemptNumber: {
+      type: Number,
+      default: 1,
+    },
     submittedAt: {
       type: Date,
       default: Date.now,

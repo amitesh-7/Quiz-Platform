@@ -105,7 +105,7 @@ const AttemptQuiz = () => {
         setSubmitting(false);
       }
     },
-    [answers, quizId, navigate, submitting]
+    [answers, quizId, navigate, submitting, questionsData, answerImages]
   );
 
   // Timer effect

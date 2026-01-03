@@ -162,12 +162,27 @@ const QuizSubmissions = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-white/10">
-                      <th className="text-left py-4 px-4 text-gray-400 font-medium">#</th>
-                      <th className="text-left py-4 px-4 text-gray-400 font-medium">Student</th>
-                      <th className="text-center py-4 px-4 text-gray-400 font-medium">Score</th>
-                      <th className="text-center py-4 px-4 text-gray-400 font-medium">Percentage</th>
-                      <th className="text-center py-4 px-4 text-gray-400 font-medium">Submitted</th>
-                      <th className="text-center py-4 px-4 text-gray-400 font-medium">Actions</th>
+                      <th className="text-left py-4 px-4 text-gray-400 font-medium">
+                        #
+                      </th>
+                      <th className="text-left py-4 px-4 text-gray-400 font-medium">
+                        Student
+                      </th>
+                      <th className="text-center py-4 px-4 text-gray-400 font-medium">
+                        Attempt
+                      </th>
+                      <th className="text-center py-4 px-4 text-gray-400 font-medium">
+                        Score
+                      </th>
+                      <th className="text-center py-4 px-4 text-gray-400 font-medium">
+                        Percentage
+                      </th>
+                      <th className="text-center py-4 px-4 text-gray-400 font-medium">
+                        Submitted
+                      </th>
+                      <th className="text-center py-4 px-4 text-gray-400 font-medium">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -183,10 +198,19 @@ const QuizSubmissions = () => {
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                              {submission.student?.name?.charAt(0).toUpperCase()}
+                              {submission.student?.name
+                                ?.charAt(0)
+                                .toUpperCase()}
                             </div>
-                            <span className="text-white">{submission.student?.name}</span>
+                            <span className="text-white">
+                              {submission.student?.name}
+                            </span>
                           </div>
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm font-medium">
+                            #{submission.attemptNumber || 1}
+                          </span>
                         </td>
                         <td className="py-4 px-4 text-center">
                           <span className="text-white font-medium">
@@ -194,12 +218,18 @@ const QuizSubmissions = () => {
                           </span>
                         </td>
                         <td className="py-4 px-4 text-center">
-                          <span className={`font-bold ${getScoreColor(submission.percentage)}`}>
+                          <span
+                            className={`font-bold ${getScoreColor(
+                              submission.percentage
+                            )}`}
+                          >
                             {submission.percentage}%
                           </span>
                         </td>
                         <td className="py-4 px-4 text-center text-gray-400">
-                          {new Date(submission.submittedAt).toLocaleDateString()}
+                          {new Date(
+                            submission.submittedAt
+                          ).toLocaleDateString()}
                         </td>
                         <td className="py-4 px-4 text-center">
                           <Link to={`/teacher/submission/${submission.id}`}>
@@ -235,8 +265,17 @@ const QuizSubmissions = () => {
                       {submission.student?.name?.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-white font-semibold">{submission.student?.name}</h3>
-                      <p className="text-sm text-gray-400">{submission.student?.email}</p>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-white font-semibold">
+                          {submission.student?.name}
+                        </h3>
+                        <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded-full text-xs font-medium">
+                          Attempt #{submission.attemptNumber || 1}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-400">
+                        {submission.student?.email}
+                      </p>
                     </div>
                     <span className="text-xs text-gray-400">#{index + 1}</span>
                   </div>
@@ -250,7 +289,11 @@ const QuizSubmissions = () => {
                     </div>
                     <div className="bg-white/5 p-3 rounded-lg">
                       <p className="text-xs text-gray-400 mb-1">Percentage</p>
-                      <p className={`font-bold ${getScoreColor(submission.percentage)}`}>
+                      <p
+                        className={`font-bold ${getScoreColor(
+                          submission.percentage
+                        )}`}
+                      >
                         {submission.percentage}%
                       </p>
                     </div>

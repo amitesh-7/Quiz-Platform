@@ -6,6 +6,7 @@ const {
   getMySubmissions,
   getQuizSubmissions,
   getSubmissionDetails,
+  updateSubmissionMarks,
   submitValidation,
 } = require("../controllers/submissionController");
 const { protect, studentOnly, teacherOnly } = require("../middleware/auth");
@@ -21,5 +22,6 @@ router.get("/my", studentOnly, getMySubmissions);
 // Teacher routes
 router.get("/quiz/:quizId", teacherOnly, getQuizSubmissions);
 router.get("/:submissionId", teacherOnly, getSubmissionDetails);
+router.patch("/:submissionId/marks", teacherOnly, updateSubmissionMarks);
 
 module.exports = router;

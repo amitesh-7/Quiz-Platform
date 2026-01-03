@@ -24,7 +24,10 @@ const submitQuiz = async (req, res) => {
     console.log("=== SUBMISSION DEBUG ===");
     console.log("QuizId:", quizId);
     console.log("Answers count:", answers?.length);
-    console.log("QuestionsData:", questionsData ? `${questionsData.length} items` : "null (manual mode)");
+    console.log(
+      "QuestionsData:",
+      questionsData ? `${questionsData.length} items` : "null (manual mode)"
+    );
 
     // Check if quiz exists
     const quiz = await Quiz.findById(quizId);
@@ -53,7 +56,11 @@ const submitQuiz = async (req, res) => {
     let questionMap = new Map();
 
     // If questionsData provided (unique per student), use it
-    if (questionsData && Array.isArray(questionsData) && questionsData.length > 0) {
+    if (
+      questionsData &&
+      Array.isArray(questionsData) &&
+      questionsData.length > 0
+    ) {
       console.log("Using questionsData (AI mode)");
       questions = questionsData;
       questions.forEach((q, index) => {
@@ -76,7 +83,10 @@ const submitQuiz = async (req, res) => {
 
       questions.forEach((q) => {
         questionMap.set(q._id.toString(), q);
-        console.log(`Mapped ${q._id.toString()}:`, q.questionText?.substring(0, 50));
+        console.log(
+          `Mapped ${q._id.toString()}:`,
+          q.questionText?.substring(0, 50)
+        );
       });
     }
 
@@ -88,33 +98,41 @@ const submitQuiz = async (req, res) => {
     for (let i = 0; i < answers.length; i++) {
       const answer = answers[i];
       let question = null;
-      
+
       console.log(`Processing answer ${i}: questionId=${answer.questionId}`);
-      
+
       // Try to find question by questionId first
       if (answer.questionId) {
         question = questionMap.get(answer.questionId);
-        
+
         // If not found, try as MongoDB ObjectId string
         if (!question) {
           question = questionMap.get(answer.questionId.toString());
         }
       }
-      
+
       // If still not found and we have questionsData, try by index
       if (!question && questionsData && questionsData.length > 0) {
         // Extract index from temp_X format or use loop index
         let idx = i;
-        if (answer.questionId && answer.questionId.startsWith && answer.questionId.startsWith('temp_')) {
-          idx = parseInt(answer.questionId.replace('temp_', ''));
+        if (
+          answer.questionId &&
+          answer.questionId.startsWith &&
+          answer.questionId.startsWith("temp_")
+        ) {
+          idx = parseInt(answer.questionId.replace("temp_", ""));
         }
         if (questionsData[idx]) {
           question = questionsData[idx];
           console.log(`Found by index ${idx}`);
         }
       }
-      
-      console.log(`Question found:`, question ? "YES" : "NO", question ? `type: ${question.questionType}` : "");
+
+      console.log(
+        `Question found:`,
+        question ? "YES" : "NO",
+        question ? `type: ${question.questionType}` : ""
+      );
 
       if (question) {
         let isCorrect = false;
@@ -211,9 +229,27 @@ const submitQuiz = async (req, res) => {
 
         processedAnswers.push(answerData);
         score += earnedMarks;
-        console.log(`Answer processed: earned ${earnedMarks}/${question.marks}, total score: ${score}`);
+        console.log(
+          `Answer processed: earned ${earnedMarks}/${question.marks}, total score: ${score}`
+        );
       } else {
-        console.log(`WARNING: Question not found for answer ${i}`);
+        // Question not found - still save the answer with basic info for debugging
+        console.log(
+          `WARNING: Question not found for answer ${i}, saving with limited info`
+        );
+
+        // Create a minimal answer record so the submission isn't incomplete
+        const fallbackAnswerData = {
+          questionId: answer.questionId,
+          questionText: `Question ${i + 1} (data not available)`,
+          questionType: "mcq",
+          marks: 0,
+          earnedMarks: 0,
+          selectedOption: answer.selectedOption,
+          feedback: "Question data was not found during submission",
+          imageUrl: answer.imageUrl || null,
+        };
+        processedAnswers.push(fallbackAnswerData);
       }
     }
 
@@ -224,40 +260,37 @@ const submitQuiz = async (req, res) => {
     // Calculate total marks
     const totalMarks = processedAnswers.reduce((sum, a) => sum + a.marks, 0);
 
-    // Update existing submission or create new one
-    let submission;
-    if (existingSubmission) {
-      // Update existing submission with new attempt
-      submission = await Submission.findByIdAndUpdate(
-        existingSubmission._id,
-        {
-          answers: processedAnswers,
-          score,
-          submittedAt: new Date(),
-        },
-        { new: true }
-      );
-    } else {
-      // Create new submission
-      submission = await Submission.create({
-        quizId,
-        studentId: req.user._id,
-        answers: processedAnswers,
-        score,
-        submittedAt: new Date(),
-      });
-    }
+    // Check previous attempts to determine attempt number
+    const previousAttempts = await Submission.find({
+      quizId,
+      studentId: req.user._id,
+    }).sort({ attemptNumber: -1 });
+
+    const attemptNumber =
+      previousAttempts.length > 0 ? previousAttempts[0].attemptNumber + 1 : 1;
+
+    // Always create a new submission for each attempt (don't update existing)
+    const submission = await Submission.create({
+      quizId,
+      studentId: req.user._id,
+      answers: processedAnswers,
+      score,
+      attemptNumber,
+      submittedAt: new Date(),
+    });
 
     res.status(201).json({
       success: true,
-      message: existingSubmission
-        ? "Quiz resubmitted successfully. Your result has been updated."
-        : "Quiz submitted successfully",
+      message:
+        attemptNumber > 1
+          ? `Quiz resubmitted successfully. This is attempt #${attemptNumber}.`
+          : "Quiz submitted successfully",
       data: {
         submission: {
           id: submission._id,
           quizId: submission.quizId,
           score: submission.score,
+          attemptNumber: submission.attemptNumber,
           totalMarks: totalMarks,
           percentage:
             totalMarks > 0 ? Math.round((score / totalMarks) * 100) : 0,
@@ -299,70 +332,143 @@ const getResult = async (req, res) => {
     // Get all questions for this quiz to show attempted and unattempted
     const allQuestions = await Question.find({ quizId });
 
-    // Create a map of submitted answers by questionId
-    const answersMap = new Map();
-    submission.answers.forEach((answer) => {
-      answersMap.set(answer.questionId?.toString(), answer);
-    });
+    let detailedResults;
 
-    // Build detailed results including all questions
-    const detailedResults = allQuestions.map((question, index) => {
-      const answer = answersMap.get(question._id.toString());
-      const isAttempted = !!answer;
+    // If no questions in DB (AI-generated quiz), use answers stored in submission
+    if (allQuestions.length === 0 && submission.answers.length > 0) {
+      // For AI-generated quizzes, build results from stored answers
+      detailedResults = submission.answers.map((answer, index) => {
+        const result = {
+          questionId: answer.questionId || `q_${index}`,
+          questionText: answer.questionText || `Question ${index + 1}`,
+          questionType: answer.questionType || "mcq",
+          marks: answer.marks || 0,
+          earnedMarks: answer.earnedMarks || 0,
+          isCorrect: answer.earnedMarks === answer.marks,
+          isPartial:
+            answer.earnedMarks > 0 && answer.earnedMarks < answer.marks,
+          isAttempted: true,
+          selectedOption: answer.selectedOption ?? null,
+          feedback: answer.feedback || "",
+          imageUrl: answer.imageUrl || null,
+        };
 
-      const result = {
-        questionId: question._id,
-        questionText: question.questionText,
-        questionType: question.questionType || "mcq",
-        marks: question.marks || 0,
-        earnedMarks: answer?.earnedMarks || 0,
-        isCorrect: answer ? answer.earnedMarks === answer.marks : false,
-        isPartial: answer ? (answer.earnedMarks > 0 && answer.earnedMarks < answer.marks) : false,
-        isAttempted: isAttempted,
-        selectedOption: answer?.selectedOption ?? null,
-        feedback: answer?.feedback || "",
-        imageUrl: answer?.imageUrl || null,
-      };
-
-      // Add type-specific fields from question (always include these)
-      if (question.questionType === "mcq" || question.questionType === "truefalse") {
-        result.options = question.options || [];
-        result.correctOption = question.correctOption;
-      } else if (question.questionType === "written") {
-        result.studentAnswer = answer?.selectedOption || "";
-        result.expectedAnswer = question.correctAnswer || "";
-        result.awardedMarks = answer?.earnedMarks || 0;
-      } else if (question.questionType === "fillblank") {
-        result.studentAnswer = answer?.selectedOption 
-          ? (Array.isArray(answer.selectedOption) ? answer.selectedOption.join(", ") : answer.selectedOption)
-          : "";
-        result.correctAnswer = Array.isArray(question.blanks) 
-          ? question.blanks.join(", ") 
-          : question.blanks || "";
-      } else if (question.questionType === "matching") {
-        // Format student matches
-        if (question.matchPairs) {
-          if (answer && typeof answer.selectedOption === "object") {
-            result.studentMatches = question.matchPairs.map((pair, idx) => ({
+        // Add type-specific fields from stored answer
+        if (
+          answer.questionType === "mcq" ||
+          answer.questionType === "truefalse"
+        ) {
+          result.options = answer.options || [];
+          result.correctOption = answer.correctOption;
+        } else if (answer.questionType === "written") {
+          result.studentAnswer = answer.selectedOption || "";
+          result.expectedAnswer = answer.correctAnswer || "";
+          result.awardedMarks = answer.earnedMarks || 0;
+        } else if (answer.questionType === "fillblank") {
+          result.studentAnswer = answer.selectedOption
+            ? Array.isArray(answer.selectedOption)
+              ? answer.selectedOption.join(", ")
+              : answer.selectedOption
+            : "";
+          result.correctAnswer = Array.isArray(answer.blanks)
+            ? answer.blanks.join(", ")
+            : answer.blanks || "";
+        } else if (answer.questionType === "matching") {
+          if (answer.matchPairs) {
+            if (typeof answer.selectedOption === "object") {
+              result.studentMatches = answer.matchPairs.map((pair, idx) => ({
+                left: pair.left,
+                right: answer.selectedOption[idx] || "Not matched",
+              }));
+            } else {
+              result.studentMatches = null;
+            }
+            result.correctMatches = answer.matchPairs.map((pair) => ({
               left: pair.left,
-              right: answer.selectedOption[idx] || "Not matched",
+              right: pair.right,
             }));
-          } else {
-            result.studentMatches = null;
           }
-          result.correctMatches = question.matchPairs.map((pair) => ({
-            left: pair.left,
-            right: pair.right,
-          }));
         }
-      }
 
-      return result;
-    });
+        return result;
+      });
+    } else {
+      // For manual quizzes, use questions from DB
+      // Create a map of submitted answers by questionId
+      const answersMap = new Map();
+      submission.answers.forEach((answer) => {
+        answersMap.set(answer.questionId?.toString(), answer);
+      });
+
+      // Build detailed results including all questions
+      detailedResults = allQuestions.map((question, index) => {
+        const answer = answersMap.get(question._id.toString());
+        const isAttempted = !!answer;
+
+        const result = {
+          questionId: question._id,
+          questionText: question.questionText,
+          questionType: question.questionType || "mcq",
+          marks: question.marks || 0,
+          earnedMarks: answer?.earnedMarks || 0,
+          isCorrect: answer ? answer.earnedMarks === answer.marks : false,
+          isPartial: answer
+            ? answer.earnedMarks > 0 && answer.earnedMarks < answer.marks
+            : false,
+          isAttempted: isAttempted,
+          selectedOption: answer?.selectedOption ?? null,
+          feedback: answer?.feedback || "",
+          imageUrl: answer?.imageUrl || null,
+        };
+
+        // Add type-specific fields from question (always include these)
+        if (
+          question.questionType === "mcq" ||
+          question.questionType === "truefalse"
+        ) {
+          result.options = question.options || [];
+          result.correctOption = question.correctOption;
+        } else if (question.questionType === "written") {
+          result.studentAnswer = answer?.selectedOption || "";
+          result.expectedAnswer = question.correctAnswer || "";
+          result.awardedMarks = answer?.earnedMarks || 0;
+        } else if (question.questionType === "fillblank") {
+          result.studentAnswer = answer?.selectedOption
+            ? Array.isArray(answer.selectedOption)
+              ? answer.selectedOption.join(", ")
+              : answer.selectedOption
+            : "";
+          result.correctAnswer = Array.isArray(question.blanks)
+            ? question.blanks.join(", ")
+            : question.blanks || "";
+        } else if (question.questionType === "matching") {
+          // Format student matches
+          if (question.matchPairs) {
+            if (answer && typeof answer.selectedOption === "object") {
+              result.studentMatches = question.matchPairs.map((pair, idx) => ({
+                left: pair.left,
+                right: answer.selectedOption[idx] || "Not matched",
+              }));
+            } else {
+              result.studentMatches = null;
+            }
+            result.correctMatches = question.matchPairs.map((pair) => ({
+              left: pair.left,
+              right: pair.right,
+            }));
+          }
+        }
+
+        return result;
+      });
+    }
 
     // Calculate total marks and earned marks
     const totalMarks = allQuestions.reduce((sum, q) => sum + (q.marks || 0), 0);
-    const earnedMarks = submission.answers.reduce((sum, a) => sum + (a.earnedMarks || 0), 0);
+    const earnedMarks = submission.answers.reduce(
+      (sum, a) => sum + (a.earnedMarks || 0),
+      0
+    );
 
     res.status(200).json({
       success: true,
@@ -370,7 +476,8 @@ const getResult = async (req, res) => {
         quiz: submission.quizId,
         score: earnedMarks,
         totalMarks: totalMarks || submission.quizId?.totalMarks || 0,
-        percentage: totalMarks > 0 ? Math.round((earnedMarks / totalMarks) * 100) : 0,
+        percentage:
+          totalMarks > 0 ? Math.round((earnedMarks / totalMarks) * 100) : 0,
         submittedAt: submission.submittedAt,
         detailedResults,
       },
@@ -446,6 +553,7 @@ const getQuizSubmissions = async (req, res) => {
       id: sub._id,
       student: sub.studentId,
       score: sub.score,
+      attemptNumber: sub.attemptNumber || 1,
       totalMarks: quiz.totalMarks,
       percentage:
         quiz.totalMarks > 0
@@ -493,9 +601,71 @@ const getSubmissionDetails = async (req, res) => {
       });
     }
 
-    // Calculate total marks from answers
-    const totalMarks = submission.answers.reduce((sum, a) => sum + (a.marks || 0), 0);
-    const earnedMarks = submission.answers.reduce((sum, a) => sum + (a.earnedMarks || 0), 0);
+    // Get all questions for this quiz to show both attempted and unattempted
+    const allQuestions = await Question.find({ quizId: submission.quizId });
+
+    // Create a map of submitted answers by questionId
+    const answersMap = new Map();
+    submission.answers.forEach((answer) => {
+      answersMap.set(answer.questionId?.toString(), answer);
+    });
+
+    let detailedAnswers;
+    let totalMarks = 0;
+    let earnedMarks = 0;
+
+    // If questions exist in DB (manual quiz), show all questions
+    if (allQuestions.length > 0) {
+      detailedAnswers = allQuestions.map((question, index) => {
+        const answer = answersMap.get(question._id.toString());
+        const isAttempted = !!answer;
+
+        totalMarks += question.marks || 0;
+        earnedMarks += answer?.earnedMarks || 0;
+
+        return {
+          questionId: question._id.toString(),
+          questionText: question.questionText,
+          questionType: question.questionType || "mcq",
+          options: question.options,
+          correctOption: question.correctOption,
+          correctAnswer: question.correctAnswer,
+          blanks: question.blanks,
+          matchPairs: question.matchPairs,
+          selectedOption: answer?.selectedOption ?? null,
+          marks: question.marks,
+          earnedMarks: answer?.earnedMarks || 0,
+          isCorrect: isAttempted && answer.earnedMarks === question.marks,
+          isAttempted: isAttempted,
+          feedback: answer?.feedback || "",
+          imageUrl: answer?.imageUrl || null,
+        };
+      });
+    } else {
+      // For AI-generated quizzes, use stored answers only
+      detailedAnswers = submission.answers.map((answer, index) => {
+        totalMarks += answer.marks || 0;
+        earnedMarks += answer.earnedMarks || 0;
+
+        return {
+          questionId: answer.questionId?.toString() || `ai-${index}`,
+          questionText: answer.questionText,
+          questionType: answer.questionType || "mcq",
+          options: answer.options,
+          correctOption: answer.correctOption,
+          correctAnswer: answer.correctAnswer,
+          blanks: answer.blanks,
+          matchPairs: answer.matchPairs,
+          selectedOption: answer.selectedOption,
+          marks: answer.marks,
+          earnedMarks: answer.earnedMarks,
+          isCorrect: answer.earnedMarks === answer.marks,
+          isAttempted: true,
+          feedback: answer.feedback,
+          imageUrl: answer.imageUrl,
+        };
+      });
+    }
 
     res.status(200).json({
       success: true,
@@ -505,24 +675,12 @@ const getSubmissionDetails = async (req, res) => {
           student: submission.studentId,
           quiz: submission.quizId,
           score: submission.score,
+          attemptNumber: submission.attemptNumber || 1,
           totalMarks: totalMarks,
-          percentage: totalMarks > 0 ? Math.round((earnedMarks / totalMarks) * 100) : 0,
+          percentage:
+            totalMarks > 0 ? Math.round((earnedMarks / totalMarks) * 100) : 0,
           submittedAt: submission.submittedAt,
-          answers: submission.answers.map((answer) => ({
-            questionText: answer.questionText,
-            questionType: answer.questionType || "mcq",
-            options: answer.options,
-            correctOption: answer.correctOption,
-            correctAnswer: answer.correctAnswer,
-            blanks: answer.blanks,
-            matchPairs: answer.matchPairs,
-            selectedOption: answer.selectedOption,
-            marks: answer.marks,
-            earnedMarks: answer.earnedMarks,
-            isCorrect: answer.earnedMarks === answer.marks,
-            feedback: answer.feedback,
-            imageUrl: answer.imageUrl,
-          })),
+          answers: detailedAnswers,
         },
       },
     });
@@ -536,11 +694,94 @@ const getSubmissionDetails = async (req, res) => {
   }
 };
 
+// @desc    Update marks for a submission (Teacher only)
+// @route   PATCH /api/submissions/:submissionId/marks
+// @access  Private (Teacher only)
+const updateSubmissionMarks = async (req, res) => {
+  try {
+    const { submissionId } = req.params;
+    const { updatedAnswers } = req.body;
+
+    if (!Array.isArray(updatedAnswers) || updatedAnswers.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Updated answers array is required",
+      });
+    }
+
+    const submission = await Submission.findById(submissionId);
+
+    if (!submission) {
+      return res.status(404).json({
+        success: false,
+        message: "Submission not found",
+      });
+    }
+
+    // Update marks for each answer
+    updatedAnswers.forEach((update) => {
+      let answerIndex = -1;
+
+      // Check if it's an AI-generated question ID (format: ai-0, ai-1, etc.)
+      if (update.questionId?.startsWith("ai-")) {
+        const indexNum = parseInt(update.questionId.replace("ai-", ""), 10);
+        if (
+          !isNaN(indexNum) &&
+          indexNum >= 0 &&
+          indexNum < submission.answers.length
+        ) {
+          answerIndex = indexNum;
+        }
+      } else {
+        // Regular questionId lookup
+        answerIndex = submission.answers.findIndex(
+          (a) => a.questionId?.toString() === update.questionId?.toString()
+        );
+      }
+
+      if (answerIndex !== -1) {
+        const maxMarks = submission.answers[answerIndex].marks || 0;
+        // Ensure earned marks don't exceed maximum marks for the question
+        const cappedMarks = Math.min(update.earnedMarks, maxMarks);
+        submission.answers[answerIndex].earnedMarks = Math.max(0, cappedMarks);
+      }
+    });
+
+    // Recalculate total score from ALL answers
+    const totalScore = submission.answers.reduce(
+      (sum, answer) => sum + (answer.earnedMarks || 0),
+      0
+    );
+    submission.score = totalScore;
+
+    await submission.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Marks updated successfully",
+      data: {
+        submission: {
+          id: submission._id,
+          score: submission.score,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Update marks error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating marks",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
 module.exports = {
   submitQuiz,
   getResult,
   getMySubmissions,
   getQuizSubmissions,
   getSubmissionDetails,
+  updateSubmissionMarks,
   submitValidation,
 };

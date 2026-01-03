@@ -76,6 +76,8 @@ export const submissionAPI = {
   getMy: () => api.get("/submissions/my"),
   getByQuiz: (quizId) => api.get(`/submissions/quiz/${quizId}`),
   getDetails: (submissionId) => api.get(`/submissions/${submissionId}`),
+  updateMarks: (submissionId, data) =>
+    api.patch(`/submissions/${submissionId}/marks`, data),
 };
 
 export const resultAPI = {
