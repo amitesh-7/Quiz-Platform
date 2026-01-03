@@ -24,6 +24,7 @@ const SubmissionDetails = () => {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [editedMarks, setEditedMarks] = useState({});
+  const [editedCorrectAnswers, setEditedCorrectAnswers] = useState({});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -60,24 +61,47 @@ const SubmissionDetails = () => {
     }));
   };
 
+  const handleEditCorrectAnswer = (questionId, value, type = "option") => {
+    setEditedCorrectAnswers((prev) => ({
+      ...prev,
+      [questionId]: { value, type },
+    }));
+  };
+
   const handleSaveMarks = async () => {
     try {
       setSaving(true);
-      const updatedAnswers = Object.entries(editedMarks).map(
-        ([questionId, earnedMarks]) => ({
-          questionId,
-          earnedMarks: parseFloat(earnedMarks),
-        })
-      );
+      const updatedAnswers = Object.keys({
+        ...editedMarks,
+        ...editedCorrectAnswers,
+      }).map((questionId) => {
+        const update = { questionId };
+
+        if (editedMarks[questionId] !== undefined) {
+          update.earnedMarks = parseFloat(editedMarks[questionId]);
+        }
+
+        if (editedCorrectAnswers[questionId]) {
+          const { value, type } = editedCorrectAnswers[questionId];
+          if (type === "option") {
+            update.correctOption = parseInt(value);
+          } else if (type === "answer") {
+            update.correctAnswer = value;
+          }
+        }
+
+        return update;
+      });
 
       await submissionAPI.updateMarks(submissionId, { updatedAnswers });
 
-      toast.success("Marks updated successfully");
+      toast.success("Marks and answers updated successfully");
       setEditMode(false);
       setEditedMarks({});
+      setEditedCorrectAnswers({});
       fetchSubmissionDetails();
     } catch (error) {
-      toast.error("Failed to update marks");
+      toast.error("Failed to update marks and answers");
     } finally {
       setSaving(false);
     }
@@ -86,6 +110,7 @@ const SubmissionDetails = () => {
   const handleCancelEdit = () => {
     setEditMode(false);
     setEditedMarks({});
+    setEditedCorrectAnswers({});
   };
 
   if (loading) {
@@ -382,7 +407,14 @@ const SubmissionDetails = () => {
                           )}
                           <div className="grid grid-cols-1 gap-2 mb-3">
                             {answer.options.map((option, optIdx) => {
-                              const isCorrect = optIdx === answer.correctOption;
+                              const currentCorrect =
+                                editedCorrectAnswers[uniqueId]?.value !==
+                                undefined
+                                  ? parseInt(
+                                      editedCorrectAnswers[uniqueId].value
+                                    )
+                                  : answer.correctOption;
+                              const isCorrect = optIdx === currentCorrect;
                               const isSelected =
                                 optIdx === answer.selectedOption;
                               return (
@@ -395,6 +427,17 @@ const SubmissionDetails = () => {
                                       ? "bg-red-500/20 border border-red-500/50 text-red-300"
                                       : "bg-white/5 border border-white/10 text-gray-400"
                                   }`}
+                                  onClick={() =>
+                                    editMode &&
+                                    handleEditCorrectAnswer(
+                                      uniqueId,
+                                      optIdx,
+                                      "option"
+                                    )
+                                  }
+                                  style={{
+                                    cursor: editMode ? "pointer" : "default",
+                                  }}
                                 >
                                   <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
                                     {String.fromCharCode(65 + optIdx)}
@@ -452,9 +495,29 @@ const SubmissionDetails = () => {
                           <p className="text-xs text-green-400 mb-2 font-medium">
                             Expected Answer:
                           </p>
-                          <div className="text-green-300 whitespace-pre-wrap break-words max-h-[400px] overflow-y-auto leading-relaxed">
-                            {answer.correctAnswer}
-                          </div>
+                          {editMode ? (
+                            <textarea
+                              value={
+                                editedCorrectAnswers[uniqueId]?.value !==
+                                undefined
+                                  ? editedCorrectAnswers[uniqueId].value
+                                  : answer.correctAnswer
+                              }
+                              onChange={(e) =>
+                                handleEditCorrectAnswer(
+                                  uniqueId,
+                                  e.target.value,
+                                  "answer"
+                                )
+                              }
+                              className="w-full px-3 py-2 bg-white/10 text-green-300 rounded border border-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-400 min-h-[100px] resize-y"
+                              placeholder="Enter correct answer"
+                            />
+                          ) : (
+                            <div className="text-green-300 whitespace-pre-wrap break-words max-h-[400px] overflow-y-auto leading-relaxed">
+                              {answer.correctAnswer}
+                            </div>
+                          )}
                         </div>
                         {answer.feedback && (
                           <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">

@@ -740,10 +740,26 @@ const updateSubmissionMarks = async (req, res) => {
       }
 
       if (answerIndex !== -1) {
-        const maxMarks = submission.answers[answerIndex].marks || 0;
-        // Ensure earned marks don't exceed maximum marks for the question
-        const cappedMarks = Math.min(update.earnedMarks, maxMarks);
-        submission.answers[answerIndex].earnedMarks = Math.max(0, cappedMarks);
+        // Update earned marks if provided
+        if (update.earnedMarks !== undefined) {
+          const maxMarks = submission.answers[answerIndex].marks || 0;
+          // Ensure earned marks don't exceed maximum marks for the question
+          const cappedMarks = Math.min(update.earnedMarks, maxMarks);
+          submission.answers[answerIndex].earnedMarks = Math.max(
+            0,
+            cappedMarks
+          );
+        }
+
+        // Update correct option for MCQ questions
+        if (update.correctOption !== undefined) {
+          submission.answers[answerIndex].correctOption = update.correctOption;
+        }
+
+        // Update correct answer for written/fill-blank questions
+        if (update.correctAnswer !== undefined) {
+          submission.answers[answerIndex].correctAnswer = update.correctAnswer;
+        }
       }
     });
 
