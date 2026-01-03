@@ -1879,6 +1879,15 @@ ${answersHTML}
                               questionTypes: ["mcq", "written"],
                               numberOfQuestions: 30,
                             });
+                          } else if (format === "upboard_biology") {
+                            // Auto-configure for UP Board Biology (Class 12)
+                            setGenerateForm({
+                              ...generateForm,
+                              examFormat: format,
+                              language: "bilingual",
+                              questionTypes: ["mcq", "written"],
+                              numberOfQuestions: 29,
+                            });
                           } else if (format === "upboard_sanskrit") {
                             // Auto-configure for UP Board Sanskrit
                             setGenerateForm({
@@ -1916,8 +1925,40 @@ ${answersHTML}
                         <option value="upboard_socialscience">
                           UP Board Social Science (Class 10)
                         </option>
+                        <option value="upboard_biology">
+                          UP Board Biology (Class 12)
+                        </option>
                       </select>
                     </div>
+                    {/* UP Board Biology Info Box */}
+                    {generateForm.examFormat === "upboard_biology" && (
+                      <div className="rounded-lg bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 p-4 border border-green-200 dark:border-green-700">
+                        <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2 flex items-center gap-2">
+                          🧬 UP Board Biology Paper (Class 12) - 70 अंक
+                        </h4>
+                        <div className="text-sm text-green-800 dark:text-green-200 space-y-1">
+                          <p>📋 Paper Code: 348(KH)</p>
+                          <p>
+                            ✓ Q1: 4 MCQs (1 mark each) = 4 marks - Bilingual
+                          </p>
+                          <p>✓ Q2: Very Short Answer (5×1) = 5 marks</p>
+                          <p>✓ Q3: Short Answer Type I (5×2) = 10 marks</p>
+                          <p>✓ Q4-Q6: Short Answer Type II (12×3) = 36 marks</p>
+                          <p>
+                            ✓ Q7-Q9: Long Answer (3×5) = 15 marks with OR
+                            options
+                          </p>
+                          <p className="font-medium mt-2 text-green-900 dark:text-green-100">
+                            Topics: Reproduction, Genetics, Evolution,
+                            Biotechnology, Ecology
+                          </p>
+                          <p className="text-xs mt-2 text-green-700 dark:text-green-300">
+                            💡 Enter "Biology" for variety or specific topic
+                            like "DNA Replication"
+                          </p>
+                        </div>
+                      </div>
+                    )}
                     {/* UP Board Social Science Info Box */}
                     {generateForm.examFormat === "upboard_socialscience" && (
                       <div className="rounded-lg bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 border border-purple-200 dark:border-purple-700">
@@ -2842,6 +2883,12 @@ ${answersHTML}
                               examFormat: format,
                               language: "bilingual",
                             });
+                          } else if (format === "upboard_biology") {
+                            setBulkForm({
+                              ...bulkForm,
+                              examFormat: format,
+                              language: "bilingual",
+                            });
                           } else {
                             setBulkForm({
                               ...bulkForm,
@@ -2870,8 +2917,35 @@ ${answersHTML}
                         <option value="upboard_socialscience">
                           UP Board Social Science (Class 10)
                         </option>
+                        <option value="upboard_biology">
+                          UP Board Biology (Class 12)
+                        </option>
                       </select>
                     </div>
+
+                    {/* UP Board Biology Info Box */}
+                    {bulkForm.examFormat === "upboard_biology" && (
+                      <div className="rounded-lg bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 p-4 border border-green-200 dark:border-green-700">
+                        <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2 flex items-center gap-2">
+                          🧬 UP Board Biology Paper (Class 12) - 70 अंक
+                        </h4>
+                        <div className="text-sm text-green-800 dark:text-green-200 space-y-1">
+                          <p>📋 Paper Code: 348(KH)</p>
+                          <p>
+                            ✓ Q1: 4 MCQs (1 mark each) = 4 marks - Bilingual
+                          </p>
+                          <p>
+                            ✓ Q2: Very Short (5×1) + Q3: Short I (5×2) = 15
+                            marks
+                          </p>
+                          <p>✓ Q4-Q6: Short Answer Type II (12×3) = 36 marks</p>
+                          <p>✓ Q7-Q9: Long Answer with OR (3×5) = 15 marks</p>
+                          <p className="text-xs mt-2 text-green-700 dark:text-green-300">
+                            💡 Enter questions with full context and details
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                     {/* UP Board Social Science Info Box */}
                     {bulkForm.examFormat === "upboard_socialscience" && (
@@ -3528,6 +3602,12 @@ Example:
                               examFormat: format,
                               language: "bilingual",
                             });
+                          } else if (format === "upboard_biology") {
+                            setImageForm({
+                              ...imageForm,
+                              examFormat: format,
+                              language: "bilingual",
+                            });
                           } else {
                             setImageForm({
                               ...imageForm,
@@ -3556,8 +3636,31 @@ Example:
                         <option value="upboard_socialscience">
                           UP Board Social Science (Class 10)
                         </option>
+                        <option value="upboard_biology">
+                          UP Board Biology (Class 12)
+                        </option>
                       </select>
                     </div>
+
+                    {/* UP Board Biology Info Box */}
+                    {imageForm.examFormat === "upboard_biology" && (
+                      <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
+                        <p className="text-green-300 font-medium mb-3">
+                          🧬 UP Board Biology (Class 12) - 70 अंक
+                        </p>
+                        <div className="text-xs text-gray-400 space-y-2">
+                          <p>📋 Paper Code: 348(KH)</p>
+                          <p>• Q1: 4 MCQs (Bilingual)</p>
+                          <p>• Q2: Very Short Answer (5×1 = 5 marks)</p>
+                          <p>• Q3: Short Type I (5×2 = 10 marks)</p>
+                          <p>• Q4-Q6: Short Type II (12×3 = 36 marks)</p>
+                          <p>• Q7-Q9: Long Answer (3×5 = 15 marks) with OR</p>
+                          <p className="text-green-400 mt-2">
+                            💡 Upload clear images of Biology question paper
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                     {/* UP Board Social Science Info Box */}
                     {imageForm.examFormat === "upboard_socialscience" && (

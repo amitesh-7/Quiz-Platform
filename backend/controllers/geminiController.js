@@ -57,6 +57,7 @@ const generateValidation = [
       "upboard_sanskrit",
       "upboard_maths",
       "upboard_socialscience",
+      "upboard_biology",
     ])
     .withMessage("Invalid exam format"),
 ];
@@ -104,6 +105,10 @@ const generateQuestionsController = async (req, res) => {
       questionTypes = ["mcq", "written"];
     } else if (examFormat === "upboard_socialscience") {
       numberOfQuestions = 30; // 20 MCQ + descriptive + map work
+      language = "bilingual";
+      questionTypes = ["mcq", "written"];
+    } else if (examFormat === "upboard_biology") {
+      numberOfQuestions = 29; // 4 MCQ + 5 Very Short + 5 Short(2m) + 12 Short(3m) + 3 Long(5m)
       language = "bilingual";
       questionTypes = ["mcq", "written"];
     }
@@ -268,6 +273,10 @@ const processQuestionsController = async (req, res) => {
       finalMaxMarks = 70;
       finalLanguage = "bilingual";
       finalNumberOfQuestions = 30;
+    } else if (examFormat === "upboard_biology") {
+      finalMaxMarks = 70;
+      finalLanguage = "bilingual";
+      finalNumberOfQuestions = 29;
     }
 
     // Process raw questions with exam format and difficulty
@@ -385,6 +394,9 @@ const extractQuestionsFromImageController = async (req, res) => {
       finalMaxMarks = 70;
       finalLanguage = "bilingual";
     } else if (examFormat === "upboard_socialscience") {
+      finalMaxMarks = 70;
+      finalLanguage = "bilingual";
+    } else if (examFormat === "upboard_biology") {
       finalMaxMarks = 70;
       finalLanguage = "bilingual";
     }

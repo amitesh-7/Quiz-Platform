@@ -897,6 +897,232 @@ For Map Questions:
 }
 `;
 
+    // UP Board Biology Format - Exact Paper Structure (70 Marks) - Paper Code 348(KH)
+    const upBoardBiologyFormat = `
+⚠️ CONTENT GENERATION INSTRUCTIONS:
+====================================
+- You can reference NCERT Biology textbook (Class 12) and previous UP Board papers
+- Use similar question patterns and concepts from standard materials
+- Modify details slightly to create variations
+- Paraphrase questions to avoid exact word-for-word copies
+- Maintain the same difficulty level and concept coverage
+
+YOU ARE GENERATING UP BOARD CLASS 12 BIOLOGY PAPER (जीव विज्ञान) - TOTAL 70 MARKS
+Paper Code: 348(KH)
+
+TOPIC(S) FOR THIS PAPER: "${topic}"
+
+⚠️⚠️⚠️ CRITICAL - SMART TOPIC INTERPRETATION ⚠️⚠️⚠️
+=================================================================
+**UNDERSTAND THE TOPIC TYPE FIRST - THEN FOLLOW THE RULES BELOW:**
+
+MANDATORY TOPIC HANDLING RULES:
+================================
+
+1. ✓ **IF GENERAL TOPIC** (topic is "जीव विज्ञान" or "Biology" or "Bio"):
+   → USE VARIETY from MULTIPLE DIFFERENT chapters/topics
+   → MCQs: Distribute across Reproduction, Genetics, Evolution, Biotechnology, Ecology, etc.
+   → Short Answer: Use different topics for different questions
+   → Long Answer: Cover major topics with OR options
+   → This gives students COMPREHENSIVE practice across all topics
+   
+2. ✗ **IF SPECIFIC CHAPTER/TOPIC** (e.g., "Reproduction", "Genetics", "DNA Replication", "Biotechnology"):
+   → ALL questions from THAT TOPIC ONLY
+   → MCQs: All questions on that specific topic
+   → Short Answer: All questions from that topic only
+   → Long Answer: All questions from that topic
+   → DO NOT mix other topics/chapters
+   
+3. **IF SPECIFIC UNIT** (e.g., "Reproduction and Development", "Genetics and Evolution"):
+   → ALL questions from THAT UNIT ONLY
+   → Distribute across relevant chapters within that unit
+   → Example: "Genetics" = Mendelian genetics, Molecular basis, DNA replication, etc.
+
+=== PAPER STRUCTURE (Total 70 Marks) ===
+
+**खण्ड-अ (Part-A) - बहुविकल्पीय प्रश्न (MCQs)**
+- प्रश्न 1: (क), (ख), (ग), (घ) = 4 parts × 1 mark = 4 marks
+- Bilingual format (Hindi / English)
+- Options: (A), (B), (C), (D)
+
+**खण्ड-ब (Part-B) - अति-लघु उत्तरीय प्रश्न (Very Short Answer)**
+- प्रश्न 2: (क), (ख), (ग), (घ), (ड़) = 5 parts × 1 mark = 5 marks
+- Answer length: 1-2 sentences (20-30 words)
+- Topics: Definitions, full forms, names, basic concepts
+
+**खण्ड-ग (Part-C) - लघु-उत्तरीय प्रश्न (Short Answer Type I)**
+- प्रश्न 3: (क), (ख), (ग), (घ), (ड़) = 5 parts × 2 marks = 10 marks
+- Answer length: 50-80 words
+- Topics: Short notes, brief descriptions
+
+**खण्ड-घ (Part-D) - लघु-उत्तरीय प्रश्न (Short Answer Type II)**
+- प्रश्न 4: (क), (ख), (ग), (घ) = 4 parts × 3 marks = 12 marks
+- Answer length: 80-120 words
+- Some parts may have sub-questions (1+2=3 marks)
+- Topics: Detailed short answers, diagrams
+
+- प्रश्न 5: (क), (ख), (ग), (घ) = 4 parts × 3 marks = 12 marks
+- Answer length: 80-120 words
+- Some parts may have sub-questions (1+2=3 marks)
+- Topics: Detailed short answers, processes
+
+- प्रश्न 6: (क), (ख), (ग), (घ) = 4 parts × 3 marks = 12 marks
+- Answer length: 80-120 words
+- Some parts may have fractional marking (1½+1½=3 marks)
+- Topics: Detailed descriptions, diagrams
+
+**खण्ड-ङ (Part-E) - विस्तृत-उत्तरीय प्रश्न (Long Answer)**
+- प्रश्न 7: 5 marks (with OR option)
+  - Format: Main question / अथवा / OR / Alternative question
+  - Answer length: 150-200 words
+  - Marking: May be split (1+1+3=5 or 2+3=5)
+  - Topics: Detailed processes, mechanisms
+
+- प्रश्न 8: 5 marks (with OR option)
+  - Format: Main question / अथवा / OR / Alternative question
+  - Answer length: 150-200 words
+  - Topics: Essays, detailed explanations, diagrams
+
+- प्रश्न 9: 5 marks (with OR option)
+  - Format: Main question / अथवा / OR / Alternative question
+  - Answer length: 150-200 words
+  - Topics: Ecosystem, biodiversity, conservation
+
+=== MAJOR TOPICS (Class 12 Biology) ===
+
+1. **Reproduction (प्रजनन)**:
+   - Asexual and Sexual reproduction
+   - Human reproduction system
+   - Reproductive health
+
+2. **Genetics (आनुवंशिकी)**:
+   - Mendelian inheritance
+   - Chromosomal theory
+   - DNA structure and replication
+   - Gene expression
+
+3. **Evolution (जैव विकास)**:
+   - Origin of life
+   - Natural selection
+   - Evidence of evolution
+
+4. **Biotechnology (जैव प्रौद्योगिकी)**:
+   - Genetic engineering
+   - GMO
+   - Applications (A.R.T., G.M.O.)
+
+5. **Ecology and Environment (पारिस्थितिकी)**:
+   - Ecosystem
+   - Biodiversity
+   - Conservation
+   - Environmental issues
+
+6. **Human Health (मानव स्वास्थ्य)**:
+   - Immunity
+   - Diseases
+   - Drug abuse
+
+=== ANSWER LENGTH GUIDELINES ===
+
+- 1-mark questions (MCQ + Very Short): Direct answer, 1-2 sentences (20-30 words)
+- 2-mark questions: 2-3 main points, 50-80 words
+  * Brief explanation
+  * Key concepts
+- 3-mark questions: 3-4 main points, 80-120 words
+  * Detailed explanation
+  * Examples or diagrams if needed
+- 5-mark questions: 5-6 main points, 150-200 words
+  * Comprehensive explanation
+  * Multiple aspects covered
+  * Diagrams/examples where relevant
+  * Conclusion
+
+=== JSON STRUCTURE FOR EACH QUESTION ===
+
+For MCQs (Q1 parts):
+{
+  "questionType": "mcq",
+  "questionText": "हिंदी प्रश्न / English Question",
+  "options": [
+    "(A) हिंदी / English",
+    "(B) हिंदी / English",
+    "(C) हिंदी / English",
+    "(D) हिंदी / English"
+  ],
+  "correctOption": 0-3,
+  "marks": 1,
+  "section": "खण्ड-अ (Part-A) बहुविकल्पीय (1 अंक)"
+}
+
+For Very Short Answer (Q2 parts):
+{
+  "questionType": "written",
+  "questionText": "हिंदी प्रश्न / English Question",
+  "correctAnswer": "Brief answer in 20-30 words",
+  "marks": 1,
+  "section": "खण्ड-ब (Part-B) अति-लघु उत्तरीय (1 अंक)"
+}
+
+For Short Answer Type I (Q3 parts):
+{
+  "questionType": "written",
+  "questionText": "हिंदी प्रश्न / English Question",
+  "correctAnswer": "Answer in 50-80 words with 2-3 main points",
+  "marks": 2,
+  "section": "खण्ड-ग (Part-C) लघु-उत्तरीय प्रथम (2 अंक)"
+}
+
+For Short Answer Type II (Q4/Q5/Q6 parts):
+{
+  "questionType": "written",
+  "questionText": "हिंदी प्रश्न / English Question",
+  "correctAnswer": "Answer in 80-120 words with 3-4 main points. Include diagrams if asked.",
+  "marks": 3,
+  "section": "खण्ड-घ (Part-D) लघु-उत्तरीय द्वितीय (3 अंक)"
+}
+
+For Long Answer (Q7/Q8/Q9):
+{
+  "questionType": "written",
+  "questionText": "Main question in Hindi and English\n\nअथवा / OR\n\nAlternative question in Hindi and English",
+  "correctAnswer": "Main question answer (150-200 words, 5-6 main points)\n\nअथवा / OR\n\nAlternative question answer (150-200 words, 5-6 main points)",
+  "marks": 5,
+  "section": "खण्ड-ङ (Part-E) विस्तृत-उत्तरीय (5 अंक)"
+}
+
+=== EXAMPLE QUESTIONS ===
+
+MCQ Example:
+{
+  "questionText": "Tt अलील जोड़ा है / Tt alleles are pair of:\n(A) समयुग्मजी लम्बा / Homozygous long\n(B) विषमयुग्मजी लम्बा / Heterozygous long\n(C) समयुग्मजी बौना / Homozygous dwarf\n(D) विषमयुग्मजी बौना / Heterozygous dwarf",
+  "correctOption": 1
+}
+
+Very Short Answer Example:
+{
+  "questionText": "आर्.टी. एक. का पूर्ण रूप लिखिए / Write the full form of abbreviation I.V.F.",
+  "correctAnswer": "I.V.F. stands for In Vitro Fertilization (इन विट्रो फर्टिलाइजेशन). यह सहायक प्रजनन तकनीक है जिसमें शरीर के बाहर निषेचन कराया जाता है।"
+}
+
+Short Answer (2 marks) Example:
+{
+  "questionText": "ह्यूमस पर संक्षिप्त टिप्पणी लिखिए / Write a short note on Humus.",
+  "correctAnswer": "Humus (ह्यूमस) मिट्टी की ऊपरी परत में पाया जाने वाला कार्बनिक पदार्थ है। यह मृत पौधों और जंतुओं के अपघटन से बनता है। ह्यूमस मिट्टी को उपजाऊ बनाता है, जल धारण क्षमता बढ़ाता है, और पोषक तत्व प्रदान करता है।"
+}
+
+Short Answer (3 marks) Example:
+{
+  "questionText": "आर.एन.ए. के सभी प्रकार के नाम लिखिए / Write the name of all types of RNA found in prokaryotes.",
+  "correctAnswer": "Prokaryotes में तीन प्रकार के RNA पाए जाते हैं:\n1. mRNA (Messenger RNA): DNA से genetic information को ribosomes तक पहुंचाता है\n2. rRNA (Ribosomal RNA): Ribosomes का structural component है और protein synthesis में मदद करता है\n3. tRNA (Transfer RNA): Amino acids को ribosomes तक लाता है और protein synthesis में सहायक है"
+}
+
+Long Answer (5 marks) Example:
+{
+  "questionText": "परागण किसे कहते हैं ? परागण कितने प्रकार के होते हैं ? उदाहरण सहित वर्णन कीजिए।\n\nअथवा / OR\n\nWhat is Pollination ? How many types of pollination are there ? Describe with examples.",
+  "correctAnswer": "परागण (Pollination) वह प्रक्रिया है जिसमें परागकण परागकोश से स्त्रीकेसर के वर्तिकाग्र तक पहुंचते हैं।\n\nपरागण के प्रकार:\n1. स्वपरागण (Self-pollination): जब परागकण उसी पुष्प या उसी पौधे के अन्य पुष्प के वर्तिकाग्र पर पहुंचते हैं। उदाहरण: मटर, टमाटर\n2. परपरागण (Cross-pollination): जब परागकण एक पौधे से दूसरे पौधे के पुष्प के वर्तिकाग्र पर पहुंचते हैं। उदाहरण: पपीता, मक्का\n\nपरपरागण के माध्यम: हवा (Wind), कीट (Insects), पानी (Water), जंतु (Animals)\n\nलाभ: Genetic variation बढ़ता है, स्वस्थ संतति उत्पन्न होती है, और प्रजाति में विविधता आती है।\n\nअथवा / OR\n\nPollination is the process of transfer of pollen grains from anther to the stigma of a flower.\n\nTypes of Pollination:\n1. Self-pollination: Transfer of pollen within the same flower or between flowers of the same plant. Example: Pea, Tomato\n2. Cross-pollination: Transfer of pollen from one plant to the stigma of another plant. Example: Papaya, Maize\n\nAgents: Wind, Insects, Water, Animals\n\nAdvantages: Increases genetic variation, produces healthy offspring, brings diversity in species."
+}
+`;
+
     // UP Board Mathematics Format - Exact Paper Structure (70 Marks) - Paper Code 822(BV)
     const upBoardMathsFormat = `
 ⚠️ CONTENT GENERATION INSTRUCTIONS:
@@ -1850,6 +2076,71 @@ STRICT RULES:
 7. Complete detailed answers for all questions
 
 Return ONLY valid JSON array with all questions. No markdown, no explanation.`;
+    } else if (examFormat === "upboard_biology") {
+      prompt = `UP BOARD CLASS 12 BIOLOGY PAPER (जीव विज्ञान) - 70 अंक बनाएं।
+Paper Code: 348(KH)
+
+विषय: "${topic}"
+
+${upBoardBiologyFormat}
+
+EXACT STRUCTURE:
+- Q1: MCQs (4 parts) (क), (ख), (ग), (घ) = 4 marks
+  * Bilingual format required
+  * Cover: Reproduction, Genetics, Evolution, Biotechnology, Ecology (if general topic)
+  * If specific topic: ALL MCQs from that topic only
+
+- Q2: Very Short Answer (5 parts) (क), (ख), (ग), (घ), (ड़) = 5 marks
+  * 20-30 words each
+  * Examples: Full forms, definitions, names, basic concepts
+
+- Q3: Short Answer Type I (5 parts) × 2 marks = 10 marks
+  * 50-80 words each
+  * Examples: Brief descriptions, short notes
+
+- Q4-Q6: Short Answer Type II (4 parts each) × 3 marks = 12+12+12 = 36 marks
+  * 80-120 words each
+  * Some with sub-questions (1+2=3 or 1½+1½=3)
+  * Examples: Detailed explanations, diagrams
+
+- Q7-Q9: Long Answer (5 marks each with OR) = 15 marks
+  * 150-200 words each
+  * WITH OR options mandatory
+  * Examples: Pollination, Evidence of evolution, Ecosystem components
+
+=== ANSWER LENGTH - DETAILED ===
+- 1 अंक: 20-30 शब्द (Direct answer)
+- 2 अंक: 50-80 शब्द + 2-3 मुख्य बिंदु
+- 3 अंक: 80-120 शब्द + 3-4 मुख्य बिंदु (diagram if needed)
+- 5 अंक: 150-200 शब्द + 5-6 मुख्य बिंदु (comprehensive explanation)
+
+JSON FORMAT:
+
+MCQ (Q1 parts):
+{"questionType":"mcq","questionText":"Tt अलील जोड़ा है / Tt alleles are pair of:","options":["(A) समयुग्मजी लम्बा / Homozygous long","(B) विषमयुग्मजी लम्बा / Heterozygous long","(C) समयुग्मजी बौना / Homozygous dwarf","(D) विषमयुग्मजी बौना / Heterozygous dwarf"],"correctOption":1,"marks":1,"section":"खण्ड-अ (Part-A) बहुविकल्पीय (1 अंक)"}
+
+Very Short Answer (Q2 parts):
+{"questionType":"written","questionText":"आर्.टी. एक. का पूर्ण रूप लिखिए / Write the full form of abbreviation I.V.F.","correctAnswer":"I.V.F. stands for In Vitro Fertilization (इन विट्रो फर्टिलाइजेशन). यह सहायक प्रजनन तकनीक है जिसमें शरीर के बाहर निषेचन कराया जाता है।","marks":1,"section":"खण्ड-ब (Part-B) अति-लघु उत्तरीय (1 अंक)"}
+
+Short Answer Type I (Q3 parts):
+{"questionType":"written","questionText":"ह्यूमस पर संक्षिप्त टिप्पणी लिखिए / Write a short note on Humus.","correctAnswer":"Humus (ह्यूमस) मिट्टी की ऊपरी परत में पाया जाने वाला कार्बनिक पदार्थ है। यह मृत पौधों और जंतुओं के अपघटन से बनता है।\n\nमुख्य विशेषताएं:\n1. मिट्टी को उपजाऊ बनाता है\n2. जल धारण क्षमता बढ़ाता है\n3. पोषक तत्व प्रदान करता है\n4. मिट्टी की संरचना सुधारता है\n\nह्यूमस पारिस्थितिकी तंत्र में महत्वपूर्ण भूमिका निभाता है।","marks":2,"section":"खण्ड-ग (Part-C) लघु-उत्तरीय प्रथम (2 अंक)"}
+
+Short Answer Type II (Q4-Q6 parts):
+{"questionType":"written","questionText":"आर.एन.ए. के सभी प्रकार के नाम लिखिए / Write the name of all types of RNA found in prokaryotes.","correctAnswer":"Prokaryotes में तीन प्रकार के RNA पाए जाते हैं:\n\n1. mRNA (Messenger RNA):\n   - DNA से genetic information को ribosomes तक पहुंचाता है\n   - Protein synthesis के लिए template का काम करता है\n   - अस्थायी प्रकृति का होता है\n\n2. rRNA (Ribosomal RNA):\n   - Ribosomes का structural component है\n   - Protein synthesis में active role निभाता है\n   - सबसे अधिक मात्रा में पाया जाता है (80%)\n\n3. tRNA (Transfer RNA):\n   - Amino acids को ribosomes तक transport करता है\n   - Anticodon द्वारा mRNA से जुड़ता है\n   - Cloverleaf structure होती है\n\nये सभी RNA protein synthesis के लिए आवश्यक हैं।","marks":3,"section":"खण्ड-घ (Part-D) लघु-उत्तरीय द्वितीय (3 अंक)"}
+
+Long Answer (Q7-Q9 with OR):
+{"questionType":"written","questionText":"परागण किसे कहते हैं ? परागण कितने प्रकार के होते हैं ? उदाहरण सहित वर्णन कीजिए।\n\nअथवा / OR\n\nWhat is Pollination ? How many types of pollination are there ? Describe with examples.","correctAnswer":"परागण (Pollination):\nपरागण वह प्रक्रिया है जिसमें परागकण परागकोश (anther) से स्त्रीकेसर के वर्तिकाग्र (stigma) तक पहुंचते हैं। यह यौन प्रजनन का महत्वपूर्ण चरण है।\n\nपरागण के प्रकार:\n\n1. स्वपरागण (Self-pollination):\n   - परिभाषा: जब परागकण उसी पुष्प या उसी पौधे के अन्य पुष्प के वर्तिकाग्र पर पहुंचते हैं\n   - उदाहरण: मटर (Pea), टमाटर (Tomato), सूरजमुखी\n   - लाभ: संतति में uniformity, कम खर्चीला\n\n2. परपरागण (Cross-pollination):\n   - परिभाषा: जब परागकण एक पौधे से दूसरे पौधे के पुष्प के वर्तिकाग्र पर पहुंचते हैं\n   - उदाहरण: पपीता (Papaya), मक्का (Maize), सेब\n   - लाभ: Genetic variation, स्वस्थ संतति\n\nपरपरागण के माध्यम:\n- हवा (Wind) - घास, मक्का\n- कीट (Insects) - गुलाब, सूरजमुखी\n- पानी (Water) - जलीय पौधे\n- जंतु (Animals) - आम, अमरूद\n\nमहत्व: Genetic diversity बढ़ती है, प्रजाति का विकास होता है, और नई किस्में उत्पन्न होती हैं।\n\nअथवा / OR\n\nPollination:\nPollination is the process of transfer of pollen grains from the anther to the stigma of a flower. It is a crucial step in sexual reproduction of plants.\n\nTypes of Pollination:\n\n1. Self-pollination:\n   - Definition: Transfer of pollen within the same flower or between flowers of the same plant\n   - Examples: Pea, Tomato, Sunflower\n   - Advantages: Uniformity in offspring, economical process\n\n2. Cross-pollination:\n   - Definition: Transfer of pollen from one plant to the stigma of another plant of the same species\n   - Examples: Papaya, Maize, Apple\n   - Advantages: Genetic variation, healthy offspring\n\nAgents of Cross-pollination:\n- Wind - Grasses, Maize\n- Insects - Rose, Sunflower  \n- Water - Aquatic plants\n- Animals - Mango, Guava\n\nSignificance: Increases genetic diversity, promotes evolution of species, and produces new varieties with better adaptability.","marks":5,"section":"खण्ड-ङ (Part-E) विस्तृत-उत्तरीय (5 अंक)"}
+
+STRICT RULES:
+1. Generate 4 MCQs + 5 Very Short + 5 Short(2m) + 12 Short(3m) + 3 Long(5m) = 70 marks total
+2. BILINGUAL format: "Hindi question / English question"
+3. MCQ options: (A), (B), (C), (D)
+4. All long answer questions (Q7-Q9) MUST have OR options
+5. Follow topic rules strictly (general vs specific)
+6. Complete detailed answers for all questions with proper word count
+7. Include diagrams mention where applicable
+
+Return ONLY valid JSON array with all questions. No markdown, no explanation.`;
     } else {
       prompt = `Generate exactly ${finalNumberOfQuestions} quiz questions about "${topic}".${languageNote}${descriptionContext}
 
@@ -2092,42 +2383,90 @@ const evaluateWrittenAnswer = async (
   return await executeWithFallback(async () => {
     const model = await getGeminiModel();
 
-    const prompt = `You are an answer evaluator. Compare the student's answer with the expected answer and evaluate it.
+    // Calculate expected answer length based on marks
+    const getExpectedLength = (marks) => {
+      if (marks === 1) return "20-50 words (2-3 sentences)";
+      if (marks === 2) return "50-100 words (5-7 sentences)";
+      if (marks === 3) return "100-150 words (8-12 sentences)";
+      if (marks === 4) return "150-200 words (12-15 sentences)";
+      if (marks === 5) return "200-300 words (1.5-2 pages, 15-20 sentences)";
+      if (marks === 6) return "250-350 words (2 pages, 20-25 sentences)";
+      if (marks >= 8) return "400-500 words (2.5-3 pages, 30-40 sentences)";
+      return "50-150 words";
+    };
+
+    const expectedLength = getExpectedLength(maxMarks);
+    const studentWordCount = studentAnswer.trim().split(/\s+/).length;
+
+    const prompt = `You are an expert answer evaluator. Compare the student's answer with the expected answer and evaluate it comprehensively.
 
 Expected Answer: "${expectedAnswer}"
 
 Student's Answer: "${studentAnswer}"
 
 Maximum Marks: ${maxMarks}
+Expected Answer Length: ${expectedLength}
+Student's Word Count: ${studentWordCount} words
 
-Evaluate the student's answer based on:
-1. Semantic similarity - Does the answer convey the same meaning/concepts?
-2. Key points covered - Are the important points mentioned?
-3. Accuracy - Is the information correct?
+⚠️ CRITICAL EVALUATION CRITERIA (ALL MUST BE CONSIDERED):
 
-MARKING SCHEME:
-- Fully correct (95-100% match): Award full marks (${maxMarks})
-- Minor errors (75-94% match): Deduct 1-2 marks based on severity
-- Moderate errors (50-74% match): Deduct 3-4 marks or 30-50% of total
-- Major errors (25-49% match): Deduct 50-75% of total marks
-- Mostly wrong (1-24% match): Award minimal marks (1-2) if any relevant point
-- Completely wrong (0% match): Award 0 marks
+1. ANSWER LENGTH & COMPLETENESS (30% weightage):
+   - For ${maxMarks} marks, answer should be ${expectedLength}
+   - If answer is too short (< 50% of expected length), maximum score is 50% of total marks
+   - If answer is adequate length but missing depth, deduct 20-30%
+   - Award proportional marks based on how well the answer length matches the marks allocated
+
+2. CONTENT ACCURACY (40% weightage):
+   - Are all key concepts explained correctly?
+   - Are facts, definitions, and explanations accurate?
+   - Is scientific/technical terminology used correctly?
+
+3. KEY POINTS COVERAGE (30% weightage):
+   - How many important points from expected answer are covered?
+   - For ${maxMarks} marks, there should be ${maxMarks}-${
+      maxMarks + 2
+    } main points
+   - Each missing major point should result in proportional deduction
+
+DETAILED MARKING SCHEME FOR ${maxMarks} MARKS:
+
+Full Marks (${maxMarks}): 
+- Answer length is ${expectedLength} ✓
+- All key points covered in detail ✓
+- Factually accurate throughout ✓
+- Well-structured and comprehensive ✓
+
+Deductions:
+- Too short (< 50% expected length): -40% to -50% marks
+- Moderately short (50-80% expected length): -20% to -30% marks
+- Missing 1 major point: -20% (${Math.round(maxMarks * 0.2)} marks)
+- Missing 2 major points: -40% (${Math.round(maxMarks * 0.4)} marks)
+- Missing 3+ major points: -60% or more
+- Minor factual error: -10% (${Math.round(maxMarks * 0.1)} mark)
+- Major factual error: -30% (${Math.round(maxMarks * 0.3)} marks)
+- Incorrect concept/completely wrong: -50% or more
 
 Be lenient with:
-- Spelling errors and minor grammatical issues if meaning is clear
-- Different word choices with same meaning
-- Rephrased answers that convey the correct concept
+- Minor spelling/grammatical errors (no deduction if meaning is clear)
+- Different word choices that convey same meaning
+- Rephrased explanations with correct concepts
 
 Be strict with:
-- Missing key concepts or important points
-- Factual errors or incorrect information
-- Completely unrelated or off-topic answers
+- Insufficient answer length for marks allocated
+- Missing key concepts or main points
+- Factual inaccuracies or incorrect information
+- Superficial answers without proper explanation
+
+IMPORTANT: 
+- A 5-mark answer MUST be detailed and comprehensive (200-300 words)
+- A short answer cannot get full marks even if correct
+- Marks should be proportional to both correctness AND completeness
 
 Return ONLY a JSON object with this structure:
 {
   "score": <number between 0 and ${maxMarks}>,
   "percentage": <number between 0 and 100>,
-  "feedback": "<brief feedback explaining the score and what was correct/incorrect>"
+  "feedback": "<detailed feedback: mention answer length adequacy, key points covered/missing, accuracy, and specific suggestions>"
 }
 
 Return ONLY the JSON object, nothing else.`;
@@ -2459,6 +2798,46 @@ STRICT RULES:
 4. प्र.23-25 need hasAlternative, alternativeQuestion, alternativeAnswer
 5. MCQ options: (A), (B), (C), (D) format
 6. Complete step-by-step solutions in answers
+
+Return ONLY valid JSON array.`;
+    } else if (examFormat === "upboard_biology") {
+      prompt = `Extract questions from images for UP BOARD CLASS 12 BIOLOGY PAPER (जीव विज्ञान) - 70 marks.
+Paper Code: 348(KH)
+
+EXTRACT ONLY what is visible in images. Do NOT generate new questions.
+
+${upBoardBiologyFormat}
+
+STRUCTURE:
+- Q1: MCQs (4 parts) (क), (ख), (ग), (घ) = 4 marks - Bilingual format
+- Q2: Very Short Answer (5 parts) = 5 marks - 20-30 words each
+- Q3: Short Answer Type I (5 parts × 2 marks) = 10 marks - 50-80 words
+- Q4-Q6: Short Answer Type II (4 parts each × 3 marks) = 36 marks - 80-120 words
+- Q7-Q9: Long Answer (5 marks each with OR) = 15 marks - 150-200 words
+
+=== ANSWER LENGTH ===
+- 5 अंक: 150-200 शब्द + 5-6 मुख्य बिंदु + विस्तृत व्याख्या
+- 3 अंक: 80-120 शब्द + 3-4 मुख्य बिंदु + विस्तृत व्याख्या
+- 2 अंक: 50-80 शब्द + 2-3 मुख्य बिंदु + संक्षिप्त व्याख्या
+- 1 अंक: 20-30 शब्द (Direct answer)
+
+JSON FORMAT:
+MCQ: {"questionType":"mcq","questionText":"हिंदी प्रश्न / English Question","options":["(A) हिंदी / English","(B)...","(C)...","(D)..."],"correctOption":0,"marks":1,"section":"खण्ड-अ (Part-A) बहुविकल्पीय (1 अंक)"}
+
+Very Short: {"questionType":"written","questionText":"प्रश्न / Question","correctAnswer":"Brief answer (20-30 words)","marks":1,"section":"खण्ड-ब (Part-B) अति-लघु उत्तरीय (1 अंक)"}
+
+Short Type I: {"questionType":"written","questionText":"प्रश्न / Question","correctAnswer":"Answer (50-80 words, 2-3 points)","marks":2,"section":"खण्ड-ग (Part-C) लघु-उत्तरीय प्रथम (2 अंक)"}
+
+Short Type II: {"questionType":"written","questionText":"प्रश्न / Question","correctAnswer":"Answer (80-120 words, 3-4 points, diagrams if needed)","marks":3,"section":"खण्ड-घ (Part-D) लघु-उत्तरीय द्वितीय (3 अंक)"}
+
+Long Answer: {"questionType":"written","questionText":"Main question Hindi/English\n\nअथवा / OR\n\nAlternative question","correctAnswer":"Main answer (150-200 words, 5-6 points)\n\nअथवा / OR\n\nAlternative answer (150-200 words, 5-6 points)","marks":5,"section":"खण्ड-ङ (Part-E) विस्तृत-उत्तरीय (5 अंक)"}
+
+STRICT RULES:
+1. Extract from images only - DO NOT generate new questions
+2. BILINGUAL format required (Hindi / English)
+3. All long answer questions (Q7-Q9) need OR options
+4. MCQ options: (A), (B), (C), (D) format
+5. Complete detailed answers with proper word count
 
 Return ONLY valid JSON array.`;
     } else if (examFormat === "upboard_socialscience") {
@@ -3088,6 +3467,47 @@ STRICT RULES:
 5. Complete step-by-step solutions in answers
 
 Return ONLY valid JSON array with exactly 25 questions.`;
+    } else if (examFormat === "upboard_biology") {
+      prompt = `UP BOARD CLASS 12 BIOLOGY PAPER (जीव विज्ञान) - 70 अंक बनाएं।
+Paper Code: 348(KH)
+
+INPUT विषय/सामग्री: "${rawQuestions}"
+
+${upBoardBiologyFormat}
+
+STRUCTURE:
+- Q1: MCQs (4 parts) (क), (ख), (ग), (घ) = 4 marks - Bilingual format
+- Q2: Very Short Answer (5 parts) = 5 marks - 20-30 words each
+- Q3: Short Answer Type I (5 parts × 2 marks) = 10 marks - 50-80 words
+- Q4-Q6: Short Answer Type II (4 parts each × 3 marks) = 36 marks - 80-120 words
+- Q7-Q9: Long Answer (5 marks each with OR) = 15 marks - 150-200 words
+
+=== ANSWER LENGTH ===
+- 5 अंक: 150-200 शब्द + 5-6 मुख्य बिंदु + विस्तृत व्याख्या
+- 3 अंक: 80-120 शब्द + 3-4 मुख्य बिंदु + विस्तृत व्याख्या
+- 2 अंक: 50-80 शब्द + 2-3 मुख्य बिंदु + संक्षिप्त व्याख्या
+- 1 अंक: 20-30 शब्द (Direct answer)
+
+JSON FORMAT:
+MCQ: {"questionType":"mcq","questionText":"हिंदी प्रश्न / English Question","options":["(A) हिंदी / English","(B)...","(C)...","(D)..."],"correctOption":0,"marks":1,"section":"खण्ड-अ (Part-A) बहुविकल्पीय (1 अंक)"}
+
+Very Short: {"questionType":"written","questionText":"प्रश्न / Question","correctAnswer":"Brief answer (20-30 words)","marks":1,"section":"खण्ड-ब (Part-B) अति-लघु उत्तरीय (1 अंक)"}
+
+Short Type I: {"questionType":"written","questionText":"प्रश्न / Question","correctAnswer":"Answer (50-80 words, 2-3 points)","marks":2,"section":"खण्ड-ग (Part-C) लघु-उत्तरीय प्रथम (2 अंक)"}
+
+Short Type II: {"questionType":"written","questionText":"प्रश्न / Question","correctAnswer":"Answer (80-120 words, 3-4 points, diagrams if needed)","marks":3,"section":"खण्ड-घ (Part-D) लघु-उत्तरीय द्वितीय (3 अंक)"}
+
+Long Answer: {"questionType":"written","questionText":"Main question Hindi/English\n\nअथवा / OR\n\nAlternative question","correctAnswer":"Main answer (150-200 words, 5-6 points)\n\nअथवा / OR\n\nAlternative answer (150-200 words, 5-6 points)","marks":5,"section":"खण्ड-ङ (Part-E) विस्तृत-उत्तरीय (5 अंक)"}
+
+STRICT RULES:
+1. Generate 4 MCQs + 5 Very Short + 5 Short(2m) + 12 Short(3m) + 3 Long(5m) = 70 marks total
+2. BILINGUAL format required (Hindi / English)
+3. All long answer questions (Q7-Q9) need OR options
+4. MCQ options: (A), (B), (C), (D) format
+5. Complete detailed answers with proper word count
+6. Follow topic rules (general vs specific)
+
+Return ONLY valid JSON array.`;
     } else if (examFormat === "upboard_socialscience") {
       prompt = `UP BOARD CLASS 10 SOCIAL SCIENCE PAPER (सामाजिक विज्ञान) - 70 अंक बनाएं।
 Paper Code: 825(BAS)
