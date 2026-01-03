@@ -1888,6 +1888,15 @@ ${answersHTML}
                               questionTypes: ["mcq", "written"],
                               numberOfQuestions: 29,
                             });
+                          } else if (format === "upboard_englishclass12") {
+                            // Auto-configure for UP Board English (Class 12)
+                            setGenerateForm({
+                              ...generateForm,
+                              examFormat: format,
+                              language: "english",
+                              questionTypes: ["mcq", "written"],
+                              numberOfQuestions: 20,
+                            });
                           } else if (format === "upboard_sanskrit") {
                             // Auto-configure for UP Board Sanskrit
                             setGenerateForm({
@@ -1928,6 +1937,9 @@ ${answersHTML}
                         <option value="upboard_biology">
                           UP Board Biology (Class 12)
                         </option>
+                        <option value="upboard_englishclass12">
+                          UP Board English (Class 12)
+                        </option>
                       </select>
                     </div>
                     {/* UP Board Biology Info Box */}
@@ -1955,6 +1967,42 @@ ${answersHTML}
                           <p className="text-xs mt-2 text-green-700 dark:text-green-300">
                             💡 Enter "Biology" for variety or specific topic
                             like "DNA Replication"
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {/* UP Board English Class 12 Info Box */}
+                    {generateForm.examFormat === "upboard_englishclass12" && (
+                      <div className="rounded-lg bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 p-4 border border-blue-200 dark:border-blue-700">
+                        <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
+                          📖 UP Board English Paper (Class 12) - 100 अंक | 20
+                          Questions
+                        </h4>
+                        <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                          <p>📋 Paper Code: 316(HV)</p>
+                          <p>
+                            ✓ Section A: Reading (25 marks) - 5 questions
+                            (comprehension + vocabulary)
+                          </p>
+                          <p>
+                            ✓ Section B: Writing (20 marks) - 2 questions
+                            (Article 10m + Letter/Application 10m)
+                          </p>
+                          <p>
+                            ✓ Section C: Grammar (15 marks) - 6 questions (5
+                            MCQs × 2m + Translation 5m)
+                          </p>
+                          <p>
+                            ✓ Section D: Literature (40 marks) - 7 questions
+                            (Prose 3 + Poetry 2 + Vistas 2)
+                          </p>
+                          <p className="font-medium mt-2 text-blue-900 dark:text-blue-100">
+                            Topics: Flamingo (The Last Lesson, Lost Spring, Deep
+                            Water) & Vistas (The Tiger King)
+                          </p>
+                          <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
+                            💡 Enter "English" for variety or specific "My
+                            Mother at Sixty-six"
                           </p>
                         </div>
                       </div>
@@ -2889,6 +2937,12 @@ ${answersHTML}
                               examFormat: format,
                               language: "bilingual",
                             });
+                          } else if (format === "upboard_englishclass12") {
+                            setBulkForm({
+                              ...bulkForm,
+                              examFormat: format,
+                              language: "english",
+                            });
                           } else {
                             setBulkForm({
                               ...bulkForm,
@@ -2920,6 +2974,9 @@ ${answersHTML}
                         <option value="upboard_biology">
                           UP Board Biology (Class 12)
                         </option>
+                        <option value="upboard_englishclass12">
+                          UP Board English (Class 12)
+                        </option>
                       </select>
                     </div>
 
@@ -2942,6 +2999,35 @@ ${answersHTML}
                           <p>✓ Q7-Q9: Long Answer with OR (3×5) = 15 marks</p>
                           <p className="text-xs mt-2 text-green-700 dark:text-green-300">
                             💡 Enter questions with full context and details
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* UP Board English Class 12 Info Box */}
+                    {bulkForm.examFormat === "upboard_englishclass12" && (
+                      <div className="rounded-lg bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 p-4 border border-blue-200 dark:border-blue-700">
+                        <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
+                          📖 UP Board English Paper (Class 12) - 100 अंक | 20
+                          Questions
+                        </h4>
+                        <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                          <p>📋 Paper Code: 316(HV)</p>
+                          <p>✓ Section A: Reading (25 marks) - 5 questions</p>
+                          <p>
+                            ✓ Section B: Writing (20 marks) - 2 questions
+                            (Article + Letter/Application with OR)
+                          </p>
+                          <p>
+                            ✓ Section C: Grammar (15 marks) - 6 questions (MCQs
+                            + Translation)
+                          </p>
+                          <p>
+                            ✓ Section D: Literature (40 marks) - 7 questions
+                            (Flamingo & Vistas with OR)
+                          </p>
+                          <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
+                            💡 Paste all questions from your paper with sections
                           </p>
                         </div>
                       </div>
@@ -3608,6 +3694,12 @@ Example:
                               examFormat: format,
                               language: "bilingual",
                             });
+                          } else if (format === "upboard_englishclass12") {
+                            setImageForm({
+                              ...imageForm,
+                              examFormat: format,
+                              language: "english",
+                            });
                           } else {
                             setImageForm({
                               ...imageForm,
@@ -3639,6 +3731,9 @@ Example:
                         <option value="upboard_biology">
                           UP Board Biology (Class 12)
                         </option>
+                        <option value="upboard_englishclass12">
+                          UP Board English (Class 12)
+                        </option>
                       </select>
                     </div>
 
@@ -3657,6 +3752,39 @@ Example:
                           <p>• Q7-Q9: Long Answer (3×5 = 15 marks) with OR</p>
                           <p className="text-green-400 mt-2">
                             💡 Upload clear images of Biology question paper
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* UP Board English Class 12 Info Box */}
+                    {imageForm.examFormat === "upboard_englishclass12" && (
+                      <div className="rounded-lg bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 p-4 border border-blue-200 dark:border-blue-700">
+                        <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
+                          📖 UP Board English Paper (Class 12) - 100 अंक | 20
+                          Questions
+                        </h4>
+                        <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                          <p>📋 Paper Code: 316(HV)</p>
+                          <p>
+                            ✓ Section A: Reading (25 marks) - 5 questions
+                            (Passage + Questions)
+                          </p>
+                          <p>
+                            ✓ Section B: Writing (20 marks) - 2 questions
+                            (Article + Letter/Application)
+                          </p>
+                          <p>
+                            ✓ Section C: Grammar (15 marks) - 6 questions (MCQs
+                            + Translation)
+                          </p>
+                          <p>
+                            ✓ Section D: Literature (40 marks) - 7 questions
+                            (Flamingo & Vistas)
+                          </p>
+                          <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
+                            💡 Upload clear images of all sections including
+                            passages
                           </p>
                         </div>
                       </div>

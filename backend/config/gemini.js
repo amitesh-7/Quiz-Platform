@@ -897,6 +897,231 @@ For Map Questions:
 }
 `;
 
+    // UP Board English Class 12 Format - Exact Paper Structure (100 Marks) - Paper Code 316(HV)
+    const upBoardEnglishClass12Format = `
+⚠️ CONTENT GENERATION INSTRUCTIONS:
+====================================
+- You can reference NCERT English textbook (Class 12) and previous UP Board papers
+- Use similar question patterns and concepts from standard materials
+- Modify details slightly to create variations
+- Paraphrase questions to avoid exact word-for-word copies
+- Maintain the same difficulty level and concept coverage
+
+YOU ARE GENERATING UP BOARD CLASS 12 ENGLISH PAPER (अंग्रेजी) - TOTAL 100 MARKS
+Paper Code: 316(HV)
+
+TOPIC(S) FOR THIS PAPER: "${topic}"
+
+⚠️⚠️⚠️ CRITICAL - SMART TOPIC INTERPRETATION ⚠️⚠️⚠️
+=================================================================
+**UNDERSTAND THE TOPIC TYPE FIRST - THEN FOLLOW THE RULES BELOW:**
+
+MANDATORY TOPIC HANDLING RULES:
+================================
+
+1. ✓ **IF GENERAL TOPIC** (topic is "English" or "English Class 12"):
+   → USE VARIETY from MULTIPLE chapters/topics
+   → Reading: General comprehension passage
+   → Writing: Various topics for articles and letters
+   → Literature: Mix questions from different chapters and poems
+   → This gives students COMPREHENSIVE practice across all topics
+   
+2. ✗ **IF SPECIFIC CHAPTER/TOPIC** (e.g., "The Last Lesson", "Lost Spring", "Deep Water"):
+   → Focus on THAT TOPIC
+   → Literature questions should be from that chapter/poem
+   → Reading passage can be related to the theme
+   
+=== PAPER STRUCTURE (Total 100 Marks) ===
+
+**SECTION - A: READING (25 marks)**
+- Question 1: Unseen Passage (400-450 words)
+  * (a) 3 marks - Comprehension question
+  * (b) 3 marks - Comprehension question
+  * (c) 3 marks - Comprehension question
+  * (d) 3 marks - Comprehension question
+  * (e) Vocabulary (3 parts):
+    - (i) 1 mark - Find word meaning
+    - (ii) 1 mark - Find word meaning
+    - (iii) 1 mark - Find opposite word
+  * Total: 3+3+3+3+1+1+1 = 15 marks
+
+- Question 1 continued or Question 2: Additional passage questions = 10 marks
+  * Total Section A = 25 marks
+
+**SECTION - B: WRITING (20 marks)**
+- Question 2: Article Writing (10 marks)
+  * Topics: Social issues, current affairs, environmental concerns
+  * Word limit: 100-150 words
+  * 3 topic options provided, student chooses one
+  
+- Question 3: Letter/Application (10 marks) with OR option
+  * Formal letter OR Application
+  * Word limit: 100-120 words
+  * Examples: Letter to DM, Principal application, complaint letter
+
+**SECTION - C: GRAMMAR (15 marks)**
+- Question 4: Multiple Choice Questions (10 marks)
+  * 5 questions × 2 marks = 10 marks
+  * Topics: Vocabulary, idioms, synonyms, sentence correction
+  
+- Question 5 or 6: Translation (5 marks)
+  * Hindi to English translation
+  * 3-4 sentences in Hindi
+  * Proper grammar and vocabulary required
+
+**SECTION - D: LITERATURE (40 marks)**
+
+Prose/Fiction Questions:
+- Question 7: Short Answer (8 marks) - 4+4 = 8 marks
+  * Two parts (a) and (b), each with OR option
+  * Answer in about 40 words each
+  * Based on prose chapters
+
+- Question 8: Long Answer (7 marks)
+  * Answer any ONE from 2 options
+  * Answer in about 80 words
+  * Based on prose chapters
+
+Poetry Questions:
+- Question 9: Extract-based Questions (6 marks) - 3×2 = 6 marks
+  * Poetry extract given
+  * Three questions based on the extract
+  * 2 marks each
+
+- Question 10: Central Idea (4 marks)
+  * Write central idea of any ONE poem from 3 options
+  * 50-60 words
+
+Supplementary Reader/Vistas:
+- Question 11: Short Answer (8 marks) - 4+4 = 8 marks
+  * Two parts (a) and (b), each with OR option
+  * Answer in about 40 words each
+
+- Question 12: Long Answer (7 marks)
+  * Answer any ONE from 2 options
+  * Answer in about 80 words
+
+=== MAJOR TOPICS (Class 12 English) ===
+
+**Prose (Flamingo):**
+- The Last Lesson
+- Lost Spring
+- Deep Water
+- The Rattrap
+- Indigo
+- Poets and Pancakes
+- The Interview
+- Going Places
+
+**Poetry (Flamingo):**
+- My Mother at Sixty-six
+- An Elementary School Classroom in a Slum
+- Keeping Quiet
+- A Thing of Beauty
+- A Roadside Stand
+- Aunt Jennifer's Tigers
+
+**Supplementary (Vistas):**
+- The Third Level
+- The Tiger King
+- The Enemy
+- On the Face of It
+- Memories of Childhood
+- Should Wizard Hit Mommy
+
+=== ANSWER LENGTH GUIDELINES ===
+
+- 1-2 mark questions: 20-30 words, direct and precise
+- 3 mark questions: 40-50 words, 2-3 main points
+- 4 mark questions: 50-60 words, 3-4 main points with explanation
+- 7-8 mark questions: 80-100 words, comprehensive answer with examples
+- 10 mark questions: 100-150 words, well-structured with introduction and conclusion
+
+=== JSON STRUCTURE FOR EACH QUESTION ===
+
+For Reading Comprehension:
+{
+  "questionType": "written",
+  "questionText": "[Passage text]\n\n(a) Question 1\n(b) Question 2\n(c) Question 3\n(d) Question 4\n(e) (i) Vocabulary (ii) Vocabulary (iii) Opposite word",
+  "correctAnswer": "(a) Answer in 40-50 words\n(b) Answer in 40-50 words\n(c) Answer in 40-50 words\n(d) Answer in 40-50 words\n(e) (i) Word (ii) Word (iii) Word",
+  "marks": 15,
+  "section": "Section-A Reading"
+}
+
+For Article Writing:
+{
+  "questionType": "written",
+  "questionText": "Write an article on any ONE of the following topics in about 100-150 words:\n(a) Topic 1\n(b) Topic 2\n(c) Topic 3",
+  "correctAnswer": "[Sample article 100-150 words with title, introduction, body paragraphs, conclusion]",
+  "marks": 10,
+  "section": "Section-B Writing - Article"
+}
+
+For Letter/Application (with OR):
+{
+  "questionType": "written",
+  "questionText": "Main prompt\n\nOR\n\nAlternative prompt",
+  "correctAnswer": "Main letter format\n\nOR\n\nAlternative letter format",
+  "marks": 10,
+  "section": "Section-B Writing - Letter/Application"
+}
+
+For Grammar MCQs:
+{
+  "questionType": "mcq",
+  "questionText": "Question text",
+  "options": ["(i) Option 1", "(ii) Option 2", "(iii) Option 3", "(iv) Option 4"],
+  "correctOption": 0,
+  "marks": 2,
+  "section": "Section-C Grammar - MCQ"
+}
+
+For Translation:
+{
+  "questionType": "written",
+  "questionText": "Translate the following passage into English:\n\n[Hindi text]",
+  "correctAnswer": "[English translation]",
+  "marks": 5,
+  "section": "Section-C Grammar - Translation"
+}
+
+For Literature Short Answer (with OR):
+{
+  "questionType": "written",
+  "questionText": "(a) Question 1\n\nOR\n\nAlternative question\n\n(b) Question 2\n\nOR\n\nAlternative question",
+  "correctAnswer": "(a) Answer in 40 words\n\nOR\n\nAlternative answer\n\n(b) Answer in 40 words\n\nOR\n\nAlternative answer",
+  "marks": 8,
+  "section": "Section-D Literature - Short Answer"
+}
+
+For Literature Long Answer:
+{
+  "questionType": "written",
+  "questionText": "Answer any ONE:\n(a) Question 1\n(b) Question 2",
+  "correctAnswer": "Comprehensive answer in 80 words with introduction, main points, examples, and conclusion",
+  "marks": 7,
+  "section": "Section-D Literature - Long Answer"
+}
+
+For Poetry Extract:
+{
+  "questionType": "written",
+  "questionText": "Read the following extract and answer:\n\n[Poetry lines]\n\n(a) Question 1\n(b) Question 2\n(c) Question 3",
+  "correctAnswer": "(a) Answer (20-30 words)\n(b) Answer (20-30 words)\n(c) Answer (20-30 words)",
+  "marks": 6,
+  "section": "Section-D Literature - Poetry"
+}
+
+For Central Idea:
+{
+  "questionType": "written",
+  "questionText": "Write the central idea of any ONE:\n(a) Poem 1\n(b) Poem 2\n(c) Poem 3",
+  "correctAnswer": "Central idea in 50-60 words covering theme, message, poetic devices, and significance",
+  "marks": 4,
+  "section": "Section-D Literature - Central Idea"
+}
+`;
+
     // UP Board Biology Format - Exact Paper Structure (70 Marks) - Paper Code 348(KH)
     const upBoardBiologyFormat = `
 ⚠️ CONTENT GENERATION INSTRUCTIONS:
@@ -2076,6 +2301,95 @@ STRICT RULES:
 7. Complete detailed answers for all questions
 
 Return ONLY valid JSON array with all questions. No markdown, no explanation.`;
+    } else if (examFormat === "upboard_englishclass12") {
+      prompt = `UP BOARD CLASS 12 ENGLISH PAPER (अंग्रेजी) - 100 अंक बनाएं।
+Paper Code: 316(HV)
+
+विषय/Topic: "${topic}"
+
+${upBoardEnglishClass12Format}
+
+⚠️⚠️⚠️ CRITICAL: GENERATE EXACTLY 20 SEPARATE JSON QUESTION OBJECTS ⚠️⚠️⚠️
+
+**HOW TO GENERATE 20 QUESTIONS:**
+
+📖 Section A - Reading (2 questions = 25 marks):
+1. Reading Passage 1 (15 marks) - with (a), (b), (c), (d), (e) parts
+2. Reading Passage 2 or continuation (10 marks)
+
+✍️ Section B - Writing (2 questions = 20 marks):
+3. Article Writing (10 marks) - 3 topic options
+4. Letter/Application (10 marks) - with OR
+
+📝 Section C - Grammar (6 questions = 15 marks):
+5. Grammar MCQ 1 (2 marks)
+6. Grammar MCQ 2 (2 marks)
+7. Grammar MCQ 3 (2 marks)
+8. Grammar MCQ 4 (2 marks)
+9. Grammar MCQ 5 (2 marks)
+10. Translation (5 marks)
+
+📚 Section D - Literature (10 questions = 40 marks):
+
+Prose (3 questions):
+11. Prose Short Answer Part (a) (4 marks) - with OR
+12. Prose Short Answer Part (b) (4 marks) - with OR
+13. Prose Long Answer (7 marks) - choose ONE from 2
+
+Poetry (4 questions):
+14. Poetry Extract Part (a) (2 marks)
+15. Poetry Extract Part (b) (2 marks)
+16. Poetry Extract Part (c) (2 marks)
+17. Central Idea (4 marks) - choose ONE poem
+
+Vistas/Supplementary (3 questions):
+18. Vistas Short Answer Part (a) (4 marks) - with OR
+19. Vistas Short Answer Part (b) (4 marks) - with OR
+20. Vistas Long Answer (7 marks) - choose ONE from 2
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOTAL: EXACTLY 20 JSON OBJECTS = 100 MARKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+=== ANSWER LENGTH - DETAILED ===
+- 10 अंक (Article/Letter): 100-150 शब्द
+- 8 अंक: 80-100 शब्द (comprehensive with examples)
+- 7 अंक: 80-100 शब्द (detailed answer)
+- 6 अंक: 50-70 शब्द (poetry extract - 3 parts × 2 marks)
+- 4 अंक: 50-60 शब्द (central idea)
+- 3 अंक: 40-50 शब्द (comprehension)
+- 2 अंक: 20-30 शब्द (MCQ explanation or short answer)
+- 1 अंक: 10-20 शब्द (vocabulary)
+
+JSON FORMAT:
+
+Reading: {"questionType":"written","questionText":"[Passage 400-450 words]\n\n(a) Question\n(b) Question\n(c) Question\n(d) Question\n(e) (i) Vocab (ii) Vocab (iii) Opposite","correctAnswer":"(a) Answer 40-50 words\n(b) Answer\n(c) Answer\n(d) Answer\n(e) (i) Word (ii) Word (iii) Word","marks":15,"section":"Section-A Reading"}
+
+Article: {"questionType":"written","questionText":"Write an article on any ONE (100-150 words):\n(a) Topic 1\n(b) Topic 2\n(c) Topic 3","correctAnswer":"[Title]\n\n[Article 100-150 words with intro, body, conclusion]","marks":10,"section":"Section-B Writing - Article"}
+
+Letter: {"questionType":"written","questionText":"Letter prompt\n\nOR\n\nApplication prompt","correctAnswer":"[Letter format]\n\nOR\n\n[Application format]","marks":10,"section":"Section-B Writing - Letter/Application"}
+
+Grammar MCQ: {"questionType":"mcq","questionText":"Question","options":["(i) Option 1","(ii) Option 2","(iii) Option 3","(iv) Option 4"],"correctOption":0,"marks":2,"section":"Section-C Grammar - MCQ"}
+
+Translation: {"questionType":"written","questionText":"Translate into English:\n\n[Hindi text]","correctAnswer":"[English translation]","marks":5,"section":"Section-C Grammar - Translation"}
+
+Literature Short (with OR): {"questionType":"written","questionText":"(a) Question\n\nOR\n\nAlternative\n\n(b) Question\n\nOR\n\nAlternative","correctAnswer":"(a) Answer 40 words\n\nOR\n\nAlt answer\n\n(b) Answer 40 words\n\nOR\n\nAlt answer","marks":8,"section":"Section-D Literature - Short Answer"}
+
+Literature Long: {"questionType":"written","questionText":"Answer any ONE (80 words):\n(a) Question 1\n(b) Question 2","correctAnswer":"Comprehensive answer 80-100 words with introduction, points, examples, conclusion","marks":7,"section":"Section-D Literature - Long Answer"}
+
+Poetry Extract: {"questionType":"written","questionText":"Extract:\n[Lines]\n\n(a) Q1 (b) Q2 (c) Q3","correctAnswer":"(a) Ans 20-30 words\n(b) Ans\n(c) Ans","marks":6,"section":"Section-D Literature - Poetry"}
+
+Central Idea: {"questionType":"written","questionText":"Central idea of any ONE:\n(a) Poem 1\n(b) Poem 2\n(c) Poem 3","correctAnswer":"Central idea 50-60 words: theme, message, poetic devices, significance","marks":4,"section":"Section-D Literature - Central Idea"}
+
+STRICT RULES:
+1. Generate Reading + Writing + Grammar + Literature = 100 marks total
+2. ALL content in ENGLISH language
+3. Literature questions need OR options where specified
+4. Follow topic rules strictly (general vs specific chapter)
+5. Complete detailed answers with proper word count
+6. Include sample passages, articles, letters, and literary analysis
+
+Return ONLY valid JSON array with all questions. No markdown, no explanation.`;
     } else if (examFormat === "upboard_biology") {
       prompt = `UP BOARD CLASS 12 BIOLOGY PAPER (जीव विज्ञान) - 70 अंक बनाएं।
 Paper Code: 348(KH)
@@ -2800,6 +3114,40 @@ STRICT RULES:
 6. Complete step-by-step solutions in answers
 
 Return ONLY valid JSON array.`;
+    } else if (examFormat === "upboard_englishclass12") {
+      prompt = `Extract questions from images for UP BOARD CLASS 12 ENGLISH PAPER (अंग्रेजी) - 100 marks.
+Paper Code: 316(HV)
+
+EXTRACT ONLY what is visible in images. Do NOT generate new questions.
+
+${upBoardEnglishClass12Format}
+
+⚠️⚠️⚠️ EXTRACT EXACTLY 20 SEPARATE JSON OBJECTS FROM IMAGES ⚠️⚠️⚠️
+
+BREAKDOWN:
+- Reading: 2 questions (25m)
+- Writing: 2 questions (20m)
+- Grammar: 6 questions (15m) - Extract each MCQ and Translation as separate objects
+- Literature: 10 questions (40m) - Break multi-part questions into separate objects
+
+TOTAL: 20 separate JSON objects = 100 marks
+
+=== ANSWER LENGTH ===
+- 10 अंक: 100-150 words
+- 7-8 अंक: 80-100 words
+- 4-6 अंक: 50-60 words
+- 2-3 अंक: 20-40 words
+- 1 अंक: 10-20 words
+
+JSON FORMAT: (Same as Generate with AI)
+
+STRICT RULES:
+1. Extract from images only - DO NOT generate
+2. ENGLISH language
+3. Include OR options where visible
+4. Complete answers with proper word count
+
+Return ONLY valid JSON array.`;
     } else if (examFormat === "upboard_biology") {
       prompt = `Extract questions from images for UP BOARD CLASS 12 BIOLOGY PAPER (जीव विज्ञान) - 70 marks.
 Paper Code: 348(KH)
@@ -3467,6 +3815,41 @@ STRICT RULES:
 5. Complete step-by-step solutions in answers
 
 Return ONLY valid JSON array with exactly 25 questions.`;
+    } else if (examFormat === "upboard_englishclass12") {
+      prompt = `UP BOARD CLASS 12 ENGLISH PAPER (अंग्रेजी) - 100 अंक बनाएं।
+Paper Code: 316(HV)
+
+INPUT विषय/सामग्री: "${rawQuestions}"
+
+${upBoardEnglishClass12Format}
+
+⚠️⚠️⚠️ CRITICAL: GENERATE EXACTLY 20 SEPARATE JSON OBJECTS = 100 MARKS ⚠️⚠️⚠️
+
+BREAKDOWN:
+- Reading: 2 questions (25m)
+- Writing: 2 questions (20m)
+- Grammar: 6 questions (15m) - 5 separate MCQs + 1 Translation
+- Literature: 10 questions (40m) - Break multi-part questions into separate objects
+
+TOTAL: 20 separate JSON objects
+
+=== ANSWER LENGTH ===
+- 10 अंक: 100-150 words
+- 7-8 अंक: 80-100 words
+- 4 अंक: 50-60 words
+- 3 अंक: 40-50 words
+- 2 अंक: 20-30 words
+- 1 अंक: 10-20 words
+
+JSON FORMAT: (Same as Generate with AI)
+
+STRICT RULES:
+1. Generate all sections = 100 marks total
+2. ENGLISH language throughout
+3. OR options in writing and literature sections
+4. Complete answers with proper formatting
+
+Return ONLY valid JSON array.`;
     } else if (examFormat === "upboard_biology") {
       prompt = `UP BOARD CLASS 12 BIOLOGY PAPER (जीव विज्ञान) - 70 अंक बनाएं।
 Paper Code: 348(KH)
