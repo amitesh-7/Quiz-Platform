@@ -1870,6 +1870,15 @@ ${answersHTML}
                               questionTypes: ["mcq", "written"],
                               numberOfQuestions: 25,
                             });
+                          } else if (format === "upboard_socialscience") {
+                            // Auto-configure for UP Board Social Science
+                            setGenerateForm({
+                              ...generateForm,
+                              examFormat: format,
+                              language: "bilingual",
+                              questionTypes: ["mcq", "written"],
+                              numberOfQuestions: 30,
+                            });
                           } else if (format === "upboard_sanskrit") {
                             // Auto-configure for UP Board Sanskrit
                             setGenerateForm({
@@ -1904,8 +1913,41 @@ ${answersHTML}
                         <option value="upboard_maths">
                           UP Board Mathematics (Class 10)
                         </option>
+                        <option value="upboard_socialscience">
+                          UP Board Social Science (Class 10)
+                        </option>
                       </select>
                     </div>
+                    {/* UP Board Social Science Info Box */}
+                    {generateForm.examFormat === "upboard_socialscience" && (
+                      <div className="rounded-lg bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 border border-purple-200 dark:border-purple-700">
+                        <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-2 flex items-center gap-2">
+                          🌍 UP Board Social Science Paper - 70 अंक
+                        </h4>
+                        <div className="text-sm text-purple-800 dark:text-purple-200 space-y-1">
+                          <p>📋 Paper Code: 825(BAS)</p>
+                          <p>
+                            ✓ Part A: 20 MCQs (1 mark each) = 20 marks -
+                            Bilingual
+                          </p>
+                          <p>
+                            ✓ Part B: Descriptive Questions (2+2, 2+4, 6 marks)
+                            with OR options
+                          </p>
+                          <p>
+                            ✓ Map Work: History Map (5 marks) + Geography Map (5
+                            marks)
+                          </p>
+                          <p className="font-medium mt-2 text-purple-900 dark:text-purple-100">
+                            Topics: History, Geography, Civics, Economics
+                          </p>
+                          <p className="text-xs mt-2 text-purple-700 dark:text-purple-300">
+                            💡 Enter "Social Science" for variety or specific
+                            topic like "French Revolution"
+                          </p>
+                        </div>
+                      </div>
+                    )}
                     {/* UP Board Mathematics Info Box */}
                     {generateForm.examFormat === "upboard_maths" && (
                       <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-lg p-4">
@@ -2794,6 +2836,12 @@ ${answersHTML}
                               examFormat: format,
                               language: "bilingual",
                             });
+                          } else if (format === "upboard_socialscience") {
+                            setBulkForm({
+                              ...bulkForm,
+                              examFormat: format,
+                              language: "bilingual",
+                            });
                           } else {
                             setBulkForm({
                               ...bulkForm,
@@ -2819,8 +2867,28 @@ ${answersHTML}
                         <option value="upboard_maths">
                           UP Board Mathematics (Class 10)
                         </option>
+                        <option value="upboard_socialscience">
+                          UP Board Social Science (Class 10)
+                        </option>
                       </select>
                     </div>
+
+                    {/* UP Board Social Science Info Box */}
+                    {bulkForm.examFormat === "upboard_socialscience" && (
+                      <div className="bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/30 rounded-lg p-4">
+                        <p className="text-purple-300 font-medium mb-3">
+                          🌍 UP Board Social Science - 70 अंक
+                        </p>
+                        <div className="text-xs text-gray-400 space-y-2">
+                          <p>📋 Paper Code: 825(BAS)</p>
+                          <p>• Part A: 20 MCQs (Bilingual)</p>
+                          <p>• Part B: Descriptive + Map Work</p>
+                          <p className="text-indigo-300">
+                            💡 History, Geography, Civics, Economics
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                     {/* UP Board Mathematics Info Box */}
                     {bulkForm.examFormat === "upboard_maths" && (
@@ -3454,6 +3522,12 @@ Example:
                               examFormat: format,
                               language: "bilingual",
                             });
+                          } else if (format === "upboard_socialscience") {
+                            setImageForm({
+                              ...imageForm,
+                              examFormat: format,
+                              language: "bilingual",
+                            });
                           } else {
                             setImageForm({
                               ...imageForm,
@@ -3479,8 +3553,28 @@ Example:
                         <option value="upboard_maths">
                           UP Board Mathematics (Class 10)
                         </option>
+                        <option value="upboard_socialscience">
+                          UP Board Social Science (Class 10)
+                        </option>
                       </select>
                     </div>
+
+                    {/* UP Board Social Science Info Box */}
+                    {imageForm.examFormat === "upboard_socialscience" && (
+                      <div className="bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/30 rounded-lg p-4">
+                        <p className="text-purple-300 font-medium mb-3">
+                          🌍 UP Board Social Science - 70 अंक
+                        </p>
+                        <div className="text-xs text-gray-400 space-y-2">
+                          <p>📋 Paper Code: 825(BAS)</p>
+                          <p>• Part A: 20 MCQs (Bilingual)</p>
+                          <p>• Part B: Descriptive + Map Work</p>
+                          <p className="text-indigo-300">
+                            💡 History, Geography, Civics, Economics
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                     {/* UP Board Mathematics Info Box */}
                     {imageForm.examFormat === "upboard_maths" && (

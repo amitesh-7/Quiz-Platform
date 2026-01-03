@@ -56,6 +56,7 @@ const generateValidation = [
       "upboard_hindi",
       "upboard_sanskrit",
       "upboard_maths",
+      "upboard_socialscience",
     ])
     .withMessage("Invalid exam format"),
 ];
@@ -99,6 +100,10 @@ const generateQuestionsController = async (req, res) => {
       questionTypes = ["mcq", "written"];
     } else if (examFormat === "upboard_maths") {
       numberOfQuestions = 25; // 20 MCQ + 5 descriptive sets
+      language = "bilingual";
+      questionTypes = ["mcq", "written"];
+    } else if (examFormat === "upboard_socialscience") {
+      numberOfQuestions = 30; // 20 MCQ + descriptive + map work
       language = "bilingual";
       questionTypes = ["mcq", "written"];
     }
@@ -259,6 +264,10 @@ const processQuestionsController = async (req, res) => {
       finalMaxMarks = 70;
       finalLanguage = "bilingual";
       finalNumberOfQuestions = 25;
+    } else if (examFormat === "upboard_socialscience") {
+      finalMaxMarks = 70;
+      finalLanguage = "bilingual";
+      finalNumberOfQuestions = 30;
     }
 
     // Process raw questions with exam format and difficulty
@@ -373,6 +382,9 @@ const extractQuestionsFromImageController = async (req, res) => {
       finalMaxMarks = 70;
       finalLanguage = "sanskrit";
     } else if (examFormat === "upboard_maths") {
+      finalMaxMarks = 70;
+      finalLanguage = "bilingual";
+    } else if (examFormat === "upboard_socialscience") {
       finalMaxMarks = 70;
       finalLanguage = "bilingual";
     }

@@ -609,6 +609,294 @@ SECTION VALUES (MUST include in each question):
 - उत्तर: प्रत्येक पद के लिए एक संस्कृत वाक्य
 `;
 
+    // UP Board Social Science Format - Exact Paper Structure (70 Marks) - Paper Code 825(BAS)
+    const upBoardSocialScienceFormat = `
+⚠️ CONTENT GENERATION INSTRUCTIONS:
+====================================
+- You can reference NCERT textbook and previous UP Board papers
+- Use similar question patterns and concepts from standard materials
+- Modify details slightly to create variations
+- Paraphrase questions to avoid exact word-for-word copies
+- Maintain the same difficulty level and concept coverage
+
+YOU ARE GENERATING UP BOARD CLASS 10 SOCIAL SCIENCE PAPER (सामाजिक विज्ञान) - TOTAL 70 MARKS
+Paper Code: 825(BAS)
+
+TOPIC(S) FOR THIS PAPER: "${topic}"
+
+⚠️⚠️⚠️ CRITICAL - SMART TOPIC INTERPRETATION ⚠️⚠️⚠️
+=================================================================
+**UNDERSTAND THE TOPIC TYPE FIRST - THEN FOLLOW THE RULES BELOW:**
+
+MANDATORY TOPIC HANDLING RULES:
+================================
+
+1. ✓ **IF GENERAL TOPIC** (topic is "सामाजिक विज्ञान" or "Social Science"):
+   → USE VARIETY from MULTIPLE DIFFERENT chapters/topics
+   → MCQs: Distribute across History, Geography, Civics, Economics (all 4 subjects)
+   → Descriptive: Use different topics for different questions
+   → Map questions: Include both History and Geography map work
+   → This gives students COMPREHENSIVE practice across all topics
+   
+2. ✗ **IF SPECIFIC CHAPTER/TOPIC** (e.g., "French Revolution", "भारत में राष्ट्रवाद", "Democracy"):
+   → ALL questions from THAT TOPIC ONLY
+   → MCQs: All 20 questions on that specific topic
+   → Descriptive: All questions from that topic only
+   → DO NOT mix other topics/chapters
+   
+3. **IF SPECIFIC SUBJECT** (e.g., "History", "Geography", "Civics", "Economics"):
+   → ALL questions from THAT SUBJECT ONLY
+   → Distribute across relevant chapters within that subject
+   → Example: "History" = French Revolution, Nationalism, etc.
+   
+4. **IF MULTIPLE SPECIFIC TOPICS** (e.g., "French Revolution, Nationalism"):
+   → Distribute ALL questions ONLY across these specified topics
+   → DO NOT add any other topics
+
+⚠️ KEY DISTINCTION:
+   • "Social Science"/"सामाजिक विज्ञान" = VARIETY needed (all 4 subjects)
+   • "French Revolution" = FOCUSED (only that chapter)
+   • "History" = HISTORY SUBJECT ONLY (multiple history chapters)
+
+${difficultyNote}
+
+EXACT PAPER STRUCTURE (70 Marks):
+==================================
+
+खण्ड 'अ' / PART 'A' (बहुविकल्पीय प्रश्न / Multiple Choice Questions) - 20 Marks
+- 20 MCQs × 1 mark each = 20 marks
+- Format: 4 options (A), (B), (C), (D)
+- BILINGUAL: "हिंदी प्रश्न / English Question"
+- **IMPORTANT**: Follow topic rules above
+
+खण्ड 'ब' / PART 'B' (वर्णनात्मक प्रश्न / Descriptive Questions) - 50 Marks
+
+**TWO TYPES OF DESCRIPTIVE QUESTIONS:**
+
+1. वर्णनात्मक - I (Descriptive-I):
+   - Multiple 2+2 or 2+4 or 2+2+2 marks questions with OR options
+   - Topics: History, Geography, Civics, Economics
+   - Total: Approximately 20-24 marks
+   
+2. वर्णनात्मक - II (Descriptive-II):
+   - 6-mark questions with OR options
+   - Detailed answers required (150 words each)
+   - Total: Approximately 18-24 marks
+
+3. मानचित्र सम्बन्धी प्रश्न (Map Related Questions):
+   - Question 9(A): History Map Work (5 locations × ½ + ½ marks = 2½ + 2½ = 5 marks)
+   - Question 9(B): Geography Map Work (5 locations × ½ + ½ marks = 2½ + 2½ = 5 marks)
+   - Total Map Questions: 10 marks
+
+GRAND TOTAL: 20 MCQs + Descriptive Questions + Map Work = 70 marks
+
+=== MCQ GENERATION FOR खण्ड 'अ' (Q1-20) ===
+⚠️⚠️⚠️ CRITICAL - TOPIC INTERPRETATION RULES ⚠️⚠️⚠️
+===============================================================
+RECEIVED TOPIC: "${topic}"
+
+**SMART TOPIC DETECTION:**
+
+✓ GENERAL TOPIC (Use variety from ALL 4 subjects):
+  - "सामाजिक विज्ञान" / "Social Science"
+  → Generate questions from ALL 4 subjects:
+     • इतिहास (History): 5-6 MCQs - French Revolution, Nationalism, Industrialization, etc.
+     • भूगोल (Geography): 5-6 MCQs - Resources, Agriculture, Water, Minerals, etc.
+     • नागरिक शास्त्र (Civics): 4-5 MCQs - Democracy, Constitution, Political Parties, etc.
+     • अर्थशास्त्र (Economics): 4-5 MCQs - Development, Sectors, Money, Globalization, etc.
+
+✗ SPECIFIC SUBJECT (Use ONLY that subject):
+  - "History"/"इतिहास", "Geography"/"भूगोल", "Civics"/"नागरिक शास्त्र", "Economics"/"अर्थशास्त्र"
+  → ALL 20 MCQs from that specific subject ONLY
+  → Do NOT mix other subjects
+
+✗ SPECIFIC CHAPTER/TOPIC (Use ONLY that chapter):
+  - "French Revolution", "Nationalism", "Democracy", "Resources", etc.
+  → ALL 20 MCQs from that specific chapter ONLY
+  → Do NOT mix other chapters/topics
+
+BILINGUAL FORMAT REQUIRED for ALL MCQs:
+Question format: "हिंदी में प्रश्न / Question in English"
+Options format: (A) "हिंदी" / "English" (B) ... (C) ... (D) ...
+
+**SAMPLE MCQ TOPICS (for General Social Science):**
+
+**HISTORY (इतिहास):**
+- French Revolution (1789)
+- Rise of Nationalism in Europe
+- Nationalism in India  
+- Industrialization
+- Urbanization
+- Print Culture
+- Novel Society
+
+**GEOGRAPHY (भूगोल):**
+- Resources and Development
+- Forest and Wildlife Resources
+- Water Resources
+- Agriculture
+- Minerals and Energy
+- Manufacturing Industries
+- Transportation and Communication
+
+**CIVICS (नागरिक शास्त्र):**
+- Power Sharing
+- Federalism
+- Democracy and Diversity
+- Gender, Religion and Caste
+- Popular Struggles and Movements
+- Political Parties
+- Outcomes of Democracy
+
+**ECONOMICS (अर्थशास्त्र):**
+- Development
+- Sectors of Indian Economy
+- Money and Credit
+- Globalization and Indian Economy
+- Consumer Rights
+
+=== DESCRIPTIVE QUESTIONS FORMAT ===
+
+**TYPE 1: वर्णनात्मक-I (Descriptive-I) - Short Answer Questions**
+
+Format variations:
+- 2+2 marks: Two sub-questions, 2 marks each
+- 2+4 marks: One 2-mark + One 4-mark question
+- 2+2+2 marks: Three sub-questions, 2 marks each
+- 4 marks: Single question
+
+Answer Length:
+- 2-mark: 50-80 words
+- 4-mark: 100-150 words
+
+Examples:
+"परिवहन क्षेत्र के विकास से देश के विकास में किस प्रकार सहायता मिलती है? इसके कोई दो लाभ लिखिए। 4 अंक
+
+अथवा / OR
+
+अयस्क क्या हैं? भारत में लोहे के अयस्क की दो महत्त्वपूर्ण पेटियों के नाम बताइए तथा इनमें से किसी एक में वृद्धि कीजिए। 2 + 2"
+
+"सूचना का अधिकार क्या है? यह उपभोक्ता अधिकारों में वृद्धि कैसे करता है? 2 + 2
+
+अथवा / OR
+
+भारत सरकार द्वारा विदेशी निवेशों को आकर्षित करने हेतु उठाये जाने वाले से उपायों का वर्णन कीजिए। 2 + 2"
+
+**TYPE 2: वर्णनात्मक-II (Descriptive-II) - Long Answer Questions**
+
+Format: 6-mark questions with OR option
+Answer Length: 150 words each
+
+Examples:
+"भारत में राष्ट्रवाद के उदय के प्रमुख कारणों की व्याख्या कीजिए। 6 अंक
+
+अथवा / OR
+
+फ्रांस की क्रान्ति के प्रमुख कारणों का वर्णन कीजिए। 6"
+
+"भारत की संघात्मक शासन व्यवस्था की प्रमुख विशेषताओं का उल्लेख कीजिए। 6
+
+अथवा / OR
+
+साम्प्रदायिकता से आप क्या समझते हैं? यह भारतीय समाज के लिए हानिकारक है? 2 + 4"
+
+"अर्थव्यवस्था के तीन क्षेत्रक कौन कौन-से हैं? भारत के आर्थिक विकास के साथ विभिन्न क्षेत्रकों की संरचना में हुए परिवर्तन का वर्णन कीजिए। 2 + 4
+
+अथवा / OR
+
+अनौपचारिक साख क्या है? भारत में साख विस्तार में अनौपचारिक साख की आवश्यकता एवं चुनौतियों को एक-एक उदाहरण द्वारा समझाइये। 2 + 2 + 2"
+
+=== MAP WORK QUESTIONS (मानचित्र सम्बन्धी प्रश्न) ===
+
+**CRITICAL: TWO SEPARATE MAP QUESTIONS REQUIRED**
+
+**Question 9(A): HISTORY MAP WORK (5 marks)**
+- Locate 5 historical places on blank India map
+- Each location: ½ mark for correct name + ½ mark for marking = 1 mark total
+- Total: 5 × 1 = 5 marks
+
+Example locations for History:
+- पूर्ण स्वराज की माँग का प्रस्ताव पारित हुआ था (Where complete Swaraj resolution was passed)
+- दिसम्बर, 1920 में कांग्रेस का अधिवेशन हुआ था (Where Congress Session held in December 1920)
+- जलियाँवाला बाग हत्याकाण्ड हुआ था (Where Jallianwala Bagh Massacre took place)
+- आनन्द भवन स्थित है (Where Anand Bhawan is situated)
+- सूती मिल के श्रमिकों ने सत्याग्रह आन्दोलन चलाया (Where cotton mill workers launched Satyagraha)
+
+**Question 9(B): GEOGRAPHY MAP WORK (5 marks)**
+- Locate 5 geographical places/features on blank India map
+- Each location: ½ mark for correct name + ½ mark for marking = 1 mark total
+- Total: 5 × 1 = 5 marks
+
+Example locations for Geography:
+- पश्चिम भारत स्थित एक सॉफ्टवेयर प्रौद्योगिकी पार्क (Software technology park in western India)
+- पूर्वी भारत स्थित एक लोहा और इस्पात संयंत्र (Iron and steel plant in eastern India)
+- दक्षिण भारत स्थित एक तापीय ऊर्जा संयंत्र (Thermal power plant in southern India)
+- छत्तीसगढ़ राज्य की राजधानी (Capital of Chhattisgarh state)
+- पूर्वी भारत में स्थित एक अन्तर्राष्ट्रीय हवाई पत्तन (International airport in eastern India)
+
+**MAP QUESTION STRUCTURE:**
+{
+  "questionType": "written",
+  "questionText": "निर्देश : दिये गये भारत के रेखा मानचित्र में निम्नलिखित स्थानों को चिह्न ⊕ द्वारा नाम सहित दर्शाइए। सही नाम तथा स्थान अंकन के लिए ½, ½ अंक निर्धारित हैं :\n\ni) वह स्थान जहाँ पूर्ण स्वराज की माँग का प्रस्ताव पारित हुआ था।\nii) वह स्थान जहाँ दिसम्बर, 1920 में कांग्रेस का अधिवेशन हुआ था।\niii) वह जनपद जहाँ जलियाँवाला बाग हत्याकाण्ड हुआ था।\niv) वह स्थान जहाँ आनन्द भवन स्थित है।\nv) वह स्थान जहाँ सूती मिल के श्रमिकों ने पहला सत्याग्रह आन्दोलन चलाया था।\n\nInstruction : Show the following places by symbols and names on the given outline map of India :\ni) The place where the resolution of complete Swaraj was passed.\nii) The place where in December, 1920 Congress Session was held.\niii) The district where Jallianwala Bagh Massacre took place.\niv) The place where Anand Bhawan is situated.\nv) The place where the cotton mill workers first launched Satyagraha movement.",
+  "correctAnswer": "[Map locations with answers]\n1. Lahore (पूर्ण स्वराज resolution, 1930)\n2. Nagpur (December 1920 Congress Session)\n3. Amritsar (Jallianwala Bagh)\n4. Allahabad/Prayagraj (Anand Bhawan)\n5. Ahmedabad (Cotton mill Satyagraha, 1918)\n\n[For visually impaired students - Text answers]\nपूर्ण स्वराज की माँग का प्रस्ताव कहाँ पारित हुआ था? - लाहौर\nदिसम्बर, 1920 में कांग्रेस का अधिवेशन कहाँ हुआ था? - नागपुर\nजलियाँवाला बाग हत्याकाण्ड किस जनपद में हुआ था? - अमृतसर\nआनन्द भवन कहाँ स्थित है? - प्रयागराज/इलाहाबाद\nसूती मिल के श्रमिकों ने सत्याग्रह आन्दोलन कहाँ चलाया था? - अहमदाबाद",
+  "marks": 5,
+  "section": "मानचित्र सम्बन्धी प्रश्न (Map Work) - History"
+}
+
+=== ANSWER LENGTH REQUIREMENTS (PROPORTIONAL TO MARKS) ===
+- 1-mark MCQ: Just the correct option letter (केवल सही विकल्प)
+- 2-mark questions: 50-80 words with key points
+  * 2-3 main points
+  * Brief explanation
+  * Examples if needed
+- 4-mark questions: 100-150 words with detailed explanation
+  * 4-5 main points
+  * Detailed explanation
+  * Examples and context
+  * Conclusion
+- 6-mark questions: 150-200 words with comprehensive explanation
+  * 6-8 main points
+  * Very detailed explanation
+  * Multiple examples
+  * Analysis and conclusion
+  * Historical/geographical context
+
+=== JSON STRUCTURE FOR EACH QUESTION ===
+
+For MCQs (Q1-20):
+{
+  "questionType": "mcq",
+  "questionText": "हिंदी प्रश्न / English Question",
+  "options": [
+    "(A) हिंदी / English",
+    "(B) हिंदी / English",
+    "(C) हिंदी / English",
+    "(D) हिंदी / English"
+  ],
+  "correctOption": 0-3,
+  "marks": 1,
+  "section": "खण्ड-अ (Part-A) MCQ (1 अंक)"
+}
+
+For Descriptive Questions:
+{
+  "questionType": "written",
+  "questionText": "हिंदी में प्रश्न / Question in English:\n\nअथवा / OR\n\nAlternative question in both languages",
+  "correctAnswer": "Main question answer (150-200 words)\n\nअथवा / OR\n\nAlternative question answer (150-200 words)",
+  "marks": 2 or 4 or 6,
+  "section": "खण्ड-ब (Part-B) वर्णनात्मक-I/II"
+}
+
+For Map Questions:
+{
+  "questionType": "written",
+  "questionText": "Map question with instructions in both Hindi and English",
+  "correctAnswer": "[Complete answer with all 5 locations]\n\n[For visually impaired: Text-based answers for all 5 locations]",
+  "marks": 5,
+  "section": "मानचित्र सम्बन्धी प्रश्न (Map Work)"
+}
+`;
+
     // UP Board Mathematics Format - Exact Paper Structure (70 Marks) - Paper Code 822(BV)
     const upBoardMathsFormat = `
 ⚠️ CONTENT GENERATION INSTRUCTIONS:
@@ -1501,6 +1789,67 @@ STRICT RULES:
 8. Chemical formulas: H₂O, CO₂ (subscript notation)
 
 Return ONLY valid JSON array with exactly 25 questions. No markdown, no explanation.`;
+    } else if (examFormat === "upboard_socialscience") {
+      prompt = `UP BOARD CLASS 10 SOCIAL SCIENCE PAPER (सामाजिक विज्ञान) - 70 अंक बनाएं।
+Paper Code: 825(BAS)
+
+विषय: "${topic}"
+
+${upBoardSocialScienceFormat}
+
+EXACT STRUCTURE:
+- Q1-Q20: MCQs (1 mark each) = 20 marks
+  * Bilingual format required
+  * Cover: History, Geography, Civics, Economics (if general topic)
+  * If specific topic: ALL MCQs from that topic only
+
+- Descriptive-I: Short answer questions (2+2, 2+4, 2+2+2, 4 marks)
+  * WITH OR options
+  * 50-150 words answers
+  * Examples: transport development, ores, consumer rights, government measures
+
+- Descriptive-II: Long answer questions (6 marks each)
+  * WITH OR options  
+  * 150-200 words answers
+  * Examples: Nationalism in India, French Revolution, Federal system, Communalism, Economic sectors
+
+- Map Work (Question 9A and 9B): 10 marks total
+  * 9(A): History Map - 5 locations (5 marks)
+  * 9(B): Geography Map - 5 locations (5 marks)
+  * Each location: ½ + ½ = 1 mark (name + marking)
+  * MUST include text-based answers for visually impaired students
+
+=== ANSWER LENGTH - DETAILED ===
+- 6 अंक: 150-200 शब्द + विस्तृत व्याख्या (multiple points, examples, conclusion)
+- 4 अंक: 100-150 शब्द + पूर्ण व्याख्या
+- 2 अंक: 50-80 शब्द + संक्षिप्त व्याख्या
+- 1 अंक (MCQ): केवल सही विकल्प
+- Map: Location name + marking (for each)
+
+JSON FORMAT:
+
+MCQ (Q1-20):
+{"questionType":"mcq","questionText":"फ्रांस की क्रान्ति कब हुई थी? / When did the French Revolution take place?","options":["(A) 1788 ई० / 1788 AD","(B) 1789 ई० / 1789 AD","(C) 1600 ई० / 1600 AD","(D) 1787 ई० / 1787 AD"],"correctOption":1,"marks":1,"section":"खण्ड-अ (Part-A) MCQ (1 अंक)"}
+
+Descriptive (2+2 or 4 or 6 marks with OR):
+{"questionType":"written","questionText":"परिवहन क्षेत्र के विकास से देश के विकास में किस प्रकार सहायता मिलती है? इसके कोई दो लाभ लिखिए। / How does development of transportation sector help the development of the country? Write any two benefits of it. 4 अंक\\n\\nअथवा / OR\\n\\nअयस्क क्या हैं? भारत में लोहे के अयस्क की दो महत्त्वपूर्ण पेटियों में से किसी एक में वृद्धि कीजिए। / What are the ores? Which are the two important belts of iron ores in India? 2 + 2","correctAnswer":"परिवहन क्षेत्र का विकास:\\n\\n1. आर्थिक विकास में सहायता:\\n   - माल और यात्रियों की आवाजाही सुगम होती है\\n   - व्यापार में वृद्धि होती है\\n   - बाजारों तक पहुंच बढ़ती है\\n\\n2. रोजगार सृजन:\\n   - परिवहन क्षेत्र में प्रत्यक्ष रोजगार\\n   - संबंधित उद्योगों में रोजगार\\n\\n3. सामाजिक विकास:\\n   - शिक्षा और स्वास्थ्य सुविधाओं तक पहुंच\\n   - क्षेत्रीय असमानता में कमी\\n\\n4. औद्योगिक विकास:\\n   - कच्चे माल की आपूर्ति सुगम\\n   - तैयार माल का वितरण आसान\\n\\nअतः परिवहन विकास का आधार है।\\n\\nअथवा / OR\\n\\nअयस्क:\\nअयस्क वे खनिज हैं जिनमें धातु पर्याप्त मात्रा में होती है और जिनसे धातु निकालना आर्थिक रूप से लाभदायक होता है।\\n\\nभारत में लोहे के अयस्क की दो महत्त्वपूर्ण पेटियाँ:\\n\\n1. उड़ीसा-झारखंड पेटी:\\n   - मयूरभंज और क्योंझर (उड़ीसा)\\n   - सिंहभूम (झारखंड)\\n   - उच्च गुणवत्ता का हेमेटाइट\\n   - भारत का 70% उत्पादन\\n\\n2. बैलाडीला-बस्तर-बैलाडीला पेटी:\\n   - छत्तीसगढ़ में स्थित\\n   - उच्च गुणवत्ता का लौह अयस्क\\n   - निर्यात के लिए महत्त्वपूर्ण","marks":4,"section":"खण्ड-ब (Part-B) वर्णनात्मक-I"}
+
+Map Question 9(A) - History (5 marks):
+{"questionType":"written","questionText":"निर्देश : दिये गये भारत के रेखा मानचित्र में निम्नलिखित स्थानों को चिह्न ⊕ द्वारा नाम सहित दर्शाइए। सही नाम तथा स्थान अंकन के लिए ½, ½ अंक निर्धारित हैं :\\n\\ni) वह स्थान जहाँ पूर्ण स्वराज की माँग का प्रस्ताव पारित हुआ था।\\nii) वह स्थान जहाँ दिसम्बर, 1920 में कांग्रेस का अधिवेशन हुआ था।\\niii) वह जनपद जहाँ जलियाँवाला बाग हत्याकाण्ड हुआ था।\\niv) वह स्थान जहाँ आनन्द भवन स्थित है।\\nv) वह स्थान जहाँ सूती मिल के श्रमिकों ने पहला सत्याग्रह आन्दोलन चलाया था।\\n\\nInstruction : Show the following places by symbols and names on the given outline map of India :\\ni) The place where the resolution of complete Swaraj was passed.\\nii) The place where in December, 1920 Congress Session was held.\\niii) The district where Jallianwala Bagh Massacre took place.\\niv) The place where Anand Bhawan is situated.\\nv) The place where the cotton mill workers first launched Satyagraha movement.","correctAnswer":"[Map locations with answers]\\n\\n1. लाहौर (Lahore) - पूर्ण स्वराज resolution, 1930 [½ + ½ = 1]\\n2. नागपुर (Nagpur) - December 1920 Congress Session [½ + ½ = 1]\\n3. अमृतसर (Amritsar) - Jallianwala Bagh Massacre [½ + ½ = 1]\\n4. प्रयागराज/इलाहाबाद (Prayagraj/Allahabad) - Anand Bhawan [½ + ½ = 1]\\n5. अहमदाबाद (Ahmedabad) - Cotton mill Satyagraha, 1918 [½ + ½ = 1]\\n\\nकुल अंक = 5\\n\\n[केवल दृष्टिबाधित परीक्षार्थियों के लिए मानचित्र कार्य के विकल्प के रूप में]\\n(Only for visually impaired examinees in lieu of Map work)\\n\\n1. पूर्ण स्वराज की माँग का प्रस्ताव कहाँ पारित हुआ था? - लाहौर (1930)\\n2. दिसम्बर, 1920 में कांग्रेस का अधिवेशन कहाँ हुआ था? - नागपुर\\n3. जलियाँवाला बाग हत्याकाण्ड किस जनपद में हुआ था? - अमृतसर\\n4. आनन्द भवन कहाँ स्थित है? - प्रयागराज/इलाहाबाद\\n5. सूती मिल के श्रमिकों ने पहला सत्याग्रह आन्दोलन कहाँ चलाया था? - अहमदाबाद","marks":5,"section":"मानचित्र सम्बन्धी प्रश्न (Map Work) - History"}
+
+Map Question 9(B) - Geography (5 marks):
+{"questionType":"written","questionText":"निर्देश : दिये गये भारत के रेखा मानचित्र में निम्नलिखित स्थानों को चिह्न द्वारा नाम सहित दर्शाइए :\\n\\ni) पश्चिम भारत स्थित एक सॉफ्टवेयर प्रौद्योगिकी पार्क का नाम लिखिए।\\nii) पूर्वी भारत में स्थित एक लोहा और इस्पात संयंत्र का नाम लिखिए।\\niii) दक्षिण भारत स्थित एक तापीय ऊर्जा संयंत्र का नाम लिखिए।\\niv) छत्तीसगढ़ राज्य की राजधानी का नाम लिखिए।\\nv) पूर्वी भारत में स्थित एक अन्तर्राष्ट्रीय हवाई पत्तन का नाम लिखिए।\\n\\nInstruction : Show the following places by symbols and names on the given outline map of India :\\ni) A software technology park situated in western part of India.\\nii) An iron and steel plant situated in eastern part of India.\\niii) A thermal power plant situated in southern part of India.\\niv) Capital of Chhattisgarh state.\\nv) An international airport situated in eastern part of India.","correctAnswer":"[Map locations with answers]\\n\\n1. पुणे/मुंबई (Pune/Mumbai) - Software technology park [½ + ½ = 1]\\n2. जमशेदपुर/भिलाई/दुर्गापुर (Jamshedpur/Bhilai/Durgapur) - Iron & steel plant [½ + ½ = 1]\\n3. नेवेली/चेन्नई (Neyveli/Chennai) - Thermal power plant [½ + ½ = 1]\\n4. रायपुर (Raipur) - Capital of Chhattisgarh [½ + ½ = 1]\\n5. कोलकाता (Kolkata) - International airport [½ + ½ = 1]\\n\\nकुल अंक = 5\\n\\n[केवल दृष्टिबाधित परीक्षार्थियों के लिए मानचित्र कार्य के विकल्प के रूप में]\\n(Only for visually impaired examinees in lieu of Map work)\\n\\n1. पश्चिम भारत में एक सॉफ्टवेयर प्रौद्योगिकी पार्क का नाम - पुणे/मुंबई\\n2. पूर्वी भारत में एक लोहा और इस्पात संयंत्र का नाम - जमशेदपुर/भिलाई/दुर्गापुर\\n3. दक्षिण भारत में एक तापीय ऊर्जा संयंत्र का नाम - नेवेली/चेन्नई\\n4. छत्तीसगढ़ राज्य की राजधानी का नाम - रायपुर\\n5. पूर्वी भारत में एक अन्तर्राष्ट्रीय हवाई पत्तन का नाम - कोलकाता","marks":5,"section":"मानचित्र सम्बन्धी प्रश्न (Map Work) - Geography"}
+
+STRICT RULES:
+1. Generate 20 MCQs + Multiple Descriptive Questions + 2 Map Questions = 70 marks total
+2. BILINGUAL format: "Hindi question / English question"
+3. MCQ options: (A), (B), (C), (D)
+4. All descriptive questions MUST have OR options
+5. Map questions MUST include text-based answers for visually impaired
+6. Follow topic rules strictly (general vs specific)
+7. Complete detailed answers for all questions
+
+Return ONLY valid JSON array with all questions. No markdown, no explanation.`;
     } else {
       prompt = `Generate exactly ${finalNumberOfQuestions} quiz questions about "${topic}".${languageNote}${descriptionContext}
 
@@ -2109,7 +2458,46 @@ STRICT RULES:
 3. Bilingual (Hindi/English)
 4. प्र.23-25 need hasAlternative, alternativeQuestion, alternativeAnswer
 5. MCQ options: (A), (B), (C), (D) format
-6. Include complete step-by-step solutions
+6. Complete step-by-step solutions in answers
+
+Return ONLY valid JSON array.`;
+    } else if (examFormat === "upboard_socialscience") {
+      prompt = `Extract questions from images for UP BOARD CLASS 10 SOCIAL SCIENCE PAPER (सामाजिक विज्ञान) - 70 marks.
+Paper Code: 825(BAS)
+
+EXTRACT ONLY what is visible in images. Do NOT generate new questions.
+
+${upBoardSocialScienceFormat}
+
+STRUCTURE:
+- Q1-Q20: MCQs (1 mark each) = 20 marks - Bilingual format
+- Descriptive-I: Short answer (2+2, 2+4, 4 marks) - With OR options
+- Descriptive-II: Long answer (6 marks each) - With OR options
+- Map Work Q9(A): History Map - 5 locations (5 marks)
+- Map Work Q9(B): Geography Map - 5 locations (5 marks)
+
+=== ANSWER LENGTH ===
+- 6 अंक: 150-200 शब्द + विस्तृत व्याख्या
+- 4 अंक: 100-150 शब्द + पूर्ण व्याख्या
+- 2 अंक: 50-80 शब्द + संक्षिप्त व्याख्या
+- 1 अंक (MCQ): केवल सही विकल्प
+- Map: Location name + marking instructions
+
+JSON FORMAT:
+MCQ: {"questionType":"mcq","questionText":"हिंदी प्रश्न / English Question","options":["(A) हिंदी / English","(B)...","(C)...","(D)..."],"correctOption":0,"marks":1,"section":"खण्ड-अ (Part-A) MCQ (1 अंक)"}
+
+Descriptive: {"questionType":"written","questionText":"प्रश्न / Question\\n\\nअथवा / OR\\n\\nAlternative","correctAnswer":"Main answer\\n\\nअथवा / OR\\n\\nAlternative answer","marks":2 or 4 or 6,"section":"खण्ड-ब (Part-B) वर्णनात्मक"}
+
+Map 9(A): {"questionType":"written","questionText":"History map instructions in Hindi and English","correctAnswer":"[Map locations]\\n1. Location 1 [½+½=1]\\n2. Location 2 [½+½=1]...\\n\\n[For visually impaired: text answers]","marks":5,"section":"मानचित्र (Map Work) - History"}
+
+Map 9(B): {"questionType":"written","questionText":"Geography map instructions in Hindi and English","correctAnswer":"[Map locations]\\n1. Location 1 [½+½=1]...\\n\\n[For visually impaired: text answers]","marks":5,"section":"मानचित्र (Map Work) - Geography"}
+
+STRICT RULES:
+1. Extract from images only - DO NOT generate new questions
+2. BILINGUAL format required (Hindi / English)
+3. All descriptive questions need OR options
+4. Map questions need text-based answers for visually impaired
+5. MCQ options: (A), (B), (C), (D) format
 
 Return ONLY valid JSON array.`;
     } else {
@@ -2700,6 +3088,45 @@ STRICT RULES:
 5. Complete step-by-step solutions in answers
 
 Return ONLY valid JSON array with exactly 25 questions.`;
+    } else if (examFormat === "upboard_socialscience") {
+      prompt = `UP BOARD CLASS 10 SOCIAL SCIENCE PAPER (सामाजिक विज्ञान) - 70 अंक बनाएं।
+Paper Code: 825(BAS)
+
+INPUT विषय/सामग्री: "${rawQuestions}"
+
+${upBoardSocialScienceFormat}
+
+STRUCTURE:
+- Q1-Q20: MCQs (1 mark each) = 20 marks - Bilingual format
+- Descriptive-I: Short answer (2+2, 2+4, 4 marks) - With OR options
+- Descriptive-II: Long answer (6 marks each) - With OR options
+- Map Work Q9(A): History Map - 5 locations (5 marks)
+- Map Work Q9(B): Geography Map - 5 locations (5 marks)
+
+=== ANSWER LENGTH ===
+- 6 अंक: 150-200 शब्द + विस्तृत व्याख्या
+- 4 अंक: 100-150 शब्द + पूर्ण व्याख्या
+- 2 अंक: 50-80 शब्द + संक्षिप्त व्याख्या
+- 1 अंक (MCQ): केवल सही विकल्प
+- Map: Location name + marking instructions
+
+JSON FORMAT:
+MCQ: {"questionType":"mcq","questionText":"हिंदी प्रश्न / English Question","options":["(A) हिंदी / English","(B)...","(C)...","(D)..."],"correctOption":0,"marks":1,"section":"खण्ड-अ (Part-A) MCQ (1 अंक)"}
+
+Descriptive: {"questionType":"written","questionText":"प्रश्न / Question\\n\\nअथवा / OR\\n\\nAlternative","correctAnswer":"Main answer\\n\\nअथवा / OR\\n\\nAlternative answer","marks":2 or 4 or 6,"section":"खण्ड-ब (Part-B) वर्णनात्मक"}
+
+Map 9(A): {"questionType":"written","questionText":"History map instructions","correctAnswer":"[Map locations]\\n1. Location 1 [½+½=1]\\n2. Location 2 [½+½=1]...\\n\\n[For visually impaired: text answers]","marks":5,"section":"मानचित्र (Map Work) - History"}
+
+Map 9(B): {"questionType":"written","questionText":"Geography map instructions","correctAnswer":"[Map locations]\\n1. Location 1 [½+½=1]...\\n\\n[For visually impaired: text answers]","marks":5,"section":"मानचित्र (Map Work) - Geography"}
+
+STRICT RULES:
+1. Generate 20 MCQs + Descriptive Questions + 2 Map Questions = 70 marks
+2. BILINGUAL format required
+3. All descriptive questions need OR options
+4. Map questions need text-based answers for visually impaired
+5. Follow topic rules (general vs specific)
+
+Return ONLY valid JSON array.`;
     } else {
       prompt = `You are a quiz question processor. Convert the following content into quiz questions.${languageNote}
 
