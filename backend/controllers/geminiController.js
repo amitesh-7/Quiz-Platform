@@ -15,8 +15,7 @@ const generateValidation = [
     .isLength({ min: 2, max: 500 })
     .withMessage("Topic must be 2-500 characters"),
   body("numberOfQuestions")
-    .notEmpty()
-    .withMessage("Number of questions is required")
+    .optional()
     .isInt({ min: 1, max: 50 })
     .withMessage("Number of questions must be 1-50"),
   body("difficulty")
@@ -25,7 +24,15 @@ const generateValidation = [
     .withMessage("Difficulty must be easy, medium, or hard"),
   body("language")
     .optional()
-    .isIn(["english", "hindi", "bilingual", "sanskrit", "spanish", "french", "german"])
+    .isIn([
+      "english",
+      "hindi",
+      "bilingual",
+      "sanskrit",
+      "spanish",
+      "french",
+      "german",
+    ])
     .withMessage("Invalid language selection"),
   body("questionTypes")
     .optional()
@@ -42,7 +49,14 @@ const generateValidation = [
     .withMessage("Description cannot exceed 1000 characters"),
   body("examFormat")
     .optional()
-    .isIn(["general", "upboard_science", "upboard_english", "upboard_hindi", "upboard_sanskrit"])
+    .isIn([
+      "general",
+      "upboard_science",
+      "upboard_english",
+      "upboard_hindi",
+      "upboard_sanskrit",
+      "upboard_maths",
+    ])
     .withMessage("Invalid exam format"),
 ];
 
@@ -53,13 +67,41 @@ const generateQuestionsController = async (req, res) => {
   try {
     const {
       topic,
-      numberOfQuestions,
+      numberOfQuestions: userNumberOfQuestions,
       difficulty = "medium",
-      language = "english",
-      questionTypes = ["mcq"],
+      language: userLanguage,
+      questionTypes: userQuestionTypes,
       description = "",
       examFormat = "general",
     } = req.body;
+
+    // Auto-configure based on exam format
+    let numberOfQuestions = userNumberOfQuestions || 10;
+    let language = userLanguage || "english";
+    let questionTypes = userQuestionTypes || ["mcq"];
+
+    // Override settings for UP Board formats
+    if (examFormat === "upboard_science") {
+      numberOfQuestions = 31; // 20 MCQ + 11 descriptive
+      language = "bilingual";
+      questionTypes = ["mcq", "written"];
+    } else if (examFormat === "upboard_english") {
+      numberOfQuestions = 31;
+      language = "english";
+      questionTypes = ["mcq", "written"];
+    } else if (examFormat === "upboard_hindi") {
+      numberOfQuestions = 30;
+      language = "hindi";
+      questionTypes = ["mcq", "written"];
+    } else if (examFormat === "upboard_sanskrit") {
+      numberOfQuestions = 31;
+      language = "sanskrit";
+      questionTypes = ["mcq", "written"];
+    } else if (examFormat === "upboard_maths") {
+      numberOfQuestions = 25; // 20 MCQ + 5 descriptive sets
+      language = "bilingual";
+      questionTypes = ["mcq", "written"];
+    }
 
     // Check if Gemini API key is configured
     if (!process.env.GEMINI_API_KEY) {
@@ -153,6 +195,16 @@ const processQuestionsController = async (req, res) => {
       difficulty,
     } = req.body;
 
+    console.log("Process Questions Request:", {
+      rawQuestions: rawQuestions?.substring(0, 100) + "...",
+      maxMarks,
+      marksDistribution,
+      language,
+      numberOfQuestions,
+      examFormat,
+      difficulty,
+    });
+
     if (!rawQuestions || !rawQuestions.trim()) {
       return res.status(400).json({
         success: false,
@@ -160,7 +212,14 @@ const processQuestionsController = async (req, res) => {
       });
     }
 
-    if (examFormat !== "upboard_science" && examFormat !== "upboard_english" && examFormat !== "upboard_hindi" && examFormat !== "upboard_sanskrit" && (!maxMarks || maxMarks < 1)) {
+    if (
+      examFormat !== "upboard_science" &&
+      examFormat !== "upboard_english" &&
+      examFormat !== "upboard_hindi" &&
+      examFormat !== "upboard_sanskrit" &&
+      examFormat !== "upboard_maths" &&
+      (!maxMarks || maxMarks < 1)
+    ) {
       return res.status(400).json({
         success: false,
         message: "Maximum marks must be at least 1",
@@ -196,6 +255,10 @@ const processQuestionsController = async (req, res) => {
       finalMaxMarks = 70;
       finalLanguage = "sanskrit";
       finalNumberOfQuestions = 31;
+    } else if (examFormat === "upboard_maths") {
+      finalMaxMarks = 70;
+      finalLanguage = "bilingual";
+      finalNumberOfQuestions = 25;
     }
 
     // Process raw questions with exam format and difficulty
@@ -230,7 +293,7 @@ const processQuestionsController = async (req, res) => {
 const extractQuestionsFromImageController = async (req, res) => {
   try {
     const {
-      image,  // Single image (backward compatibility)
+      image, // Single image (backward compatibility)
       images, // Multiple images array
       maxMarks,
       marksDistribution,
@@ -263,7 +326,14 @@ const extractQuestionsFromImageController = async (req, res) => {
       });
     }
 
-    if (examFormat !== "upboard_science" && examFormat !== "upboard_english" && examFormat !== "upboard_hindi" && examFormat !== "upboard_sanskrit" && (!maxMarks || maxMarks < 1)) {
+    if (
+      examFormat !== "upboard_science" &&
+      examFormat !== "upboard_english" &&
+      examFormat !== "upboard_hindi" &&
+      examFormat !== "upboard_sanskrit" &&
+      examFormat !== "upboard_maths" &&
+      (!maxMarks || maxMarks < 1)
+    ) {
       return res.status(400).json({
         success: false,
         message: "Maximum marks must be at least 1",
@@ -279,9 +349,10 @@ const extractQuestionsFromImageController = async (req, res) => {
     }
 
     // Parse all images
-    const parsedImages = imageArray.map(img => {
+    const parsedImages = imageArray.map((img) => {
       const base64Data = img.replace(/^data:image\/\w+;base64,/, "");
-      const mimeType = img.match(/data:(image\/\w+);base64,/)?.[1] || "image/jpeg";
+      const mimeType =
+        img.match(/data:(image\/\w+);base64,/)?.[1] || "image/jpeg";
       return { base64Data, mimeType };
     });
 
@@ -301,6 +372,9 @@ const extractQuestionsFromImageController = async (req, res) => {
     } else if (examFormat === "upboard_sanskrit") {
       finalMaxMarks = 70;
       finalLanguage = "sanskrit";
+    } else if (examFormat === "upboard_maths") {
+      finalMaxMarks = 70;
+      finalLanguage = "bilingual";
     }
 
     // Extract questions from image(s) with exam format and difficulty

@@ -21,8 +21,8 @@ const createQuestionValidation = [
     .withMessage("Invalid question type"),
   body("marks")
     .optional()
-    .isInt({ min: 1, max: 10 })
-    .withMessage("Marks must be 1-10"),
+    .isInt({ min: 1, max: 70 })
+    .withMessage("Marks must be 1-70"),
 ];
 
 // Validation rules for bulk creating questions
@@ -47,8 +47,8 @@ const bulkCreateValidation = [
     .withMessage("Invalid question type"),
   body("questions.*.marks")
     .optional()
-    .isInt({ min: 1, max: 10 })
-    .withMessage("Marks must be 1-10"),
+    .isInt({ min: 1, max: 70 })
+    .withMessage("Marks must be 1-70"),
 ];
 
 // @desc    Create a new question
@@ -104,6 +104,26 @@ const createQuestion = async (req, res) => {
 const bulkCreateQuestions = async (req, res) => {
   try {
     const { quizId, questions } = req.body;
+
+    console.log("Bulk Create Request:", {
+      quizId,
+      questionCount: questions?.length,
+    });
+
+    // Validate request body
+    if (!quizId) {
+      return res.status(400).json({
+        success: false,
+        message: "Quiz ID is required",
+      });
+    }
+
+    if (!questions || !Array.isArray(questions) || questions.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Questions array is required and must not be empty",
+      });
+    }
 
     // Verify quiz exists
     const quiz = await Quiz.findById(quizId);

@@ -67,7 +67,7 @@ const questionSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Marks are required"],
       min: [1, "Marks must be at least 1"],
-      max: [10, "Marks cannot exceed 10"],
+      max: [70, "Marks cannot exceed 70"],
       default: 1,
     },
     // Section for organized display (e.g., UP Board format)

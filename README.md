@@ -1,6 +1,6 @@
 # 📝 Quiz Platform
 
-A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, featuring AI-powered question generation, OCR-based answer extraction, and intelligent evaluation using Google's Gemini API.
+A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, featuring AI-powered question generation, OCR-based answer extraction, intelligent evaluation using Google's Gemini API, and **UP Board Exam Paper Formats**.
 
 ![Quiz Platform](https://img.shields.io/badge/Stack-MERN-green) ![React](https://img.shields.io/badge/React-18-blue) ![Node.js](https://img.shields.io/badge/Node.js-Express-green) ![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen) ![AI](https://img.shields.io/badge/AI-Gemini-purple)
 
@@ -17,6 +17,7 @@ A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, 
 - **Flexible Quiz Settings**: Set duration, total marks, and activation status
 - **Student Management**: View all students and their quiz attempts
 - **Detailed Analytics**: View submissions with detailed scoring and evaluation
+- **PDF Download**: Download question papers with answer keys in board exam format
 
 ### 📚 Student Portal
 
@@ -28,26 +29,33 @@ A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, 
   - AI automatically extracts and maps answers from images
   - Support for numbered answers (e.g., Ans29, Ans30)
 - **Real-time Timer**: Countdown timer with auto-submit on timeout
-- **Comprehensive Results**: View detailed results with:
-  - Score breakdown and percentage
-  - Question-wise review with correct answers
-  - AI feedback for written answers
-  - Proportional marking display
+- **Comprehensive Results**: View detailed results with score breakdown
+
+### 🏫 UP Board Exam Formats (Class 10)
+
+Generate complete board exam papers with exact structure:
+
+| Subject | Paper Code | Total Marks | Questions | Language |
+|---------|------------|-------------|-----------|----------|
+| **Science (विज्ञान)** | - | 70 | 31 | Bilingual (Hindi/English) |
+| **English (अंग्रेजी)** | 817(BH) | 70 | 31 | English |
+| **Hindi (हिन्दी)** | 801(BA) | 70 | 30 | Hindi |
+| **Sanskrit (संस्कृत)** | 818(BP) | 70 | 31 | Sanskrit/Hindi |
+| **Mathematics (गणित)** | 822(BV) | 70 | 25 | Bilingual (Hindi/English) |
+
+Each format includes:
+- Exact section-wise structure (खण्ड अ/ब)
+- Proper marks distribution
+- MCQ with (A), (B), (C), (D) format
+- Descriptive questions with अथवा/OR options
+- Answer length proportional to marks
 
 ### 🤖 AI-Powered Features
 
 - **Question Generation**: Generate diverse questions on any topic
-- **Image Processing**:
-  - Extract questions from images (OCR)
-  - Extract handwritten/printed answers from student submissions
-- **Smart Answer Parsing**: Automatically detect and map answers like "Ans32: [text]"
-- **Proportional Marking**: AI evaluates written answers with detailed marking:
-  - 95-100% match: Full marks
-  - 75-94%: Minor deduction (1-2 marks)
-  - 50-74%: Moderate deduction (30-50%)
-  - 25-49%: Major deduction (50-75%)
-  - 1-24%: Minimal marks (1-2)
-  - 0%: Zero marks
+- **Image Processing**: Extract questions from images (OCR)
+- **Smart Answer Parsing**: Automatically detect and map answers
+- **Proportional Marking**: AI evaluates written answers with detailed marking
 - **Feedback Generation**: Detailed AI-generated feedback for written answers
 
 ### 🔐 Security
@@ -60,16 +68,14 @@ A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, 
 
 ### 🎨 UI/UX
 
-- Glassmorphism design
+- Glassmorphism design with dark theme
 - Particle background effects
 - Smooth animations with Framer Motion
 - Fully responsive design
-- Dark theme optimized
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-
 - **React 18** (Vite)
 - **Tailwind CSS** - Styling
 - **Framer Motion** - Animations
@@ -77,9 +83,9 @@ A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, 
 - **Axios** - HTTP client
 - **React Router DOM** - Navigation
 - **React Hot Toast** - Notifications
+- **React Icons** - Icon library
 
 ### Backend
-
 - **Node.js** with **Express.js**
 - **MongoDB** with **Mongoose**
 - **JWT** - Authentication
@@ -90,40 +96,44 @@ A production-ready **MERN Stack Quiz Platform** with Teacher & Student portals, 
 ## 📦 Project Structure
 
 ```
-Quiz Platform/
+quiz-platform/
 ├── backend/
 │   ├── config/
-│   │   ├── db.js           # MongoDB connection
-│   │   └── gemini.js       # Gemini AI configuration
+│   │   ├── db.js              # MongoDB connection
+│   │   └── gemini.js          # Gemini AI config & UP Board formats
 │   ├── controllers/
 │   │   ├── authController.js
-│   │   ├── quizController.js
-│   │   ├── questionController.js
 │   │   ├── geminiController.js
+│   │   ├── questionController.js
+│   │   ├── quizController.js
 │   │   └── submissionController.js
 │   ├── middleware/
-│   │   ├── auth.js         # JWT & role verification
-│   │   └── validate.js     # Input validation
+│   │   ├── auth.js            # JWT & role verification
+│   │   └── validate.js        # Input validation
 │   ├── models/
-│   │   ├── User.js
-│   │   ├── Quiz.js
 │   │   ├── Question.js
-│   │   └── Submission.js
+│   │   ├── Quiz.js
+│   │   ├── Submission.js
+│   │   └── User.js
 │   ├── routes/
 │   │   ├── auth.js
-│   │   ├── quizzes.js
-│   │   ├── questions.js
 │   │   ├── gemini.js
-│   │   ├── submissions.js
-│   │   └── results.js
+│   │   ├── questions.js
+│   │   ├── quizzes.js
+│   │   ├── results.js
+│   │   └── submissions.js
+│   ├── .env.example
+│   ├── .gitignore
 │   ├── app.js
+│   ├── package.json
 │   ├── server.js
-│   └── package.json
+│   └── vercel.json
 │
 ├── frontend/
 │   ├── public/
+│   │   └── quiz-icon.svg
 │   ├── src/
-│   ├── components/
+│   │   ├── components/
 │   │   │   ├── Loading.jsx
 │   │   │   ├── Navbar.jsx
 │   │   │   ├── ParticleBackground.jsx
@@ -131,104 +141,96 @@ Quiz Platform/
 │   │   │   └── ThemeToggle.jsx
 │   │   ├── context/
 │   │   │   └── AuthContext.jsx
-│   ├── pages/
-│   │   │   ├── Landing.jsx
+│   │   ├── pages/
 │   │   │   ├── auth/
 │   │   │   │   ├── Login.jsx
 │   │   │   │   ├── Register.jsx
 │   │   │   │   ├── StudentLogin.jsx
 │   │   │   │   └── TeacherLogin.jsx
-│   │   │   ├── teacher/
+│   │   │   ├── student/
+│   │   │   │   ├── AttemptQuiz.jsx
 │   │   │   │   ├── Dashboard.jsx
+│   │   │   │   ├── MyResults.jsx
+│   │   │   │   └── QuizResult.jsx
+│   │   │   ├── teacher/
 │   │   │   │   ├── CreateQuiz.jsx
+│   │   │   │   ├── Dashboard.jsx
 │   │   │   │   ├── ManageQuiz.jsx
 │   │   │   │   ├── ManageStudents.jsx
 │   │   │   │   ├── QuizSubmissions.jsx
-│   │   │   │   └── StudentQuizzes.jsx
-│   │   │   └── student/
-│   │   │       ├── Dashboard.jsx
-│   │   │       ├── AttemptQuiz.jsx
-│   │   │       ├── QuizResult.jsx
-│   │   │       └── MyResults.jsx
+│   │   │   │   ├── StudentQuizzes.jsx
+│   │   │   │   └── SubmissionDetails.jsx
+│   │   │   └── Landing.jsx
 │   │   ├── services/
 │   │   │   └── api.js
 │   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
+│   │   ├── index.css
+│   │   └── main.jsx
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── index.html
 │   ├── package.json
+│   ├── postcss.config.js
 │   ├── tailwind.config.js
+│   ├── vercel.json
 │   └── vite.config.js
 │
+├── .gitignore
 └── README.md
 ```
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-
 - Node.js 18+
 - MongoDB Atlas account
-- Google Gemini API key
+- Google Gemini API key(s)
 
 ### 1. Clone the Repository
-
 ```bash
 git clone <repository-url>
-cd "Quiz Platform"
+cd quiz-platform
 ```
 
 ### 2. Backend Setup
-
 ```bash
 cd backend
-
-# Install dependencies
 npm install
-
-# Create environment file
 cp .env.example .env
 ```
 
-Edit `.env` with your credentials:
-
+Edit `.env`:
 ```env
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/quiz-platform
-JWT_SECRET=your-super-secret-jwt-key-change-in-production
-GEMINI_API_KEY=your-gemini-api-key
+JWT_SECRET=your-super-secret-jwt-key
+GEMINI_API_KEY=your-primary-gemini-api-key
+GEMINI_API_KEY_2=your-backup-gemini-api-key-2
+GEMINI_API_KEY_3=your-backup-gemini-api-key-3
 PORT=5000
 NODE_ENV=development
 ```
 
 ```bash
-# Start the server
 npm run dev
 ```
 
 ### 3. Frontend Setup
-
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Create environment file
 cp .env.example .env
 ```
 
 Edit `.env`:
-
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
 ```bash
-# Start the development server
 npm run dev
 ```
 
 ### 4. Access the Application
-
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:5000
 - Health Check: http://localhost:5000/health
@@ -236,87 +238,144 @@ npm run dev
 ## 📡 API Endpoints
 
 ### Authentication
-
-| Method | Endpoint             | Description       |
-| ------ | -------------------- | ----------------- |
-| POST   | `/api/auth/register` | Register new user |
-| POST   | `/api/auth/login`    | Login user        |
-| GET    | `/api/auth/me`       | Get current user  |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register new user |
+| POST | `/api/auth/login` | Login user |
+| GET | `/api/auth/me` | Get current user |
 
 ### Quizzes (Teacher)
-
-| Method | Endpoint           | Description     |
-| ------ | ------------------ | --------------- |
-| POST   | `/api/quizzes`     | Create quiz     |
-| GET    | `/api/quizzes`     | Get all quizzes |
-| GET    | `/api/quizzes/:id` | Get quiz by ID  |
-| PUT    | `/api/quizzes/:id` | Update quiz     |
-| DELETE | `/api/quizzes/:id` | Delete quiz     |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/quizzes` | Create quiz |
+| GET | `/api/quizzes` | Get all quizzes |
+| GET | `/api/quizzes/:id` | Get quiz by ID |
+| PUT | `/api/quizzes/:id` | Update quiz |
+| DELETE | `/api/quizzes/:id` | Delete quiz |
 
 ### Questions (Teacher)
-
-| Method | Endpoint                 | Description           |
-| ------ | ------------------------ | --------------------- |
-| POST   | `/api/questions`         | Create question       |
-| POST   | `/api/questions/bulk`    | Bulk create questions |
-| GET    | `/api/questions/:quizId` | Get quiz questions    |
-| PUT    | `/api/questions/:id`     | Update question       |
-| DELETE | `/api/questions/:id`     | Delete question       |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/questions` | Create question |
+| POST | `/api/questions/bulk` | Bulk create questions |
+| GET | `/api/questions/:quizId` | Get quiz questions |
+| PUT | `/api/questions/:id` | Update question |
+| DELETE | `/api/questions/:id` | Delete question |
 
 ### Gemini AI
-
-| Method | Endpoint                        | Description                     |
-| ------ | ------------------------------- | ------------------------------- |
-| POST   | `/api/gemini/generate`          | Generate questions with AI      |
-| POST   | `/api/gemini/process-questions` | Process raw text to quiz format |
-| POST   | `/api/gemini/extract-questions` | Extract questions from image    |
-| POST   | `/api/gemini/ocr`               | Extract text from image (OCR)   |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/gemini/generate` | Generate questions with AI |
+| POST | `/api/gemini/process-questions` | Process raw text to quiz format |
+| POST | `/api/gemini/extract-questions` | Extract questions from image |
+| POST | `/api/gemini/ocr` | Extract text from image (OCR) |
 
 ### Submissions (Student)
-
-| Method | Endpoint               | Description        |
-| ------ | ---------------------- | ------------------ |
-| POST   | `/api/submissions`     | Submit quiz        |
-| GET    | `/api/submissions/my`  | Get my submissions |
-| GET    | `/api/results/:quizId` | Get quiz result    |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/submissions` | Submit quiz |
+| GET | `/api/submissions/my` | Get my submissions |
+| GET | `/api/results/:quizId` | Get quiz result |
 
 ## 🔑 Environment Variables
 
 ### Backend
-
-| Variable         | Description                          |
-| ---------------- | ------------------------------------ |
-| `MONGODB_URI`    | MongoDB connection string            |
-| `JWT_SECRET`     | Secret key for JWT tokens            |
-| `GEMINI_API_KEY` | Google Gemini API key                |
-| `PORT`           | Server port (default: 5000)          |
-| `NODE_ENV`       | Environment (development/production) |
-| `FRONTEND_URL`   | Frontend URL for CORS                |
+| Variable | Description |
+|----------|-------------|
+| `MONGODB_URI` | MongoDB connection string |
+| `JWT_SECRET` | Secret key for JWT tokens |
+| `GEMINI_API_KEY` | Primary Google Gemini API key |
+| `GEMINI_API_KEY_2` | Backup Gemini API key (optional) |
+| `GEMINI_API_KEY_3` | Backup Gemini API key (optional) |
+| `PORT` | Server port (default: 5000) |
+| `NODE_ENV` | Environment (development/production) |
+| `FRONTEND_URL` | Frontend URL for CORS |
 
 ### Frontend
-
-| Variable       | Description     |
-| -------------- | --------------- |
+| Variable | Description |
+|----------|-------------|
 | `VITE_API_URL` | Backend API URL |
+
+## 🏫 UP Board Paper Formats
+
+### Science (विज्ञान) - 70 Marks, 31 Questions
+
+**खण्ड-अ (Part-A)** - 20 MCQs × 1 mark = 20 marks
+- उप-भाग I: 7 MCQs (Q1-Q7)
+- उप-भाग II: 6 MCQs (Q8-Q13)
+- उप-भाग III: 7 MCQs (Q14-Q20)
+
+**खण्ड-ब (Part-B)** - 50 marks
+- उप-भाग I: 4 questions × 4 marks (Q21-Q24)
+- उप-भाग II: 4 questions × 4 marks (Q25-Q28)
+- उप-भाग III: 3 questions × 6 marks with OR (Q29-Q31)
+
+### English (अंग्रेजी) - Paper Code: 817(BH) - 70 Marks, 31 Questions
+
+**Part-A** - 20 MCQs × 1 mark = 20 marks
+
+**Part-B** - 50 marks
+- Q21: Reading Comprehension (8 marks)
+- Q22: Letter/Application Writing (4 marks) with OR
+- Q23: Article/Essay Writing (6 marks) with OR
+- Q24-Q27: Grammar Questions (4 × 2 marks = 8 marks)
+- Q28-Q31: Literature Questions (4 × 6 marks = 24 marks) with OR
+
+### Hindi (हिन्दी) - Paper Code: 801(BA) - 70 Marks, 30 Questions
+
+**खण्ड 'अ'** - 20 MCQs × 1 mark = 20 marks
+
+**खण्ड 'ब'** - 50 marks
+- प्र.21: गद्यांश (3×2=6 अंक) with अथवा
+- प्र.22: पद्यांश (3×2=6 अंक) with अथवा
+- प्र.23-24: संस्कृत अनुवाद (5+5=10 अंक)
+- प्र.25: खण्डकाव्य (3 अंक)
+- प्र.26: लेखक/कवि परिचय (5+5=10 अंक)
+- प्र.27: कण्ठस्थ श्लोक (2 अंक)
+- प्र.28: पत्र लेखन (4 अंक)
+- प्र.29: संस्कृत प्रश्न (2 अंक)
+- प्र.30: निबन्ध (7 अंक)
+
+### Sanskrit (संस्कृत) - Paper Code: 818(BP) - 70 Marks, 31 Questions
+
+**खण्ड 'अ'** - 20 MCQs = 20 marks
+- उपखण्ड (क): गद्यांश आधारित MCQs (प्र.1-6)
+- उपखण्ड (ख): व्याकरण MCQs (प्र.7-20)
+
+**खण्ड 'ब'** - 50 marks
+- प्र.21-26: गद्यांश/श्लोक/सारांश/चरित्र (23 अंक) with अथवा
+- प्र.27-31: व्याकरण/अनुवाद/निबन्ध (27 अंक)
+
+### Mathematics (गणित) - Paper Code: 822(BV) - 70 Marks, 25 Questions
+
+**खण्ड 'अ' (Section A)** - 20 MCQs × 1 mark = 20 marks
+- Topics: वास्तविक संख्याएं, बहुपद, द्विघात समीकरण, समान्तर श्रेढ़ी, निर्देशांक ज्यामिति, त्रिकोणमिति, वृत्त, क्षेत्रमिति, सांख्यिकी, प्रायिकता
+
+**खण्ड 'ब' (Section B)** - 50 marks
+- प्र.1: 6 parts × 2 marks = 12 marks (सभी करें)
+- प्र.2: 5 parts × 4 marks = 20 marks (किन्हीं 5, 6 में से)
+- प्र.3-5: 3 questions × 6 marks = 18 marks (अथवा सहित)
+
+**Note for Diagram-Based Questions:**
+- AI generates questions with `[चित्र आवश्यक]` tag
+- Describes figure measurements in text
+- Teachers need to add actual diagrams manually
 
 ## 🌐 Deployment
 
 ### Frontend (Vercel)
-
 1. Push to GitHub
 2. Import project in Vercel
 3. Set environment variables
 4. Deploy
 
 ### Backend (Render/Railway)
-
 1. Push to GitHub
 2. Create new web service
 3. Set environment variables
 4. Deploy
 
 ### Database (MongoDB Atlas)
-
 1. Create cluster
 2. Add database user
 3. Whitelist IP addresses
@@ -325,125 +384,37 @@ npm run dev
 ## 🧪 Testing the Application
 
 ### 1. Register Users
-
 - Create a teacher account
 - Create a student account
 
 ### 2. As Teacher
 
 **Manual Question Creation:**
-
 - Create a new quiz
-- Add questions of different types (MCQ, Written, Fill Blanks, Matching, True/False)
+- Add questions of different types
 - Set marks for each question
 - Activate the quiz
 
 **AI-Powered Question Creation:**
+- Use "Generate with AI" - select exam format (General/UP Board)
+- Use "Process Raw Questions" to convert plain text
+- Upload images to extract questions automatically
 
-- Use "Generate with AI" to create questions from a topic
-- Use "Process Raw Questions" to convert plain text into quiz format
-- Upload an image of a test paper to extract questions automatically
+**UP Board Paper Generation:**
+- Select exam format (e.g., "UP Board Science")
+- Enter topic(s) - single or comma-separated
+- AI generates complete 70-mark paper with exact structure
+- Download as PDF with answer key
 
 ### 3. As Student
-
-**Traditional Approach:**
-
 - View available quizzes
-- Attempt a quiz (timer will start)
-- Answer each question individually
+- Attempt quiz with timer
+- Upload answer sheet images (optional)
 - Submit and view results
-
-**Answer Sheet Upload:**
-
-- Navigate to the last question of the quiz
-- Upload images of your handwritten answer sheets (up to 10)
-- Ensure answers are labeled with numbers (e.g., Ans1, Ans29, Ans30)
-- AI will extract and map answers automatically
-- Submit and view results with AI feedback
-
-### 4. Multiple Attempts
-
-- Students can retake any quiz unlimited times
-- Results are updated with each new submission
-- View all attempt history in "My Results"
-
-## 🎯 Question Types Guide
-
-### 1. Multiple Choice Questions (MCQ)
-
-- 4 options (A, B, C, D)
-- Single correct answer
-- Binary scoring (correct/incorrect)
-
-### 2. True/False Questions
-
-- 2 options (True, False)
-- Single correct answer
-- Binary scoring
-
-### 3. Written Answer Questions
-
-- Open-ended text response
-- AI-powered evaluation with proportional marking
-- Detailed feedback provided
-- Support for image upload with OCR
-
-### 4. Fill in the Blanks
-
-- Multiple blanks possible
-- Exact match scoring
-- Case-insensitive comparison
-
-### 5. Matching Questions
-
-- Pairs of items to match
-- Left column and right column
-- All pairs must be correct for full marks
-
-## 📸 Image Upload Features
-
-### For Teachers
-
-- **Extract Questions**: Upload test paper images to automatically generate quiz questions
-- **Bulk Processing**: Convert raw text questions to structured format
-
-### For Students
-
-- **Answer Sheet Upload**: Upload up to 10 images of handwritten answers
-- **Auto-Mapping**: AI detects answer numbers (Ans1, Ans29, etc.) and maps to questions
-- **OCR Processing**: Extracts text from handwritten or printed answers
-- **Smart Evaluation**: AI evaluates written answers with proportional marking
-
-### Best Practices for Image Upload
-
-- Use clear, well-lit photos
-- Write on white paper with dark ink
-- Label each answer with its number (e.g., Ans1, Ans32)
-- Maximum 5MB per image
-- Supported formats: JPG, PNG, JPEG
-
-## 🎨 UI Components
-
-### Glassmorphism Classes
-
-```css
-.glass {
-  @apply bg-white/10 backdrop-blur-lg border border-white/20;
-}
-
-.glass-card {
-  @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6;
-}
-
-.btn-primary {
-  @apply bg-gradient-to-r from-blue-600 to-purple-600 text-white;
-}
-```
 
 ## 📝 Database Schemas
 
 ### User
-
 ```javascript
 {
   name: String,
@@ -454,7 +425,6 @@ npm run dev
 ```
 
 ### Quiz
-
 ```javascript
 {
   title: String,
@@ -467,47 +437,39 @@ npm run dev
 ```
 
 ### Question
-
 ```javascript
 {
   quizId: ObjectId (Quiz),
   questionType: "mcq" | "written" | "fillblank" | "matching" | "truefalse",
   questionText: String,
-
-  // For MCQ and True/False
-  options: [String],
-  correctOption: Number (0-3),
-
-  // For Written Answer
-  correctAnswer: String,
-
-  // For Fill in the Blanks
-  blanks: [String],
-
-  // For Matching
-  matchPairs: [{left: String, right: String}],
-
-  marks: Number (1-10)
+  options: [String],           // For MCQ/True-False
+  correctOption: Number,       // 0-3
+  correctAnswer: String,       // For written
+  blanks: [String],           // For fill blanks
+  matchPairs: [{left, right}], // For matching
+  marks: Number,
+  section: String,            // For board exams
+  subParts: [{part, question, answer, marks}],
+  hasAlternative: Boolean,
+  alternativeQuestion: String,
+  alternativeAnswer: String
 }
 ```
 
 ### Submission
-
 ```javascript
 {
   quizId: ObjectId (Quiz),
   studentId: ObjectId (User),
-  answers: [
-    {
-      questionId: ObjectId,
-      selectedOption: Number,        // For MCQ/True-False
-      studentAnswer: String,         // For written/fill blank
-      studentMatches: [{left, right}], // For matching
-      isCorrect: Boolean,
-      awardedMarks: Number,          // For proportional marking
-      feedback: String               // AI feedback for written answers
-    }
-  ],
+  answers: [{
+    questionId: ObjectId,
+    selectedOption: Number,
+    studentAnswer: String,
+    studentMatches: [{left, right}],
+    isCorrect: Boolean,
+    awardedMarks: Number,
+    feedback: String
+  }],
   score: Number,
   totalMarks: Number,
   percentage: Number,
@@ -517,35 +479,34 @@ npm run dev
 
 ## ⚠️ Security Considerations
 
-1. **Gemini API Key**: Never expose to frontend
+1. **Gemini API Keys**: Never expose to frontend, supports multiple keys with fallback
 2. **JWT Secret**: Use strong, unique secret in production
 3. **Password**: Minimum 6 characters, bcrypt hashed
 4. **CORS**: Configure for production domains
 5. **Input Validation**: All inputs are validated
 6. **File Upload**: Images validated for type and size (max 5MB)
-7. **API Rate Limiting**: Consider implementing for Gemini API calls
-
-## 🚀 Performance Optimization
-
-- **OCR Caching**: Consider caching OCR results for identical images
-- **Lazy Loading**: Images and components loaded on demand
-- **Optimistic Updates**: UI updates before server confirmation
-- **Debounced Requests**: Reduced API calls for text inputs
 
 ## 🔄 Recent Updates
 
-### Version 2.0 (Latest)
+### Version 3.0 (Latest)
+- ✅ UP Board Science format (70 marks, 31 questions)
+- ✅ UP Board English format (70 marks, 31 questions)
+- ✅ UP Board Hindi format (70 marks, 30 questions)
+- ✅ UP Board Sanskrit format (70 marks, 31 questions)
+- ✅ UP Board Mathematics format (70 marks, 25 questions)
+- ✅ Multiple Gemini API keys with automatic fallback
+- ✅ PDF download with board exam styling
+- ✅ Detailed answers proportional to marks
+- ✅ Questions with अथवा/OR alternatives
+- ✅ Section-wise question organization
+- ✅ Submission details page for teachers
 
-- ✅ Added 5 question types (MCQ, Written, Fill Blanks, Matching, True/False)
+### Version 2.0
+- ✅ 5 question types (MCQ, Written, Fill Blanks, Matching, True/False)
 - ✅ Multiple quiz attempts with result updates
 - ✅ Image upload for answer sheets (up to 10 per quiz)
-- ✅ Smart answer parsing with number detection (Ans29, Ans30, etc.)
-- ✅ AI-powered proportional marking for written answers
-- ✅ OCR-based text extraction from images
-- ✅ Bulk question processing from raw text
-- ✅ Question extraction from uploaded images
-- ✅ Enhanced result display for all question types
-- ✅ Detailed AI feedback for written answers
+- ✅ AI-powered proportional marking
+- ✅ OCR-based text extraction
 
 ## 📱 Browser Support
 

@@ -48,11 +48,28 @@ const executeWithFallback = async (operation) => {
         error.message
       );
 
+      // Check if error is recitation (copyrighted content detected)
+      const isRecitationError =
+        error.message?.includes("RECITATION") ||
+        error.message?.includes("blocked due to RECITATION");
+
       // Check if error is quota/rate limit related
       const isQuotaError =
         error.message?.includes("quota") ||
         error.message?.includes("rate limit") ||
         error.message?.includes("429");
+
+      if (isRecitationError) {
+        console.error(
+          "❌ RECITATION ERROR: Generated content too similar to existing material. Please try:"
+        );
+        console.error("  1. Using a more specific/different topic");
+        console.error("  2. Changing the difficulty level");
+        console.error("  3. Adding more specific instructions");
+        throw new Error(
+          "Content generation blocked due to similarity with existing material. Please rephrase your topic or try different parameters."
+        );
+      }
 
       if (isQuotaError && attempt < maxRetries - 1) {
         rotateApiKey();
@@ -73,8 +90,11 @@ const executeWithFallback = async (operation) => {
 // Normalize question type from various AI responses to standard types
 const normalizeQuestionType = (type) => {
   if (!type) return null;
-  const normalized = type.toLowerCase().trim().replace(/[_\-\s]/g, "");
-  
+  const normalized = type
+    .toLowerCase()
+    .trim()
+    .replace(/[_\-\s]/g, "");
+
   const typeMap = {
     // MCQ variations
     mcq: "mcq",
@@ -110,7 +130,7 @@ const normalizeQuestionType = (type) => {
     boolean: "truefalse",
     yesno: "truefalse",
   };
-  
+
   return typeMap[normalized] || null;
 };
 
@@ -161,30 +181,34 @@ DIFFICULTY: EASY (बोर्ड परीक्षा स्तर / Board Exa
 `,
       medium: `
 DIFFICULTY: MEDIUM (प्रतियोगी परीक्षा स्तर / Competitive Exam Level)
-- Questions should test understanding and application of concepts
-- MCQs: Include tricky options, require careful analysis, some calculation-based
-- Written: Ask for explanations with examples, compare/contrast, derive formulas
-- Include: Numerical problems, diagram-based questions, reason-based questions
-- Require: Multi-step thinking, connecting concepts, practical applications
-- Example MCQ: "यदि किसी लेंस की क्षमता -2D है, तो यह है / If power of a lens is -2D, then it is:" (with calculation needed)
-- Example Written: "उत्तल और अवतल दर्पण में अंतर स्पष्ट कीजिए। उदाहरण सहित समझाइए। / Differentiate between convex and concave mirrors with examples."
-- Include WHY and HOW questions, not just WHAT
+- Questions should test deep understanding and application of concepts
+- MCQs: Tricky distractors, require analysis and calculation, conceptual clarity needed
+- Written: Detailed explanations with examples, compare/contrast, derive formulas with steps
+- Include: Multi-step numerical problems, diagram-based reasoning, cause-effect questions
+- Require: Analytical thinking, connecting multiple concepts, practical applications
+- Numerical problems must have 2-3 steps minimum
+- Example MCQ: "एक नाव स्थिर जल में 8 km/h चलती है। यदि धारा की चाल 2 km/h है, तो धारा के प्रतिकूल 30 km की दूरी तय करने में कितना समय लगेगा? / A boat moves at 8 km/h in still water. If stream speed is 2 km/h, time to cover 30 km upstream?"
+- Example Written: "द्विघात समीकरण ax²+bx+c=0 के मूलों की प्रकृति विवेचक के आधार पर समझाइए। उदाहरण सहित सिद्ध कीजिए। / Explain nature of roots of quadratic equation based on discriminant with proof and examples."
+- Focus on WHY, HOW, and PROVE questions, not just WHAT
 `,
       hard: `
-DIFFICULTY: HARD (JEE/NEET/Olympiad स्तर / Competitive Entrance Level)
-- Questions should be challenging, requiring deep understanding
-- MCQs: Complex scenarios, multiple concepts combined, assertion-reason type, numerical with multiple steps
-- Written: Derivations, prove statements, complex numerical, case studies, HOTS questions
-- Include: Integration of multiple topics, real-world problem solving, critical thinking
-- Require: Advanced reasoning, mathematical calculations, conceptual clarity
-- Example MCQ: "एक उत्तल लेंस की फोकस दूरी 20cm है। यदि वस्तु को 15cm पर रखा जाए तो प्रतिबिंब की प्रकृति और आवर्धन ज्ञात कीजिए। / A convex lens has focal length 20cm. If object is placed at 15cm, find nature and magnification of image."
-- Example Written: "लेंस निर्माता सूत्र का व्युत्पन्न कीजिए और इसका उपयोग करके सिद्ध कीजिए कि... / Derive lens maker's formula and use it to prove that..."
-- Include: Assertion-Reason, Case-based, Numerical with 3+ steps, Derivations
-- Questions should make students THINK, not just recall
-`
+DIFFICULTY: HARD (JEE/NEET/Olympiad स्तर / Advanced Competitive Level)
+- Questions MUST be highly challenging, testing mastery and deep conceptual understanding
+- MCQs: Complex multi-step problems, assertion-reason type, integration of 2-3 concepts, advanced numericals
+- All MCQs must require calculations or deep reasoning - NO direct recall questions
+- Written: Complete derivations with all steps, prove complex statements, multi-concept integration, HOTS questions
+- Include: Advanced theorems, applications in real-world complex scenarios, critical analysis
+- Numerical problems MUST have 4-5 steps minimum with intermediate calculations
+- Example MCQ: "एक लेंस की फोकस दूरी 20cm है। जब वस्तु को एक स्थिति से 10cm पास लाया जाता है तो प्रतिबिंब की दूरी 2/3 गुनी हो जाती है। वस्तु की प्रारंभिक दूरी क्या थी? / A lens of focal length 20cm forms image. When object is moved 10cm closer, image distance becomes 2/3 times. Find initial object distance."
+- Example Written: "समान्तर श्रेणी के n पदों के योग का सूत्र Sn = n/2[2a+(n-1)d] व्युत्पन्न कीजिए। इसका उपयोग करके सिद्ध कीजिए कि यदि Sp = q और Sq = p हो, तो Sp+q = -(p+q)। / Derive AP sum formula and prove that if Sp = q and Sq = p, then Sp+q = -(p+q)."
+- Include: Assertion-Reason (both with explanations), Case-based with analysis, Lengthy numericals with 4+ steps, Complete derivations with geometric/algebraic proofs
+- Mathematical problems should require: formula manipulation, substitution, solving equations, verification
+- Every question should challenge even top students and require complete problem-solving skills
+`,
     };
 
-    const difficultyNote = difficultyInstructions[difficulty] || difficultyInstructions.medium;
+    const difficultyNote =
+      difficultyInstructions[difficulty] || difficultyInstructions.medium;
 
     // UP Board Science Format - Exact Paper Structure (70 Marks)
     const upBoardScienceFormat = `
@@ -585,11 +609,455 @@ SECTION VALUES (MUST include in each question):
 - उत्तर: प्रत्येक पद के लिए एक संस्कृत वाक्य
 `;
 
+    // UP Board Mathematics Format - Exact Paper Structure (70 Marks) - Paper Code 822(BV)
+    const upBoardMathsFormat = `
+⚠️ CONTENT GENERATION INSTRUCTIONS:
+====================================
+- You can reference NCERT textbook and previous UP Board papers
+- Use similar question patterns and concepts from standard materials
+- Modify numerical values slightly to create variations
+- Paraphrase questions to avoid exact word-for-word copies
+- Maintain the same difficulty level and concept coverage
+
+YOU ARE GENERATING UP BOARD CLASS 10 MATHEMATICS PAPER (गणित) - TOTAL 70 MARKS
+Paper Code: 822(BV) | Roll No: 928 | Paper ID: 2162159 | Total Questions: 25
+
+TOPIC(S) FOR THIS PAPER: "${topic}"
+
+⚠️⚠️⚠️ CRITICAL - SMART TOPIC INTERPRETATION ⚠️⚠️⚠️
+=================================================================
+**UNDERSTAND THE TOPIC TYPE FIRST - THEN FOLLOW THE RULES BELOW:**
+
+MANDATORY TOPIC HANDLING RULES:
+================================
+
+1. ✓ **IF GENERAL TOPIC** (topic is "गणित" or "Mathematics" or "Maths"):
+   → USE VARIETY from MULTIPLE DIFFERENT chapters/topics
+   → MCQs: Distribute across 6-8 different chapters (त्रिकोणमिति, निर्देशांक ज्यामिति, समान्तर श्रेढ़ी, सांख्यिकी, प्रायिकता, क्षेत्रमिति, etc.)
+   → Descriptive: Use different chapters for different questions
+   → This gives students COMPREHENSIVE practice across all topics
+   
+2. ✗ **IF SPECIFIC CHAPTER** (e.g., "त्रिकोणमिति", "समान्तर श्रेढ़ी", "Coordinate Geometry"):
+   → ALL 25 questions from THAT CHAPTER ONLY
+   → MCQs: All 20 questions on that specific chapter (vary subtopics within it)
+   → Descriptive: All 5 question sets from that chapter only
+   → DO NOT mix other chapters
+   
+3. **IF MULTIPLE SPECIFIC CHAPTERS** (e.g., "द्विघात समीकरण, त्रिकोणमिति"):
+   → Distribute ALL 25 questions ONLY across these specified chapters
+   → Example: 10 MCQs from each chapter
+   → DO NOT add any other chapters
+
+⚠️ KEY DISTINCTION:
+   • "गणित"/"Mathematics" = VARIETY needed (different chapters)
+   • "त्रिकोणमिति" = FOCUSED (only that chapter)
+
+${difficultyNote}
+
+EXACT PAPER STRUCTURE (70 Marks):
+==================================
+
+खण्ड 'अ' / SECTION 'A' (बहुविकल्पीय प्रश्न / Multiple Choice Questions) - 20 Marks
+- 20 MCQs × 1 mark each = 20 marks
+- **IMPORTANT**: Follow topic rules above
+- Format: 4 options (A), (B), (C), (D)
+- BILINGUAL: "हिंदी प्रश्न / English Question"
+
+खण्ड 'ब' / SECTION 'B' (वर्णनात्मक प्रश्न / Descriptive Questions) - 50 Marks
+
+1. प्रश्न 1 (Question 1) - सभी खण्ड कीजिए / Do all parts - 12 Marks
+   - 6 parts: (क), (ख), (ग), (घ), (ङ), (च) OR (a), (b), (c), (d), (e), (f)
+   - Each part = 2 marks
+   - Total = 6 × 2 = 12 marks
+   - All parts are COMPULSORY
+   - Section value: "खण्ड-ब (Part-B) प्र.1 (2 अंक प्रत्येक)"
+
+2. प्रश्न 2 (Question 2) - किन्हीं पाँच खण्डों को हल कीजिए / Do any five parts - 20 Marks
+   - 6 parts given: (क), (ख), (ग), (घ), (ङ), (च) OR (a), (b), (c), (d), (e), (f)
+   - Student attempts any 5 parts
+   - Each part = 4 marks
+   - Total = 5 × 4 = 20 marks (but generate 6 parts)
+   - Section value: "खण्ड-ब (Part-B) प्र.2 (4 अंक प्रत्येक)"
+
+3. प्रश्न 3 (Question 3) - अथवा सहित / With OR option - 6 Marks
+   - One 6-mark question with अथवा / OR alternative
+   - Section value: "खण्ड-ब (Part-B) प्र.3 (6 अंक)"
+
+4. प्रश्न 4 (Question 4) - अथवा सहित / With OR option - 6 Marks
+   - One 6-mark question with अथवा / OR alternative
+   - Section value: "खण्ड-ब (Part-B) प्र.4 (6 अंक)"
+
+5. प्रश्न 5 (Question 5) - अथवा सहित / With OR option - 6 Marks
+   - One 6-mark question with अथवा / OR alternative
+   - Section value: "खण्ड-ब (Part-B) प्र.5 (6 अंक)"
+
+GRAND TOTAL: 25 question sets = 70 marks
+(20 MCQs + 1 set of 6 parts(2m each) + 1 set of 6 parts(4m each, do 5) + 3 questions(6m each))
+
+=== MCQ GENERATION FOR खण्ड 'अ' (Q1-20) ===
+⚠️⚠️⚠️ CRITICAL - TOPIC INTERPRETATION RULES ⚠️⚠️⚠️
+===============================================================
+RECEIVED TOPIC: "${topic}"
+
+**SMART TOPIC DETECTION:**
+
+✓ GENERAL TOPICS (Use variety from DIFFERENT chapters):
+  - "गणित" / "Mathematics" / "Maths" / "Math"
+  - Any variation of general math terms
+  → Generate questions from MULTIPLE different chapters:
+     • त्रिकोणमिति (Trigonometry) 
+     • निर्देशांक ज्यामिति (Coordinate Geometry)
+     • समान्तर श्रेढ़ी (Arithmetic Progression)
+     • द्विघात समीकरण (Quadratic Equations)
+     • सांख्यिकी (Statistics)
+     • प्रायिकता (Probability)
+     • क्षेत्रमिति (Mensuration)
+     • चतुर्भुज (Quadrilaterals)
+     • त्रिभुज (Triangles)
+     • वृत्त (Circles)
+  → Distribute MCQs across 5-8 different chapters for variety
+
+✗ SPECIFIC CHAPTER (Use ONLY that chapter):
+  - "त्रिकोणमिति" / "Trigonometry"
+  - "समान्तर श्रेढ़ी" / "Arithmetic Progression" / "AP"
+  - "निर्देशांक ज्यामिति" / "Coordinate Geometry"
+  - "सांख्यिकी" / "Statistics"
+  - "प्रायिकता" / "Probability"
+  - Any specific chapter name
+  → ALL 20 MCQs from that specific chapter ONLY
+  → Do NOT mix other chapters
+
+BILINGUAL FORMAT REQUIRED for ALL MCQs:
+Question format: "हिंदी में प्रश्न / Question in English:"
+Options format: (A) "हिंदी" / "English" (B) ... (C) ... (D) ...
+
+**MCQ DISTRIBUTION RULES:**
+
+✓ IF General Topic ("गणित"/"Mathematics"):
+→ ONLY THEN use variety from these standard topics:
+1-2.   वास्तविक संख्याएं / Real Numbers: HCF/LCM, भाज्य गुणनखण्डन, परिमेय/अपरिमेय
+3-4.   बहुपद / Polynomials: शून्यक और गुणांकों में संबंध, विभाजन एल्गोरिथ्म
+5-6.   द्विघात समीकरण / Quadratic Equations: मूल की प्रकृति, विवेचक
+7-8.   समान्तर श्रेढ़ी / AP: सार्व-अन्तर, nवां पद, प्रथम n पदों का योग
+9-10.  निर्देशांक ज्यामिति / Coordinate Geometry: दूरी सूत्र, विभाजन बिंदु
+11-12. त्रिकोणमिति / Trigonometry: त्रिकोणमितीय अनुपात, मान, सर्वसमिकाएँ
+13-14. वृत्त / Circles: स्पर्श रेखा, त्रिज्या, जीवा
+15-16. क्षेत्रमिति / Mensuration: शंकु/बेलन/गोला का आयतन/क्षेत्रफल
+17-18. सांख्यिकी / Statistics: माध्य/माध्यिका/बहुलक, बारंबारता सारणी
+19-20. प्रायिकता / Probability: सैद्धांतिक प्रायिकता, पासा/सिक्का
+
+=== प्रश्न 1 FORMAT (12 अंक - 6 × 2) - सभी भाग अनिवार्य ===
+⚠️⚠️⚠️ TOPIC RULE: "${topic}" ⚠️⚠️⚠️
+
+Generate 6 parts with 2 marks each. All parts MUST be answered:
+
+✓ **IF General Topic** ("गणित"/"Mathematics"): 
+→ Use VARIETY - Each part from DIFFERENT chapter
+→ Example: (क) Trigonometry, (ख) Coordinate Geometry, (ग) AP, (घ) Quadratic, (ङ) Statistics, (च) Probability
+
+✗ **IF Specific Chapter** (e.g., "त्रिकोणमिति"): 
+→ ALL 6 parts from that chapter ONLY (vary problem types within trigonometry)
+✗ **IF Specific Chapter** (e.g., "त्रिकोणमिति"): 
+→ ALL 6 parts from that chapter ONLY (vary problem types within trigonometry)
+
+Example formats (showing variety for general topic):
+- क्षेत्रमिति: शंकु/बेलन/गोला का आयतन या पृष्ठीय क्षेत्रफल
+- वास्तविक संख्याएं: HCF या LCM अभाज्य गुणनखंडन विधि द्वारा
+- निर्देशांक ज्यामिति: रेखाखंड विभाजन, दूरी सूत्र
+- त्रिकोणमिति: मान ज्ञात करना, सर्वसमिका सिद्ध करना
+- समान्तर श्रेढ़ी: nवां पद, सार्व-अन्तर, योग ज्ञात करना
+- द्विघात समीकरण: विवेचक, मूलों की प्रकृति
+
+=== प्रश्न 2 FORMAT (20 अंक - किन्हीं 5 × 4) ===
+⚠️⚠️⚠️ TOPIC RULE: "${topic}" ⚠️⚠️⚠️
+
+Generate 6 parts, student attempts any 5. Each part = 4 marks:
+
+✓ **IF General Topic** ("गणित"/"Mathematics"):
+→ Use VARIETY - Each part from DIFFERENT chapter
+→ Example: (क) AP, (ख) Quadratic equations, (ग) Triangles, (घ) Quadrilaterals, (ङ) Statistics, (च) Probability
+
+✗ **IF Specific Chapter** (e.g., "त्रिकोणमिति"):
+→ ALL 6 parts from that chapter ONLY (vary problem types within trigonometry)
+
+Example formats showing VARIETY for General topic ("गणित"):
+(क) / (a) समान्तर श्रेढ़ी / AP - 4 marks
+   17वां पद, सार्व-अन्तर, योग की समस्याएं
+   Example: "किसी AP का तीसरा पद 5 है और सातवां पद 9 है। 17वां पद ज्ञात कीजिए"
+
+(ख) / (b) द्विघात समीकरण / Quadratic Equation - 4 marks
+   समीकरण के मूल ज्ञात करना
+   Example: "समीकरण √2x² + 7x + 5√2 = 0 के मूल ज्ञात कीजिए"
+
+(ग) / (c) त्रिभुज प्रमेय / Triangle Theorem - 4 marks
+   बेसिक प्रमेय या पाइथागोरस प्रमेय सिद्ध करना
+   Example: "त्रिभुज ABC की भुजा BC पर D एक बिंदु इस प्रकार है कि ∠ADC = ∠BAC. सिद्ध कीजिए कि CA² = CB × CD"
+
+(घ) / (d) चतुर्भुज प्रमेय / Quadrilateral Theorem - 4 marks
+   चतुर्भुज का वृत्त परिगत होना सिद्ध करना
+   Example: "एक चतुर्भुज ABCD किसी वृत्त के परिगत खींचा गया है। सिद्ध कीजिए कि AB + CD = AD + BC"
+
+(ङ) / (e) सांख्यिकी / Statistics - 4 marks
+   दी गई बारंबारता वितरण का माध्यक ज्ञात करना
+   Example: "यदि दिए गए आवृत्ति वितरण का माध्यक 28.5 है, तो 'x' और 'y' का मान ज्ञात कीजिए (दिया है n = 60)"
+
+(च) / (f) प्रायिकता / Probability - 4 marks
+   प्रायिकता की गणना
+   Example: "किसी कारण 12 खराब पेन, 132 अच्छे पेनों में मिल गए हैं। इस मिश्रण में से एक पेन यादृच्छया निकाला जाता है। निकाले गए पेन के अच्छे होने की प्रायिकता ज्ञात कीजिए"
+
+Example formats for SPECIFIC CHAPTER - Trigonometry:
+- त्रिकोणमितीय मान: sin 30°, cos 45°, tan 60° से संबंधित समस्याएं
+- सर्वसमिका सिद्ध करना: (1+tanθ)² + (1-tanθ)² = 2sec²θ
+- ऊंचाई और दूरी: मीनार/भवन की ऊंचाई या दूरी ज्ञात करना
+- कोण की गणना: त्रिकोणमितीय अनुपात से कोण निकालना
+- समीकरण हल करना: 2sin²θ - 3sinθ + 1 = 0
+- अनुपात सिद्ध करना: tanA/(1-cotA) + cotA/(1-tanA) = 1 + secA·cosecA
+
+=== प्रश्न 3 FORMAT (6 अंक) - अथवा सहित ===
+⚠️⚠️⚠️ TOPIC RULE: "${topic}" ⚠️⚠️⚠️
+
+**IF General Topic** ("गणित"/"Mathematics"):
+→ Main & OR can be from DIFFERENT chapters for variety
+
+**IF Specific Chapter**:
+→ Main & OR BOTH from that chapter ONLY
+
+Example for TRIGONOMETRY topic:
+Main: "यदि secθ + tanθ = p है, तो सिद्ध कीजिए कि (p² - 1)/(p² + 1) = sinθ"
+अथवा: "सिद्ध कीजिए कि: √[(1+sinθ)/(1-sinθ)] = secθ + tanθ"
+
+Example for COORDINATE GEOMETRY topic:
+Main: "वह अनुपात ज्ञात कीजिए जिसमें बिंदु (-3, k) रेखाखंड जो बिंदुओं (-5, 4) और (-2, 3) को मिलाता है, को विभाजित करता है। k का मान भी ज्ञात कीजिए।"
+अथवा: "△ABC के शीर्ष A(4, 2), B(6, 5) और C(1, 4) हैं। माध्यिका AD की लंबाई ज्ञात कीजिए।"
+
+=== प्रश्न 4 FORMAT (6 अंक) - अथवा सहित ===
+⚠️⚠️⚠️ TOPIC RULE: "${topic}" ⚠️⚠️⚠️
+
+**IF General Topic** ("गणित"/"Mathematics"):
+→ Main & OR can be from DIFFERENT chapters for variety
+
+**IF Specific Chapter**:
+→ Main & OR BOTH from that chapter ONLY
+
+Example for TRIGONOMETRY topic (Heights & Distances):
+Main: "एक 80 m चौड़ी सड़क के दोनों ओर आमने-सामने समान ऊँचाई वाले दो खंभे लगे हुए हैं। खंभों के बीच सड़क पर स्थित किसी बिंदु से इन दोनों खंभों के शिखर के उन्नयन कोण क्रमशः 60° और 30° हैं। खंभों की ऊँचाई और खंभों से बिंदु की दूरी ज्ञात कीजिए।"
+अथवा: "भूमि के एक बिंदु से 20 m ऊँचे भवन के शिखर पर लगी एक मीनार के तल और शिखर के उन्नयन कोण क्रमशः 45° और 60° हैं। मीनार की ऊँचाई ज्ञात कीजिए।"
+
+Example for AP/SEQUENCE topic:
+Main: "किसी AP के n पद का योग 3n² + 5n है। इस AP का 25वां पद ज्ञात कीजिए।"
+अथवा: "एक AP के 6वें और 17वें पदों का योग 40 है और 13वें पद 24 है। AP का प्रथम पद और सार्व-अन्तर ज्ञात कीजिए।"
+
+=== प्रश्न 5 FORMAT (6 अंक) - अथवा सहित ===
+⚠️⚠️⚠️ TOPIC RULE: "${topic}" ⚠️⚠️⚠️
+
+**IF General Topic** ("गणित"/"Mathematics"):
+→ Main & OR can be from DIFFERENT chapters for variety [चित्र आवश्यक if needed]
+
+**IF Specific Chapter**:
+→ Main & OR BOTH from that chapter ONLY [चित्र आवश्यक if needed]
+
+Example for MENSURATION topic:
+Main: "लकड़ी के एक ठोस बेलन के प्रत्येक सिरे पर एक अर्धगोला खोदकर निकालते हुए एक खिलौना बनाया गया है। यदि बेलन की ऊँचाई 10 cm है और आधार की त्रिज्या 3.5 cm है तो इस खिलौने का समग्र पृष्ठीय क्षेत्रफल ज्ञात कीजिए। (π = 22/7 लीजिए)"
+Include: [चित्र की व्याख्या: बेलन (10 cm ऊँचाई, 3.5 cm त्रिज्या) के दोनों सिरों पर 3.5 cm त्रिज्या के अर्धगोले]
+अथवा: "एक ठोस एक अर्धगोले पर खड़े शंकु के आकार का है, शंकु और अर्धगोले की त्रिज्याएँ समान हैं तथा इसका माप 3 cm है। यदि ठोस की ऊँचाई 6 cm है, तो ठोस का आयतन ज्ञात कीजिए।"
+
+Example for TRIGONOMETRY topic:
+Main: "सिद्ध कीजिए कि: (secA - tanA)² = (1 - sinA)/(1 + sinA)"
+अथवा: "यदि cotθ + tanθ = x और secθ - cosθ = y है, तो सिद्ध कीजिए कि (x²y)^(2/3) - (xy²)^(2/3) = 1"
+
+=== ANSWER LENGTH REQUIREMENTS (PROPORTIONAL TO MARKS) ===
+- 1-mark MCQ: Just the correct option letter (केवल सही विकल्प)
+- 2-mark questions: 50-80 words with step-by-step solution
+  * Show all calculation steps
+  * Include formulas used
+  * Final answer clearly stated
+- 4-mark questions: 100-150 words with complete detailed solution
+  * Show all working steps
+  * Include all formulas and substitutions
+  * Explain the method/approach
+  * Include intermediate results
+  * Final answer with units
+- 6-mark questions: 150-200 words with comprehensive solution
+  * Detailed step-by-step working
+  * All formulas with explanations
+  * Multiple calculation steps shown
+  * For word problems: define variables, form equations, solve, verify
+  * For geometry: mention theorems used
+  * For diagrams: describe figure measurements
+  * Final answer with complete units and verification
+
+=== MATHEMATICAL NOTATION RULES ===
+- Use Unicode subscripts: H₂O, CO₂, x₁, x₂, aₙ
+- Use Unicode superscripts: x², x³, 2ⁿ
+- Square root: √2, √3, √(x² + y²)
+- Fractions: 1/2, 3/4, (x+1)/(x-1)
+- Greek letters: α (alpha), β (beta), θ (theta), π (pi)
+- Angles: ∠ABC, ∠BAC
+- Triangles: △ABC, △PQR
+- Parallel: ||, Perpendicular: ⊥
+- Approximately: ≈, Not equal: ≠
+- Greater/Less: >, <, ≥, ≤
+
+=== DIAGRAM DRAWING INSTRUCTIONS (चित्र कैसे बनाएं) ===
+
+**CRITICAL: DO NOT try to generate diagrams. Instead, provide CLEAR STEP-BY-STEP DRAWING INSTRUCTIONS in the answer.**
+
+For questions requiring diagrams, include detailed drawing instructions in the answer:
+
+**1. GEOMETRY QUESTIONS (त्रिभुज, चतुर्भुज, वृत्त):**
+Format: "[चित्र बनाने की विधि: Step 1: ... Step 2: ... Step 3: ...]"
+
+Example for Triangle:
+"[चित्र बनाने की विधि:
+चरण 1: एक त्रिभुज ABC बनाइए जिसमें BC = 6 cm हो।
+चरण 2: बिंदु D को BC पर इस प्रकार अंकित करें कि BD = 4 cm हो।
+चरण 3: बिंदु A को D से और फिर B और C से जोड़िए।
+चरण 4: ∠ADC और ∠BAC को दर्शाइए।]"
+
+Example for Circle:
+"[Drawing Instructions:
+Step 1: Draw a circle with center O and radius 5 cm.
+Step 2: Mark point P outside the circle at 13 cm from O.
+Step 3: Draw two tangents PA and PB from point P to the circle.
+Step 4: Label points A and B where tangents touch the circle.
+Step 5: Join OA, OB, and OP.]"
+
+**2. HEIGHT & DISTANCE (ऊँचाई और दूरी):**
+Format: Include building/tower heights, angles, and observer position
+
+Example:
+"[चित्र बनाने की विधि:
+चरण 1: एक क्षैतिज रेखा खींचें (भूमि को दर्शाने के लिए)।
+चरण 2: बाईं ओर 80 m ऊँचा एक लंबवत खंभा AB बनाएं।
+चरण 3: दाईं ओर समान ऊँचाई का दूसरा खंभा CD बनाएं।
+चरण 4: भूमि पर बिंदु P अंकित करें (दोनों खंभों के बीच)।
+चरण 5: P से A तक रेखा खींचें और उन्नयन कोण 60° दर्शाएं।
+चरण 6: P से C तक रेखा खींचें और उन्नयन कोण 30° दर्शाएं।
+चरण 7: सभी माप लेबल करें: ऊँचाई, दूरी, कोण।]"
+
+**3. MENSURATION (क्षेत्रमिति) - COMBINED SOLIDS:**
+Format: Detailed description of each solid component with measurements
+
+Example for Cylinder with Hemispheres:
+"[चित्र बनाने की विधि:
+चरण 1: बीच में एक बेलन बनाएं (ऊँचाई 10 cm, त्रिज्या 3.5 cm)।
+चरण 2: बेलन के ऊपरी सिरे पर एक अर्धगोला बनाएं (त्रिज्या 3.5 cm)।
+चरण 3: बेलन के निचले सिरे पर एक अर्धगोला बनाएं (त्रिज्या 3.5 cm)।
+चरण 4: सभी माप स्पष्ट रूप से लिखें।
+चरण 5: बिंदीदार रेखाओं से छिपे भागों को दर्शाएं।]"
+
+Example for Cone on Hemisphere:
+"[Drawing Instructions:
+Step 1: Draw a hemisphere with radius 3 cm (base at bottom).
+Step 2: On top of hemisphere, draw a cone with same base radius 3 cm.
+Step 3: Mark total height of solid as 6 cm.
+Step 4: Since hemisphere radius = 3 cm, cone height = 6 - 3 = 3 cm.
+Step 5: Label all dimensions clearly.
+Step 6: Use dashed lines for hidden edges.]"
+
+**4. COORDINATE GEOMETRY (निर्देशांक ज्यामिति):**
+Format: X-Y axes with labeled points and coordinates
+
+Example:
+"[चित्र बनाने की विधि:
+चरण 1: X और Y अक्ष खींचें (मूल बिंदु O पर मिलते हुए)।
+चरण 2: बिंदु A(-1, 7) को अंकित करें।
+चरण 3: बिंदु B(4, -3) को अंकित करें।
+चरण 4: A और B को जोड़कर रेखाखंड AB बनाएं।
+चरण 5: बिंदु P को AB पर अंकित करें जो AB को 2:3 में विभाजित करता है।
+चरण 6: सभी निर्देशांक स्पष्ट लिखें।]"
+
+**5. STATISTICAL GRAPHS (सांख्यिकी ग्राफ):**
+Format: Frequency polygon, histogram, or ogive with labeled axes
+
+Example:
+"[Graph Drawing Instructions:
+Step 1: Draw X-axis for class intervals (0-10, 10-20, etc.).
+Step 2: Draw Y-axis for frequency.
+Step 3: Mark midpoints of class intervals on X-axis.
+Step 4: Plot frequency values at corresponding midpoints.
+Step 5: Join all points with straight lines to form frequency polygon.
+Step 6: Label axes: "वर्ग-अंतराल (Class Interval)" and "बारंबारता (Frequency)".]"
+
+**IMPORTANT: Every diagram instruction MUST include:**
+1. चरण-दर-चरण विधि (Step-by-step method)
+2. सभी माप (All measurements)
+3. कोण (Angles) if applicable
+4. लेबल (Labels) for all parts
+5. बिंदीदार रेखाएं (Dashed lines) for hidden parts
+
+=== JSON STRUCTURE FOR EACH QUESTION ===
+
+For MCQs (Q1-20):
+{
+  "questionType": "mcq",
+  "questionText": "हिंदी प्रश्न / English Question:",
+  "options": [
+    "(A) हिंदी / English",
+    "(B) हिंदी / English",
+    "(C) हिंदी / English",
+    "(D) हिंदी / English"
+  ],
+  "correctOption": 0-3,
+  "marks": 1,
+  "section": "खण्ड-अ (Section-A) MCQ (1 अंक)"
+}
+
+For प्रश्न 1 parts (6 parts × 2 marks):
+{
+  "questionType": "written",
+  "questionText": "(क) / (a) प्रश्न हिंदी में / Question in English:",
+  "correctAnswer": "Complete solution in 50-80 words with all steps",
+  "marks": 2,
+  "section": "खण्ड-ब (Part-B) प्र.1 (2 अंक प्रत्येक)",
+  "partLabel": "(क)"  // or (ख), (ग), (घ), (ङ), (च)
+}
+
+For प्रश्न 2 parts (6 parts × 4 marks, attempt any 5):
+{
+  "questionType": "written",
+  "questionText": "(क) / (a) प्रश्न हिंदी में / Question in English:",
+  "correctAnswer": "Complete solution in 100-150 words with detailed steps",
+  "marks": 4,
+  "section": "खण्ड-ब (Part-B) प्र.2 (4 अंक प्रत्येक)",
+  "partLabel": "(क)",  // or (ख), (ग), (घ), (ङ), (च)
+  "attemptNote": "किन्हीं पाँच भागों को हल कीजिए / Do any five parts"
+}
+
+For प्रश्न 3, 4, 5 (6 marks each with OR):
+{
+  "questionType": "written",
+  "questionText": "Main question (प्रश्न हिंदी में / Question in English):",
+  "correctAnswer": "Comprehensive solution in 150-200 words with all calculation steps",
+  "marks": 6,
+  "section": "खण्ड-ब (Part-B) प्र.3 (6 अंक)",  // or प्र.4, प्र.5
+  "hasAlternative": true,
+  "alternativeQuestion": "अथवा / OR\n\nAlternative question (हिंदी / English):",
+  "alternativeAnswer": "Complete alternative solution in 150-200 words"
+}
+
+CRITICAL REMINDERS:
+1. ALWAYS use BILINGUAL format: "हिंदी / English" for ALL questions
+2. MCQ options MUST have (A), (B), (C), (D) format
+3. प्रश्न 1: All 6 parts COMPULSORY (सभी भाग अनिवार्य)
+4. प्रश्न 2: Generate 6 parts, student does any 5 (किन्हीं 5 करें)
+5. प्रश्न 3, 4, 5: Each has "अथवा / OR" with alternative question
+6. Answer length MUST be proportional to marks (1:2:4:6 ratio)
+7. **DIAGRAM INSTRUCTIONS**: DO NOT generate diagrams! Instead include detailed step-by-step drawing instructions in [चित्र बनाने की विधि: ...] format in the answer
+8. For geometry/mensuration: Provide complete diagram drawing steps with all measurements, angles, and labels
+9. Use correct Unicode mathematical symbols (√, ², ³, π, θ, ∠, △, etc.)
+10. Show ALL calculation steps - marks are for METHOD, not just answer
+11. For word problems: Define variables → Form equation → Solve → Verify → Answer
+12. Every answer must include: Given data → Formula → Substitution → Calculation → Final Answer with units
+
+RETURN ONLY valid JSON array with properly structured questions.
+`;
+
     // For UP Board, override settings
     let finalNumberOfQuestions = numberOfQuestions;
     let finalQuestionTypes = questionTypes;
     let finalLanguage = language;
-    
+
     if (examFormat === "upboard_science") {
       finalNumberOfQuestions = 31; // 20 MCQ + 4(4-mark) + 4(4-mark) + 3(6-mark) = 31
       finalQuestionTypes = ["mcq", "written"];
@@ -606,6 +1074,10 @@ SECTION VALUES (MUST include in each question):
       finalNumberOfQuestions = 31; // 20 MCQ + 11 descriptive = 31
       finalQuestionTypes = ["mcq", "written"];
       finalLanguage = "sanskrit";
+    } else if (examFormat === "upboard_maths") {
+      finalNumberOfQuestions = 25; // 20 MCQ + 5 descriptive sets = 25
+      finalQuestionTypes = ["mcq", "written"];
+      finalLanguage = "bilingual";
     }
 
     // Exam format specific instructions
@@ -615,6 +1087,7 @@ SECTION VALUES (MUST include in each question):
       upboard_science: upBoardScienceFormat,
       upboard_english: upBoardEnglishFormat,
       upboard_sanskrit: upBoardSanskritFormat,
+      upboard_maths: upBoardMathsFormat,
     };
 
     const examFormatNote = examFormatInstructions[examFormat] || "";
@@ -677,7 +1150,7 @@ Example: {"questionType": "truefalse", "questionText": "The Earth is flat.", "op
 
     // Build the prompt based on exam format
     let prompt;
-    
+
     if (examFormat === "upboard_science") {
       prompt = `${upBoardScienceFormat}
 
@@ -967,6 +1440,67 @@ STRICT RULES:
 IMPORTANT: ALL ANSWERS MUST BE VERY LONG AND DETAILED AS SHOWN IN EXAMPLES ABOVE.
 
 Return ONLY valid JSON array with exactly 31 questions. No markdown, no explanation.`;
+    } else if (examFormat === "upboard_maths") {
+      prompt = `UP BOARD CLASS 10 MATHEMATICS PAPER (गणित) - 70 अंक, 25 प्रश्न बनाएं।
+Paper Code: 822(BV)
+
+विषय: "${topic}"
+
+संरचना (EXACT STRUCTURE - 25 questions = 70 marks):
+
+खण्ड 'अ' (Section A) - बहुविकल्पीय प्रश्न (MCQ) - 20 अंक:
+- 20 प्रश्न × 1 अंक = 20 अंक (प्र.1-20)
+- Topics: वास्तविक संख्याएं, बहुपद, द्विघात समीकरण, समान्तर श्रेढ़ी, निर्देशांक ज्यामिति, त्रिकोणमिति, वृत्त, क्षेत्रमिति, सांख्यिकी, प्रायिकता
+
+खण्ड 'ब' (Section B) - वर्णनात्मक प्रश्न - 50 अंक:
+- प्र.21: 6 भाग × 2 अंक = 12 अंक (सभी करें)
+- प्र.22: 6 भाग में से किन्हीं 5 × 4 अंक = 20 अंक
+- प्र.23: 1 प्रश्न × 6 अंक = 6 अंक (अथवा सहित)
+- प्र.24: 1 प्रश्न × 6 अंक = 6 अंक (अथवा सहित)
+- प्र.25: 1 प्रश्न × 6 अंक = 6 अंक (अथवा सहित)
+
+=== ANSWER LENGTH - DETAILED WITH FULL SOLUTION ===
+- 6 अंक: 150-200 शब्द + पूर्ण हल (सभी चरण, सूत्र, गणना)
+- 4 अंक: 100-150 शब्द + पूर्ण हल
+- 2 अंक: 50-80 शब्द + संक्षिप्त हल
+- 1 अंक (MCQ): केवल सही विकल्प
+
+=== DIAGRAM-BASED QUESTIONS ===
+- For geometry/mensuration questions, include [चित्र आवश्यक] tag
+- Describe the figure in text with all measurements
+- Example: "एक बेलन जिसकी ऊँचाई 10 cm और त्रिज्या 3.5 cm है [चित्र आवश्यक]"
+
+JSON FORMAT:
+
+MCQ (प्र.1-20):
+{"questionType":"mcq","questionText":"यदि द्विघात समीकरण x² - 5x + 6 = 0 के मूल α और β हों, तो α + β का मान है / If roots of quadratic equation x² - 5x + 6 = 0 are α and β, then value of α + β is:","options":["(A) 5","(B) 6","(C) -5","(D) -6"],"correctOption":0,"marks":1,"section":"खण्ड 'अ' (Section A) - MCQ (1 अंक)"}
+
+प्र.21 (12 अंक - 6×2) - सभी भाग करें:
+{"questionType":"written","questionText":"निम्नलिखित प्रश्नों के उत्तर दीजिए / Answer the following questions:\\n\\n(क) एक शंकु की त्रिज्या 7 cm और ऊँचाई 24 cm है। इसका आयतन ज्ञात कीजिए। / A cone has radius 7 cm and height 24 cm. Find its volume. [चित्र आवश्यक]\\n\\n(ख) 12 और 18 का HCF ज्ञात कीजिए। / Find HCF of 12 and 18.\\n\\n(ग) बिंदु A(2, 3) और B(4, 1) को मिलाने वाले रेखाखण्ड को 1:1 के अनुपात में विभाजित करने वाले बिंदु के निर्देशांक ज्ञात कीजिए। / Find coordinates of point dividing line segment joining A(2, 3) and B(4, 1) in ratio 1:1.\\n\\n(घ) यदि sin θ = 3/5, तो cos θ का मान ज्ञात कीजिए। / If sin θ = 3/5, find value of cos θ.\\n\\n(ङ) दो बिंदुओं (1, 2) और (4, 6) के बीच की दूरी ज्ञात कीजिए। / Find distance between points (1, 2) and (4, 6).\\n\\n(च) सिद्ध कीजिए: sin²θ + cos²θ = 1 / Prove: sin²θ + cos²θ = 1","correctAnswer":"(क) शंकु का आयतन / Volume of cone:\\nदिया है / Given: r = 7 cm, h = 24 cm\\nसूत्र / Formula: V = (1/3)πr²h\\nV = (1/3) × (22/7) × 7² × 24\\nV = (1/3) × (22/7) × 49 × 24\\nV = (1/3) × 22 × 7 × 24\\nV = (22 × 7 × 24)/3\\nV = 3696/3 = 1232 cm³\\nअतः शंकु का आयतन = 1232 cm³\\n\\n(ख) HCF of 12 and 18:\\n12 = 2² × 3\\n18 = 2 × 3²\\nHCF = 2 × 3 = 6\\nअतः HCF = 6\\n\\n(ग) विभाजन बिंदु / Division point:\\nसूत्र / Formula: ((m×x₂ + n×x₁)/(m+n), (m×y₂ + n×y₁)/(m+n))\\nm:n = 1:1, A(2,3), B(4,1)\\nx = (1×4 + 1×2)/(1+1) = 6/2 = 3\\ny = (1×1 + 1×3)/(1+1) = 4/2 = 2\\nअतः बिंदु = (3, 2)\\n\\n(घ) cos θ का मान:\\nsin θ = 3/5\\nsin²θ + cos²θ = 1\\n(3/5)² + cos²θ = 1\\n9/25 + cos²θ = 1\\ncos²θ = 1 - 9/25 = 16/25\\ncos θ = 4/5\\n\\n(ङ) दूरी / Distance:\\nसूत्र / Formula: d = √[(x₂-x₁)² + (y₂-y₁)²]\\nd = √[(4-1)² + (6-2)²]\\nd = √[9 + 16] = √25 = 5 units\\n\\n(च) sin²θ + cos²θ = 1 का प्रमाण:\\nमाना एक समकोण त्रिभुज ABC में ∠B = 90°\\nsin θ = लम्ब/कर्ण = BC/AC\\ncos θ = आधार/कर्ण = AB/AC\\nsin²θ + cos²θ = (BC/AC)² + (AB/AC)²\\n= (BC² + AB²)/AC²\\nपाइथागोरस प्रमेय से: BC² + AB² = AC²\\n= AC²/AC² = 1\\nअतः सिद्ध हुआ।","marks":12,"section":"खण्ड 'ब' (Section B) - प्र.21 (6×2=12 अंक)"}
+
+प्र.22 (20 अंक - किन्हीं 5×4):
+{"questionType":"written","questionText":"निम्नलिखित में से किन्हीं पाँच प्रश्नों के उत्तर दीजिए / Answer any five of the following:\\n\\n(क) समान्तर श्रेढ़ी 5, 8, 11, 14, ... का 20वाँ पद ज्ञात कीजिए। / Find 20th term of AP 5, 8, 11, 14, ...\\n\\n(ख) द्विघात समीकरण x² - 7x + 12 = 0 को हल कीजिए। / Solve quadratic equation x² - 7x + 12 = 0\\n\\n(ग) सिद्ध कीजिए कि समरूप त्रिभुजों के क्षेत्रफलों का अनुपात उनकी संगत भुजाओं के वर्गों के अनुपात के बराबर होता है। / Prove that ratio of areas of similar triangles equals ratio of squares of corresponding sides.\\n\\n(घ) सिद्ध कीजिए कि वृत्त की स्पर्श रेखा स्पर्श बिंदु से होकर जाने वाली त्रिज्या पर लम्ब होती है। / Prove that tangent to a circle is perpendicular to radius at point of contact.\\n\\n(ङ) निम्नलिखित बारंबारता बंटन का माध्य ज्ञात कीजिए / Find mean of following frequency distribution:\\n| वर्ग अंतराल | 0-10 | 10-20 | 20-30 | 30-40 | 40-50 |\\n| बारंबारता | 5 | 8 | 15 | 16 | 6 |\\n\\n(च) एक थैले में 3 लाल और 5 काली गेंदें हैं। यादृच्छया एक गेंद निकाली जाती है। लाल गेंद आने की प्रायिकता ज्ञात कीजिए। / A bag contains 3 red and 5 black balls. One ball is drawn randomly. Find probability of getting red ball.","correctAnswer":"(क) AP का 20वाँ पद:\\na = 5, d = 8 - 5 = 3, n = 20\\naₙ = a + (n-1)d\\na₂₀ = 5 + (20-1) × 3\\na₂₀ = 5 + 19 × 3\\na₂₀ = 5 + 57 = 62\\nअतः 20वाँ पद = 62\\n\\n(ख) x² - 7x + 12 = 0 का हल:\\nमध्यपद विभाजन से:\\nx² - 4x - 3x + 12 = 0\\nx(x - 4) - 3(x - 4) = 0\\n(x - 4)(x - 3) = 0\\nx = 4 या x = 3\\nअतः मूल x = 3, 4\\n\\n(ग) समरूप त्रिभुजों के क्षेत्रफल:\\nमाना △ABC ~ △DEF\\nतब AB/DE = BC/EF = CA/FD = k\\nक्षेत्रफल(△ABC)/क्षेत्रफल(△DEF)\\n= (1/2 × AB × h₁)/(1/2 × DE × h₂)\\nचूँकि त्रिभुज समरूप हैं, h₁/h₂ = AB/DE\\n= (AB × AB)/(DE × DE) = AB²/DE²\\nअतः सिद्ध हुआ।\\n\\n(घ) स्पर्श रेखा प्रमेय:\\nमाना O केंद्र वाले वृत्त पर P स्पर्श बिंदु है।\\nPT स्पर्श रेखा है और OP त्रिज्या है।\\nमाना OP, PT पर लम्ब नहीं है।\\nतब O से PT पर लम्ब OQ खींचें जहाँ Q ≠ P\\nOQ < OP (लम्ब सबसे छोटी दूरी)\\nपरन्तु OP = त्रिज्या, अतः Q वृत्त के अंदर होगा\\nयह असंभव है क्योंकि PT स्पर्श रेखा है\\nअतः OP ⊥ PT सिद्ध हुआ।\\n\\n(ङ) माध्य गणना:\\n| वर्ग | f | x | fx |\\n| 0-10 | 5 | 5 | 25 |\\n| 10-20 | 8 | 15 | 120 |\\n| 20-30 | 15 | 25 | 375 |\\n| 30-40 | 16 | 35 | 560 |\\n| 40-50 | 6 | 45 | 270 |\\nΣf = 50, Σfx = 1350\\nमाध्य = Σfx/Σf = 1350/50 = 27\\n\\n(च) प्रायिकता:\\nकुल गेंदें = 3 + 5 = 8\\nलाल गेंदें = 3\\nP(लाल) = 3/8","marks":20,"section":"खण्ड 'ब' (Section B) - प्र.22 (किन्हीं 5×4=20 अंक)"}
+
+प्र.23 (6 अंक - अथवा सहित):
+{"questionType":"written","questionText":"एक नाव धारा के अनुकूल 30 km की दूरी 3 घंटे में तय करती है और धारा के प्रतिकूल उतनी ही दूरी 5 घंटे में तय करती है। नाव की स्थिर जल में चाल और धारा की चाल ज्ञात कीजिए। / A boat covers 30 km downstream in 3 hours and same distance upstream in 5 hours. Find speed of boat in still water and speed of stream.","correctAnswer":"हल / Solution:\\n\\nमाना नाव की स्थिर जल में चाल = x km/h\\nधारा की चाल = y km/h\\n\\nधारा के अनुकूल चाल = (x + y) km/h\\nधारा के प्रतिकूल चाल = (x - y) km/h\\n\\nप्रश्नानुसार:\\nधारा के अनुकूल: दूरी/समय = चाल\\n30/3 = x + y\\nx + y = 10 ... (1)\\n\\nधारा के प्रतिकूल:\\n30/5 = x - y\\nx - y = 6 ... (2)\\n\\nसमीकरण (1) और (2) को जोड़ने पर:\\n2x = 16\\nx = 8 km/h\\n\\nसमीकरण (1) में x = 8 रखने पर:\\n8 + y = 10\\ny = 2 km/h\\n\\nअतः नाव की स्थिर जल में चाल = 8 km/h\\nधारा की चाल = 2 km/h\\n\\nसत्यापन:\\nधारा के अनुकूल: 30/(8+2) = 30/10 = 3 घंटे ✓\\nधारा के प्रतिकूल: 30/(8-2) = 30/6 = 5 घंटे ✓","marks":6,"section":"खण्ड 'ब' (Section B) - प्र.23 (6 अंक)","hasAlternative":true,"alternativeQuestion":"अथवा / OR\\n\\nएक समान्तर श्रेढ़ी के प्रथम 10 पदों का योग 155 है और प्रथम 20 पदों का योग 610 है। प्रथम पद और सार्व अन्तर ज्ञात कीजिए। / Sum of first 10 terms of an AP is 155 and sum of first 20 terms is 610. Find first term and common difference.","alternativeAnswer":"हल / Solution:\\n\\nमाना प्रथम पद = a, सार्व अन्तर = d\\n\\nसूत्र: Sₙ = n/2[2a + (n-1)d]\\n\\nप्रश्नानुसार:\\nS₁₀ = 155\\n10/2[2a + 9d] = 155\\n5[2a + 9d] = 155\\n2a + 9d = 31 ... (1)\\n\\nS₂₀ = 610\\n20/2[2a + 19d] = 610\\n10[2a + 19d] = 610\\n2a + 19d = 61 ... (2)\\n\\nसमीकरण (2) - (1):\\n10d = 30\\nd = 3\\n\\nसमीकरण (1) में d = 3 रखने पर:\\n2a + 27 = 31\\n2a = 4\\na = 2\\n\\nअतः प्रथम पद a = 2\\nसार्व अन्तर d = 3\\n\\nसत्यापन:\\nS₁₀ = 10/2[2×2 + 9×3] = 5[4 + 27] = 5 × 31 = 155 ✓\\nS₂₀ = 20/2[2×2 + 19×3] = 10[4 + 57] = 10 × 61 = 610 ✓"}
+
+प्र.24 (6 अंक - अथवा सहित):
+{"questionType":"written","questionText":"एक मीनार के आधार से 100 m दूर स्थित बिंदु से मीनार के शिखर का उन्नयन कोण 60° है। मीनार की ऊँचाई ज्ञात कीजिए। / From a point 100 m away from base of a tower, angle of elevation of top of tower is 60°. Find height of tower. [चित्र आवश्यक]","correctAnswer":"हल / Solution:\\n\\n[चित्र आवश्यक - समकोण त्रिभुज जिसमें मीनार लम्बवत है]\\n\\nमाना मीनार AB की ऊँचाई = h m\\nबिंदु C से मीनार की दूरी BC = 100 m\\nउन्नयन कोण ∠ACB = 60°\\n\\nसमकोण त्रिभुज ABC में:\\ntan 60° = AB/BC\\n√3 = h/100\\nh = 100√3 m\\nh = 100 × 1.732\\nh = 173.2 m\\n\\nअतः मीनार की ऊँचाई = 100√3 m या 173.2 m\\n\\nवैकल्पिक विधि:\\ntan θ = लम्ब/आधार\\ntan 60° = h/100\\n√3 = h/100\\nh = 100√3 ≈ 173.2 m","marks":6,"section":"खण्ड 'ब' (Section B) - प्र.24 (6 अंक)","hasAlternative":true,"alternativeQuestion":"अथवा / OR\\n\\nएक हवाई जहाज जमीन से 3000 m की ऊँचाई पर उड़ रहा है। जमीन पर स्थित एक बिंदु से हवाई जहाज का उन्नयन कोण 60° है। हवाई जहाज की उस बिंदु से क्षैतिज दूरी ज्ञात कीजिए। / An airplane is flying at height 3000 m above ground. Angle of elevation from a point on ground is 60°. Find horizontal distance of airplane from that point. [चित्र आवश्यक]","alternativeAnswer":"हल / Solution:\\n\\n[चित्र आवश्यक]\\n\\nमाना हवाई जहाज A पर है\\nऊँचाई AB = 3000 m\\nउन्नयन कोण ∠ACB = 60°\\nक्षैतिज दूरी BC = ?\\n\\nसमकोण त्रिभुज ABC में:\\ntan 60° = AB/BC\\n√3 = 3000/BC\\nBC = 3000/√3\\nBC = 3000/√3 × √3/√3\\nBC = 3000√3/3\\nBC = 1000√3 m\\nBC = 1000 × 1.732\\nBC = 1732 m\\n\\nअतः क्षैतिज दूरी = 1000√3 m या 1732 m"}
+
+प्र.25 (6 अंक - अथवा सहित):
+{"questionType":"written","questionText":"एक ठोस लोहे के बेलन की त्रिज्या 3.5 cm और ऊँचाई 16 cm है। इसे पिघलाकर 7 cm त्रिज्या वाले कितने गोले बनाए जा सकते हैं? / A solid iron cylinder has radius 3.5 cm and height 16 cm. How many spheres of radius 7 cm can be made by melting it? [चित्र आवश्यक]","correctAnswer":"हल / Solution:\\n\\n[चित्र आवश्यक - बेलन और गोला]\\n\\nबेलन की त्रिज्या r₁ = 3.5 cm\\nबेलन की ऊँचाई h = 16 cm\\nगोले की त्रिज्या r₂ = 7 cm\\n\\nबेलन का आयतन = πr₁²h\\n= π × (3.5)² × 16\\n= π × 12.25 × 16\\n= 196π cm³\\n\\nएक गोले का आयतन = (4/3)πr₂³\\n= (4/3) × π × (7)³\\n= (4/3) × π × 343\\n= (1372/3)π cm³\\n\\nगोलों की संख्या = बेलन का आयतन / एक गोले का आयतन\\n= 196π / (1372π/3)\\n= 196 × 3 / 1372\\n= 588 / 1372\\n= 0.428...\\n\\nचूँकि गोलों की संख्या पूर्ण होनी चाहिए और 0.428 < 1\\n\\nनोट: प्रश्न में त्रुटि प्रतीत होती है। यदि गोले की त्रिज्या 0.7 cm हो तो:\\nगोले का आयतन = (4/3)π(0.7)³ = (4/3)π × 0.343 = 0.457π cm³\\nगोलों की संख्या = 196π / 0.457π ≈ 428 गोले\\n\\nअतः लगभग 428 गोले बनाए जा सकते हैं।","marks":6,"section":"खण्ड 'ब' (Section B) - प्र.25 (6 अंक)","hasAlternative":true,"alternativeQuestion":"अथवा / OR\\n\\nएक शंकु की ऊँचाई 24 cm और आधार की त्रिज्या 6 cm है। इसका वक्र पृष्ठीय क्षेत्रफल और आयतन ज्ञात कीजिए। / A cone has height 24 cm and base radius 6 cm. Find its curved surface area and volume. [चित्र आवश्यक]","alternativeAnswer":"हल / Solution:\\n\\n[चित्र आवश्यक - शंकु]\\n\\nशंकु की ऊँचाई h = 24 cm\\nआधार की त्रिज्या r = 6 cm\\n\\nतिर्यक ऊँचाई l = √(h² + r²)\\nl = √(24² + 6²)\\nl = √(576 + 36)\\nl = √612\\nl = √(36 × 17)\\nl = 6√17 cm\\nl ≈ 6 × 4.123 = 24.74 cm\\n\\nवक्र पृष्ठीय क्षेत्रफल = πrl\\n= (22/7) × 6 × 6√17\\n= (22/7) × 36√17\\n= (792/7)√17\\n= 113.14 × 4.123\\n≈ 466.5 cm²\\n\\nआयतन = (1/3)πr²h\\n= (1/3) × (22/7) × 6² × 24\\n= (1/3) × (22/7) × 36 × 24\\n= (22 × 36 × 24)/(7 × 3)\\n= 19008/21\\n= 905.14 cm³\\n\\nअतः वक्र पृष्ठीय क्षेत्रफल ≈ 466.5 cm²\\nआयतन ≈ 905.14 cm³"}
+
+STRICT RULES:
+1. EXACTLY 25 questions (20 MCQ + 5 descriptive sets)
+2. BILINGUAL format: Hindi / English in same questionText
+3. MCQ options format: (A), (B), (C), (D)
+4. प्र.23-25 MUST have hasAlternative, alternativeQuestion, alternativeAnswer
+5. Include [चित्र आवश्यक] tag for geometry/mensuration questions
+6. Mathematical formulas with proper notation
+7. Complete step-by-step solutions in answers
+8. Chemical formulas: H₂O, CO₂ (subscript notation)
+
+Return ONLY valid JSON array with exactly 25 questions. No markdown, no explanation.`;
     } else {
       prompt = `Generate exactly ${finalNumberOfQuestions} quiz questions about "${topic}".${languageNote}${descriptionContext}
 
@@ -988,7 +1522,11 @@ STRICT RULES:
 8. Fill blank must have blanks array matching _____ count
 9. Matching must have 4-6 pairs with left and right values
 10. FOLLOW THE DIFFICULTY LEVEL STRICTLY - questions must match the specified difficulty
-${finalLanguage !== "english" ? `11. ALL text MUST be in ${finalLanguage} language` : ""}
+${
+  finalLanguage !== "english"
+    ? `11. ALL text MUST be in ${finalLanguage} language`
+    : ""
+}
 
 CRITICAL: Return ONLY a valid JSON array. No markdown, no explanation, no code blocks.
 
@@ -1029,26 +1567,38 @@ CRITICAL: Return ONLY a valid JSON array. No markdown, no explanation, no code b
 
     // Validate and normalize each question based on type
     const validatedQuestions = [];
-    
+
     for (let index = 0; index < questions.length; index++) {
       const q = questions[index];
-      
+
       if (!q.questionText) {
-        console.warn(`Skipping question at index ${index}: missing questionText`);
+        console.warn(
+          `Skipping question at index ${index}: missing questionText`
+        );
         continue;
       }
 
       // Normalize the question type
       const originalType = q.questionType;
       q.questionType = normalizeQuestionType(q.questionType);
-      
+
       if (!q.questionType) {
-        console.warn(`Skipping question at index ${index}: unknown type "${originalType}"`);
+        console.warn(
+          `Skipping question at index ${index}: unknown type "${originalType}"`
+        );
         // Try to infer type from structure
-        if (q.options && q.options.length === 4 && typeof q.correctOption === "number") {
+        if (
+          q.options &&
+          q.options.length === 4 &&
+          typeof q.correctOption === "number"
+        ) {
           q.questionType = "mcq";
-        } else if (q.options && q.options.length === 2 && 
-                   (q.options[0].toLowerCase() === "true" || q.options[1].toLowerCase() === "false")) {
+        } else if (
+          q.options &&
+          q.options.length === 2 &&
+          (q.options[0].toLowerCase() === "true" ||
+            q.options[1].toLowerCase() === "false")
+        ) {
           q.questionType = "truefalse";
         } else if (q.correctAnswer) {
           q.questionType = "written";
@@ -1080,7 +1630,11 @@ CRITICAL: Return ONLY a valid JSON array. No markdown, no explanation, no code b
             if (q.options.length > 4) {
               q.options = q.options.slice(0, 4);
             }
-            if (typeof q.correctOption !== "number" || q.correctOption < 0 || q.correctOption > 3) {
+            if (
+              typeof q.correctOption !== "number" ||
+              q.correctOption < 0 ||
+              q.correctOption > 3
+            ) {
               q.correctOption = 0; // Default to first option
             }
             break;
@@ -1104,11 +1658,15 @@ CRITICAL: Return ONLY a valid JSON array. No markdown, no explanation, no code b
 
           case "matching":
             if (!Array.isArray(q.matchPairs) || q.matchPairs.length < 2) {
-              console.warn(`Skipping matching question at index ${index}: insufficient pairs`);
+              console.warn(
+                `Skipping matching question at index ${index}: insufficient pairs`
+              );
               continue;
             }
             // Ensure all pairs have left and right
-            q.matchPairs = q.matchPairs.filter(pair => pair.left && pair.right);
+            q.matchPairs = q.matchPairs.filter(
+              (pair) => pair.left && pair.right
+            );
             if (q.matchPairs.length < 2) {
               continue;
             }
@@ -1117,7 +1675,10 @@ CRITICAL: Return ONLY a valid JSON array. No markdown, no explanation, no code b
           case "truefalse":
             // Always set standard options
             q.options = ["True", "False"];
-            if (typeof q.correctOption !== "number" || (q.correctOption !== 0 && q.correctOption !== 1)) {
+            if (
+              typeof q.correctOption !== "number" ||
+              (q.correctOption !== 0 && q.correctOption !== 1)
+            ) {
               // Try to infer from correctAnswer if available
               if (q.correctAnswer) {
                 const answer = q.correctAnswer.toString().toLowerCase();
@@ -1131,12 +1692,16 @@ CRITICAL: Return ONLY a valid JSON array. No markdown, no explanation, no code b
 
         validatedQuestions.push(q);
       } catch (validationError) {
-        console.warn(`Skipping question at index ${index}: ${validationError.message}`);
+        console.warn(
+          `Skipping question at index ${index}: ${validationError.message}`
+        );
       }
     }
 
     if (validatedQuestions.length === 0) {
-      throw new Error("No valid questions could be generated. Please try again.");
+      throw new Error(
+        "No valid questions could be generated. Please try again."
+      );
     }
 
     return validatedQuestions;
@@ -1263,9 +1828,12 @@ const extractQuestionsFromImage = async (
 
     const languageInstructions = {
       english: "",
-      hindi: "\n\nGenerate ALL content in Hindi (हिंदी). Use Devanagari script.",
-      bilingual: "\n\nGenerate in BILINGUAL format: Hindi first, then English. Example: 'हिंदी प्रश्न / English question'",
-      sanskrit: "\n\nGenerate ALL content in Sanskrit (संस्कृत). Use Devanagari script.",
+      hindi:
+        "\n\nGenerate ALL content in Hindi (हिंदी). Use Devanagari script.",
+      bilingual:
+        "\n\nGenerate in BILINGUAL format: Hindi first, then English. Example: 'हिंदी प्रश्न / English question'",
+      sanskrit:
+        "\n\nGenerate ALL content in Sanskrit (संस्कृत). Use Devanagari script.",
     };
 
     const difficultyInstructions = {
@@ -1283,14 +1851,15 @@ DIFFICULTY: MEDIUM - Competitive exam level
 DIFFICULTY: HARD - JEE/NEET/Olympiad level
 - Complex scenarios, multiple concepts combined
 - Assertion-reason MCQs, multi-step numerical
-- Written: derivations, prove statements, HOTS questions, case studies`
+- Written: derivations, prove statements, HOTS questions, case studies`,
     };
 
     const languageNote = languageInstructions[language] || "";
-    const difficultyNote = difficultyInstructions[difficulty] || difficultyInstructions.medium;
+    const difficultyNote =
+      difficultyInstructions[difficulty] || difficultyInstructions.medium;
 
     let prompt;
-    
+
     if (examFormat === "upboard_science") {
       prompt = `You are extracting questions from image(s) to create UP BOARD CLASS 10 SCIENCE PAPER.
 
@@ -1500,6 +2069,49 @@ STRICT RULES:
 6. ALL ANSWERS MUST BE VERY LONG AND DETAILED
 
 Return ONLY valid JSON array.`;
+    } else if (examFormat === "upboard_maths") {
+      prompt = `Extract questions from images for UP BOARD CLASS 10 MATHEMATICS PAPER (गणित) - 70 marks, 25 questions.
+Paper Code: 822(BV)
+
+EXTRACT ONLY what is visible in images. Do NOT generate new questions.
+
+STRUCTURE (25 questions = 70 marks):
+खण्ड 'अ' (Section A) - बहुविकल्पीय प्रश्न (MCQ) - 20 अंक:
+- 20 प्रश्न × 1 अंक = 20 अंक (प्र.1-20)
+
+खण्ड 'ब' (Section B) - वर्णनात्मक प्रश्न - 50 अंक:
+- प्र.21: 6 भाग × 2 अंक = 12 अंक (सभी करें)
+- प्र.22: 6 भाग में से किन्हीं 5 × 4 अंक = 20 अंक
+- प्र.23-25: 3 प्रश्न × 6 अंक = 18 अंक (अथवा सहित)
+
+=== ANSWER LENGTH - DETAILED WITH FULL SOLUTION ===
+- 6 अंक: 150-200 शब्द + पूर्ण हल (सभी चरण)
+- 4 अंक: 100-150 शब्द + पूर्ण हल
+- 2 अंक: 50-80 शब्द + संक्षिप्त हल
+- 1 अंक (MCQ): केवल सही विकल्प
+
+=== DIAGRAM-BASED QUESTIONS ===
+- Include [चित्र आवश्यक] tag for geometry/mensuration
+- Describe figure with measurements in text
+
+JSON FORMAT:
+MCQ: {"questionType":"mcq","questionText":"प्रश्न / Question","options":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"correctOption":0,"marks":1,"section":"खण्ड 'अ' (Section A) - MCQ (1 अंक)"}
+
+प्र.21 (12 अंक): {"questionType":"written","questionText":"(क)...(ख)...(ग)...(घ)...(ङ)...(च)...","correctAnswer":"(क) [पूर्ण हल]\\n(ख) [पूर्ण हल]...","marks":12,"section":"खण्ड 'ब' - प्र.21 (6×2=12 अंक)"}
+
+प्र.22 (20 अंक): {"questionType":"written","questionText":"किन्हीं पाँच के उत्तर दीजिए...","correctAnswer":"[पूर्ण हल]","marks":20,"section":"खण्ड 'ब' - प्र.22 (5×4=20 अंक)"}
+
+प्र.23-25 (6 अंक each): {"questionType":"written","questionText":"प्रश्न","correctAnswer":"[पूर्ण हल]","marks":6,"section":"खण्ड 'ब' - प्र.23/24/25 (6 अंक)","hasAlternative":true,"alternativeQuestion":"अथवा...","alternativeAnswer":"[पूर्ण हल]"}
+
+STRICT RULES:
+1. Extract from images only - DO NOT generate new questions
+2. 25 questions total (20 MCQ + 5 descriptive sets)
+3. Bilingual (Hindi/English)
+4. प्र.23-25 need hasAlternative, alternativeQuestion, alternativeAnswer
+5. MCQ options: (A), (B), (C), (D) format
+6. Include complete step-by-step solutions
+
+Return ONLY valid JSON array.`;
     } else {
       prompt = `You are a quiz question extractor. EXTRACT questions ONLY from the provided image(s).
 
@@ -1513,7 +2125,10 @@ MARKS DISTRIBUTION:
 ${marksDistribution || "Distribute marks based on question complexity"}
 
 ADDITIONAL INSTRUCTIONS:
-${additionalInstructions || "Extract questions exactly as they appear in the images"}
+${
+  additionalInstructions ||
+  "Extract questions exactly as they appear in the images"
+}
 
 CRITICAL JSON FORMAT - USE EXACTLY THESE FIELD NAMES:
 {
@@ -1539,10 +2154,17 @@ Return ONLY a valid JSON array, no markdown, no explanation.`;
 
     // Prepare content array with prompt and all images
     const contentArray = [prompt];
-    
+
     // Handle both array of images and single image (backward compatibility)
-    const images = Array.isArray(imagesData) ? imagesData : [{ base64Data: imagesData.base64Data || imagesData, mimeType: imagesData.mimeType || "image/jpeg" }];
-    
+    const images = Array.isArray(imagesData)
+      ? imagesData
+      : [
+          {
+            base64Data: imagesData.base64Data || imagesData,
+            mimeType: imagesData.mimeType || "image/jpeg",
+          },
+        ];
+
     images.forEach((img, index) => {
       contentArray.push({
         inlineData: {
@@ -1557,7 +2179,10 @@ Return ONLY a valid JSON array, no markdown, no explanation.`;
     const response = await result.response;
     let text = response.text();
 
-    text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    text = text
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
 
     const jsonStart = text.indexOf("[");
     const jsonEnd = text.lastIndexOf("]");
@@ -1567,7 +2192,7 @@ Return ONLY a valid JSON array, no markdown, no explanation.`;
     }
 
     text = text.substring(jsonStart, jsonEnd + 1);
-    
+
     let questions;
     try {
       questions = JSON.parse(text);
@@ -1583,43 +2208,68 @@ Return ONLY a valid JSON array, no markdown, no explanation.`;
 
     // Log first question to debug field names
     if (questions.length > 0) {
-      console.log("Sample question structure:", JSON.stringify(questions[0], null, 2).substring(0, 500));
+      console.log(
+        "Sample question structure:",
+        JSON.stringify(questions[0], null, 2).substring(0, 500)
+      );
     }
 
     // Validate and normalize each question (same logic as generateQuestions)
     const validatedQuestions = [];
-    
+
     for (let index = 0; index < questions.length; index++) {
       const q = questions[index];
-      
+
       // Handle alternative field names for questionText
       if (!q.questionText) {
         // Try common alternative field names
-        q.questionText = q.question || q.text || q.Question || q.questiontext || 
-                         q.question_text || q.QuestionText || q.content || q.prompt;
+        q.questionText =
+          q.question ||
+          q.text ||
+          q.Question ||
+          q.questiontext ||
+          q.question_text ||
+          q.QuestionText ||
+          q.content ||
+          q.prompt;
       }
-      
+
       if (!q.questionText) {
-        console.warn(`Skipping question at index ${index}: missing questionText. Keys: ${Object.keys(q).join(', ')}`);
+        console.warn(
+          `Skipping question at index ${index}: missing questionText. Keys: ${Object.keys(
+            q
+          ).join(", ")}`
+        );
         continue;
       }
 
       // Handle alternative field names for questionType
       if (!q.questionType) {
-        q.questionType = q.type || q.Type || q.question_type || q.QuestionType || q.qtype;
+        q.questionType =
+          q.type || q.Type || q.question_type || q.QuestionType || q.qtype;
       }
 
       // Normalize the question type
       const originalType = q.questionType;
       q.questionType = normalizeQuestionType(q.questionType);
-      
+
       if (!q.questionType) {
-        console.warn(`Question at index ${index}: unknown type "${originalType}", trying to infer...`);
+        console.warn(
+          `Question at index ${index}: unknown type "${originalType}", trying to infer...`
+        );
         // Try to infer type from structure
-        if (q.options && q.options.length === 4 && typeof q.correctOption === "number") {
+        if (
+          q.options &&
+          q.options.length === 4 &&
+          typeof q.correctOption === "number"
+        ) {
           q.questionType = "mcq";
-        } else if (q.options && q.options.length === 2 && 
-                   (q.options[0]?.toLowerCase() === "true" || q.options[1]?.toLowerCase() === "false")) {
+        } else if (
+          q.options &&
+          q.options.length === 2 &&
+          (q.options[0]?.toLowerCase() === "true" ||
+            q.options[1]?.toLowerCase() === "false")
+        ) {
           q.questionType = "truefalse";
         } else if (q.correctAnswer || q.answer || q.Answer) {
           q.questionType = "written";
@@ -1634,12 +2284,18 @@ Return ONLY a valid JSON array, no markdown, no explanation.`;
 
       // Handle alternative field names for correctAnswer
       if (!q.correctAnswer) {
-        q.correctAnswer = q.answer || q.Answer || q.correct_answer || q.expectedAnswer || q.expected_answer;
+        q.correctAnswer =
+          q.answer ||
+          q.Answer ||
+          q.correct_answer ||
+          q.expectedAnswer ||
+          q.expected_answer;
       }
 
       // Handle alternative field names for correctOption
       if (q.correctOption === undefined) {
-        q.correctOption = q.correct_option ?? q.correctIndex ?? q.correct ?? q.answerIndex ?? 0;
+        q.correctOption =
+          q.correct_option ?? q.correctIndex ?? q.correct ?? q.answerIndex ?? 0;
       }
 
       // Ensure marks is set
@@ -1660,7 +2316,11 @@ Return ONLY a valid JSON array, no markdown, no explanation.`;
             if (q.options.length > 4) {
               q.options = q.options.slice(0, 4);
             }
-            if (typeof q.correctOption !== "number" || q.correctOption < 0 || q.correctOption > 3) {
+            if (
+              typeof q.correctOption !== "number" ||
+              q.correctOption < 0 ||
+              q.correctOption > 3
+            ) {
               q.correctOption = 0;
             }
             break;
@@ -1683,10 +2343,14 @@ Return ONLY a valid JSON array, no markdown, no explanation.`;
 
           case "matching":
             if (!Array.isArray(q.matchPairs) || q.matchPairs.length < 2) {
-              console.warn(`Skipping matching question at index ${index}: insufficient pairs`);
+              console.warn(
+                `Skipping matching question at index ${index}: insufficient pairs`
+              );
               continue;
             }
-            q.matchPairs = q.matchPairs.filter(pair => pair.left && pair.right);
+            q.matchPairs = q.matchPairs.filter(
+              (pair) => pair.left && pair.right
+            );
             if (q.matchPairs.length < 2) {
               continue;
             }
@@ -1694,7 +2358,10 @@ Return ONLY a valid JSON array, no markdown, no explanation.`;
 
           case "truefalse":
             q.options = ["True", "False"];
-            if (typeof q.correctOption !== "number" || (q.correctOption !== 0 && q.correctOption !== 1)) {
+            if (
+              typeof q.correctOption !== "number" ||
+              (q.correctOption !== 0 && q.correctOption !== 1)
+            ) {
               if (q.correctAnswer) {
                 const answer = q.correctAnswer.toString().toLowerCase();
                 q.correctOption = answer === "true" || answer === "yes" ? 0 : 1;
@@ -1707,12 +2374,16 @@ Return ONLY a valid JSON array, no markdown, no explanation.`;
 
         validatedQuestions.push(q);
       } catch (validationError) {
-        console.warn(`Skipping question at index ${index}: ${validationError.message}`);
+        console.warn(
+          `Skipping question at index ${index}: ${validationError.message}`
+        );
       }
     }
 
     if (validatedQuestions.length === 0) {
-      throw new Error("No valid questions could be extracted. Please try again with clearer images.");
+      throw new Error(
+        "No valid questions could be extracted. Please try again with clearer images."
+      );
     }
 
     return validatedQuestions;
@@ -1734,9 +2405,12 @@ const processRawQuestions = async (
 
     const languageInstructions = {
       english: "",
-      hindi: "\n\nGenerate ALL content in Hindi (हिंदी). Use Devanagari script.",
-      bilingual: "\n\nGenerate in BILINGUAL format: Hindi first, then English. Example: 'हिंदी प्रश्न / English question'",
-      sanskrit: "\n\nGenerate ALL content in Sanskrit (संस्कृत). Use Devanagari script.",
+      hindi:
+        "\n\nGenerate ALL content in Hindi (हिंदी). Use Devanagari script.",
+      bilingual:
+        "\n\nGenerate in BILINGUAL format: Hindi first, then English. Example: 'हिंदी प्रश्न / English question'",
+      sanskrit:
+        "\n\nGenerate ALL content in Sanskrit (संस्कृत). Use Devanagari script.",
     };
 
     const difficultyInstructions = {
@@ -1757,14 +2431,15 @@ DIFFICULTY: HARD - JEE/NEET/Olympiad level
 - Complex scenarios combining multiple concepts
 - Assertion-reason MCQs, multi-step numerical problems
 - Written: derivations, prove statements, HOTS questions, case studies
-- Critical thinking, advanced reasoning required`
+- Critical thinking, advanced reasoning required`,
     };
 
     const languageNote = languageInstructions[language] || "";
-    const difficultyNote = difficultyInstructions[difficulty] || difficultyInstructions.medium;
+    const difficultyNote =
+      difficultyInstructions[difficulty] || difficultyInstructions.medium;
 
     let prompt;
-    
+
     if (examFormat === "upboard_science") {
       prompt = `You are generating UP BOARD CLASS 10 SCIENCE PAPER from the given topic/content.
 
@@ -1983,6 +2658,48 @@ STRICT RULES:
 5. ALL ANSWERS MUST BE VERY LONG AND DETAILED AS SHOWN IN EXAMPLES
 
 Return ONLY valid JSON array with exactly 31 questions.`;
+    } else if (examFormat === "upboard_maths") {
+      prompt = `UP BOARD CLASS 10 MATHEMATICS PAPER (गणित) - 70 अंक, 25 प्रश्न बनाएं।
+Paper Code: 822(BV)
+
+INPUT विषय/सामग्री: "${rawQuestions}"
+
+STRUCTURE (25 questions = 70 marks):
+खण्ड 'अ' (Section A) - बहुविकल्पीय प्रश्न (MCQ) - 20 अंक:
+- 20 प्रश्न × 1 अंक = 20 अंक (प्र.1-20)
+
+खण्ड 'ब' (Section B) - वर्णनात्मक प्रश्न - 50 अंक:
+- प्र.21: 6 भाग × 2 अंक = 12 अंक (सभी करें)
+- प्र.22: 6 भाग में से किन्हीं 5 × 4 अंक = 20 अंक
+- प्र.23-25: 3 प्रश्न × 6 अंक = 18 अंक (अथवा सहित)
+
+=== ANSWER LENGTH - DETAILED WITH FULL SOLUTION ===
+- 6 अंक: 150-200 शब्द + पूर्ण हल (सभी चरण, सूत्र, गणना)
+- 4 अंक: 100-150 शब्द + पूर्ण हल
+- 2 अंक: 50-80 शब्द + संक्षिप्त हल
+- 1 अंक (MCQ): केवल सही विकल्प
+
+=== DIAGRAM-BASED QUESTIONS ===
+- Include [चित्र आवश्यक] tag for geometry/mensuration
+- Describe figure with measurements in text
+
+JSON FORMAT:
+MCQ: {"questionType":"mcq","questionText":"प्रश्न / Question","options":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"correctOption":0,"marks":1,"section":"खण्ड 'अ' (Section A) - MCQ (1 अंक)"}
+
+प्र.21 (12 अंक): {"questionType":"written","questionText":"(क)...(ख)...(ग)...(घ)...(ङ)...(च)...","correctAnswer":"(क) [पूर्ण हल]\\n(ख) [पूर्ण हल]...","marks":12,"section":"खण्ड 'ब' - प्र.21 (6×2=12 अंक)"}
+
+प्र.22 (20 अंक): {"questionType":"written","questionText":"किन्हीं पाँच के उत्तर दीजिए...","correctAnswer":"[पूर्ण हल]","marks":20,"section":"खण्ड 'ब' - प्र.22 (5×4=20 अंक)"}
+
+प्र.23-25 (6 अंक each): {"questionType":"written","questionText":"प्रश्न","correctAnswer":"[पूर्ण हल]","marks":6,"section":"खण्ड 'ब' - प्र.23/24/25 (6 अंक)","hasAlternative":true,"alternativeQuestion":"अथवा...","alternativeAnswer":"[पूर्ण हल]"}
+
+STRICT RULES:
+1. EXACTLY 25 questions (20 MCQ + 5 descriptive sets)
+2. Bilingual (Hindi/English)
+3. MCQ options: (A), (B), (C), (D)
+4. प्र.23-25 need hasAlternative, alternativeQuestion, alternativeAnswer
+5. Complete step-by-step solutions in answers
+
+Return ONLY valid JSON array with exactly 25 questions.`;
     } else {
       prompt = `You are a quiz question processor. Convert the following content into quiz questions.${languageNote}
 
@@ -2000,7 +2717,11 @@ MARKS DISTRIBUTION:
 ${marksDistribution || "Distribute marks based on question complexity"}
 """
 
-${numberOfQuestions ? `GENERATE EXACTLY ${numberOfQuestions} QUESTIONS.` : "Generate appropriate number of questions from the content."}
+${
+  numberOfQuestions
+    ? `GENERATE EXACTLY ${numberOfQuestions} QUESTIONS.`
+    : "Generate appropriate number of questions from the content."
+}
 
 CRITICAL JSON FORMAT - USE EXACTLY THESE FIELD NAMES:
 {
@@ -2030,18 +2751,24 @@ Return ONLY a valid JSON array, no markdown.`;
     const response = await result.response;
     let text = response.text();
 
-    text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    text = text
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
 
     const jsonStart = text.indexOf("[");
     const jsonEnd = text.lastIndexOf("]");
 
     if (jsonStart === -1 || jsonEnd === -1) {
-      console.error("No JSON array found. Raw response:", text.substring(0, 500));
+      console.error(
+        "No JSON array found. Raw response:",
+        text.substring(0, 500)
+      );
       throw new Error("No JSON array found in response");
     }
 
     text = text.substring(jsonStart, jsonEnd + 1);
-    
+
     let questions;
     try {
       questions = JSON.parse(text);
@@ -2057,43 +2784,74 @@ Return ONLY a valid JSON array, no markdown.`;
 
     // Log first question to debug field names
     if (questions.length > 0) {
-      console.log("Sample question structure:", JSON.stringify(questions[0], null, 2).substring(0, 500));
+      console.log(
+        "Sample question structure:",
+        JSON.stringify(questions[0], null, 2).substring(0, 500)
+      );
     }
 
     // Validate and normalize each question
     const validatedQuestions = [];
-    
+
     for (let index = 0; index < questions.length; index++) {
       const q = questions[index];
-      
+
       // Handle alternative field names for questionText
       if (!q.questionText) {
-        q.questionText = q.question || q.text || q.Question || q.questiontext || 
-                         q.question_text || q.QuestionText || q.content || q.prompt;
+        q.questionText =
+          q.question ||
+          q.text ||
+          q.Question ||
+          q.questiontext ||
+          q.question_text ||
+          q.QuestionText ||
+          q.content ||
+          q.prompt;
       }
-      
+
       if (!q.questionText) {
-        console.warn(`Skipping question at index ${index}: missing questionText. Keys: ${Object.keys(q).join(', ')}`);
+        console.warn(
+          `Skipping question at index ${index}: missing questionText. Keys: ${Object.keys(
+            q
+          ).join(", ")}`
+        );
         continue;
       }
 
       // Handle alternative field names for questionType
       if (!q.questionType) {
-        q.questionType = q.type || q.Type || q.question_type || q.QuestionType || q.qtype;
+        q.questionType =
+          q.type || q.Type || q.question_type || q.QuestionType || q.qtype;
       }
 
       // Normalize the question type
       const originalType = q.questionType;
       q.questionType = normalizeQuestionType(q.questionType);
-      
+
       if (!q.questionType) {
-        console.warn(`Question at index ${index}: unknown type "${originalType}", trying to infer...`);
-        if (q.options && q.options.length === 4 && (typeof q.correctOption === "number" || typeof q.correct_option === "number")) {
+        console.warn(
+          `Question at index ${index}: unknown type "${originalType}", trying to infer...`
+        );
+        if (
+          q.options &&
+          q.options.length === 4 &&
+          (typeof q.correctOption === "number" ||
+            typeof q.correct_option === "number")
+        ) {
           q.questionType = "mcq";
-        } else if (q.options && q.options.length === 2 && 
-                   (q.options[0]?.toLowerCase() === "true" || q.options[1]?.toLowerCase() === "false")) {
+        } else if (
+          q.options &&
+          q.options.length === 2 &&
+          (q.options[0]?.toLowerCase() === "true" ||
+            q.options[1]?.toLowerCase() === "false")
+        ) {
           q.questionType = "truefalse";
-        } else if (q.correctAnswer || q.answer || q.Answer || q.correct_answer) {
+        } else if (
+          q.correctAnswer ||
+          q.answer ||
+          q.Answer ||
+          q.correct_answer
+        ) {
           q.questionType = "written";
         } else if (q.blanks) {
           q.questionType = "fillblank";
@@ -2106,12 +2864,18 @@ Return ONLY a valid JSON array, no markdown.`;
 
       // Handle alternative field names for correctAnswer
       if (!q.correctAnswer) {
-        q.correctAnswer = q.answer || q.Answer || q.correct_answer || q.expectedAnswer || q.expected_answer;
+        q.correctAnswer =
+          q.answer ||
+          q.Answer ||
+          q.correct_answer ||
+          q.expectedAnswer ||
+          q.expected_answer;
       }
 
       // Handle alternative field names for correctOption
       if (q.correctOption === undefined) {
-        q.correctOption = q.correct_option ?? q.correctIndex ?? q.correct ?? q.answerIndex ?? 0;
+        q.correctOption =
+          q.correct_option ?? q.correctIndex ?? q.correct ?? q.answerIndex ?? 0;
       }
 
       // Handle alternative field names for marks
@@ -2131,7 +2895,11 @@ Return ONLY a valid JSON array, no markdown.`;
             if (q.options.length > 4) {
               q.options = q.options.slice(0, 4);
             }
-            if (typeof q.correctOption !== "number" || q.correctOption < 0 || q.correctOption > 3) {
+            if (
+              typeof q.correctOption !== "number" ||
+              q.correctOption < 0 ||
+              q.correctOption > 3
+            ) {
               q.correctOption = 0;
             }
             break;
@@ -2152,13 +2920,18 @@ Return ONLY a valid JSON array, no markdown.`;
             if (!Array.isArray(q.matchPairs) || q.matchPairs.length < 2) {
               continue;
             }
-            q.matchPairs = q.matchPairs.filter(pair => pair.left && pair.right);
+            q.matchPairs = q.matchPairs.filter(
+              (pair) => pair.left && pair.right
+            );
             if (q.matchPairs.length < 2) continue;
             break;
 
           case "truefalse":
             q.options = ["True", "False"];
-            if (typeof q.correctOption !== "number" || (q.correctOption !== 0 && q.correctOption !== 1)) {
+            if (
+              typeof q.correctOption !== "number" ||
+              (q.correctOption !== 0 && q.correctOption !== 1)
+            ) {
               if (q.correctAnswer) {
                 const answer = q.correctAnswer.toString().toLowerCase();
                 q.correctOption = answer === "true" || answer === "yes" ? 0 : 1;
@@ -2171,12 +2944,16 @@ Return ONLY a valid JSON array, no markdown.`;
 
         validatedQuestions.push(q);
       } catch (validationError) {
-        console.warn(`Skipping question at index ${index}: ${validationError.message}`);
+        console.warn(
+          `Skipping question at index ${index}: ${validationError.message}`
+        );
       }
     }
 
     if (validatedQuestions.length === 0) {
-      throw new Error("No valid questions could be processed. Please try again.");
+      throw new Error(
+        "No valid questions could be processed. Please try again."
+      );
     }
 
     return validatedQuestions;

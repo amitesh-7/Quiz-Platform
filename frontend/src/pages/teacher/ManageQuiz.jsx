@@ -242,7 +242,11 @@ const ManageQuiz = () => {
       return;
     }
 
-    if (!window.confirm(`Are you sure you want to delete all ${questions.length} questions? This action cannot be undone.`)) {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete all ${questions.length} questions? This action cannot be undone.`
+      )
+    ) {
       return;
     }
 
@@ -250,7 +254,7 @@ const ManageQuiz = () => {
       // Delete all questions one by one
       const deletePromises = questions.map((q) => questionAPI.delete(q._id));
       await Promise.all(deletePromises);
-      
+
       setQuestions([]);
       setQuiz({ ...quiz, totalMarks: 0 });
       toast.success(`Deleted all ${questions.length} questions`);
@@ -296,14 +300,17 @@ const ManageQuiz = () => {
             </div>
             <div class="q-text">${q.questionText || ""}</div>
         `;
-        
+
         if (q.subParts && q.subParts.length > 0) {
           q.subParts.forEach((part) => {
             questionsHTML += `<div class="sub-part">${part.part} ${part.question} (${part.marks} अंक)</div>`;
           });
         }
-        
-        if ((q.questionType === "mcq" || q.questionType === "truefalse") && q.options) {
+
+        if (
+          (q.questionType === "mcq" || q.questionType === "truefalse") &&
+          q.options
+        ) {
           questionsHTML += `
             <div class="options">
               <div class="opt-row">
@@ -317,7 +324,7 @@ const ManageQuiz = () => {
             </div>
           `;
         }
-        
+
         if (q.hasAlternative && q.alternativeQuestion) {
           questionsHTML += `
             <div class="or-section">
@@ -326,7 +333,7 @@ const ManageQuiz = () => {
             </div>
           `;
         }
-        
+
         questionsHTML += `</div>`;
       });
     });
@@ -343,26 +350,35 @@ const ManageQuiz = () => {
       }
       sectionQuestions.forEach((q) => {
         answersHTML += `<div class="answer"><div class="ans-num">उत्तर ${q.qNum}. [${q.marks} अंक]</div>`;
-        
-        if ((q.questionType === "mcq" || q.questionType === "truefalse") && q.options) {
+
+        if (
+          (q.questionType === "mcq" || q.questionType === "truefalse") &&
+          q.options
+        ) {
           const optLabels = ["अ", "ब", "स", "द"];
-          answersHTML += `<div class="ans-text correct">(${optLabels[q.correctOption || 0]}) ${q.options[q.correctOption] || ""}</div>`;
+          answersHTML += `<div class="ans-text correct">(${
+            optLabels[q.correctOption || 0]
+          }) ${q.options[q.correctOption] || ""}</div>`;
         }
-        
+
         if (q.questionType === "written" && q.correctAnswer) {
           answersHTML += `<div class="ans-text">${q.correctAnswer}</div>`;
         }
-        
+
         if (q.subParts && q.subParts.length > 0) {
           q.subParts.forEach((part) => {
-            answersHTML += `<div class="sub-ans"><b>${part.part}</b> ${part.answer || ""}</div>`;
+            answersHTML += `<div class="sub-ans"><b>${part.part}</b> ${
+              part.answer || ""
+            }</div>`;
           });
         }
-        
+
         if (q.questionType === "fillblank" && q.blanks) {
-          answersHTML += `<div class="ans-text correct">${q.blanks.join(", ")}</div>`;
+          answersHTML += `<div class="ans-text correct">${q.blanks.join(
+            ", "
+          )}</div>`;
         }
-        
+
         if (q.questionType === "matching" && q.matchPairs) {
           answersHTML += `<div class="match-ans">`;
           q.matchPairs.forEach((pair, idx) => {
@@ -370,11 +386,11 @@ const ManageQuiz = () => {
           });
           answersHTML += `</div>`;
         }
-        
+
         if (q.hasAlternative && q.alternativeAnswer) {
           answersHTML += `<div class="or-ans"><b>अथवा:</b><br/>${q.alternativeAnswer}</div>`;
         }
-        
+
         answersHTML += `</div>`;
       });
     });
@@ -475,7 +491,7 @@ ${answersHTML}
     try {
       // Create blob and download
       const blob = new Blob([fullHTML], { type: "text/html;charset=utf-8" });
-      
+
       // Create iframe for printing to PDF
       const iframe = document.createElement("iframe");
       iframe.style.position = "fixed";
@@ -534,11 +550,18 @@ ${answersHTML}
     if (generatedQuestions.length === 0) return;
 
     try {
+      console.log("Adding questions to quiz:", {
+        quizId,
+        count: generatedQuestions.length,
+      });
       await questionAPI.bulkCreate({
         quizId,
         questions: generatedQuestions,
       });
 
+      toast.success(
+        `Successfully added ${generatedQuestions.length} questions`
+      );
       await fetchQuizData(); // Refresh to get updated questions
       setShowGenerateModal(false);
       setGeneratedQuestions([]);
@@ -553,7 +576,17 @@ ${answersHTML}
       });
       toast.success("Questions added successfully");
     } catch (error) {
-      toast.error("Failed to add questions");
+      console.error("Failed to add questions:", error.response?.data);
+      const errorMsg =
+        error.response?.data?.message || "Failed to add questions";
+      const validationErrors = error.response?.data?.errors;
+
+      if (validationErrors && validationErrors.length > 0) {
+        console.error("Validation errors:", validationErrors);
+        toast.error(`${errorMsg}: ${validationErrors[0].message}`);
+      } else {
+        toast.error(errorMsg);
+      }
     }
   };
 
@@ -566,22 +599,25 @@ ${answersHTML}
 
     setProcessingBulk(true);
     try {
-      const response = await geminiAPI.processQuestions({
+      const payload = {
         rawQuestions: bulkForm.rawQuestions,
-        maxMarks: bulkForm.maxMarks,
-        marksDistribution: bulkForm.marksDistribution,
+        maxMarks: bulkForm.maxMarks || 50,
+        marksDistribution: bulkForm.marksDistribution || "",
         numberOfQuestions: bulkForm.numberOfQuestions
           ? parseInt(bulkForm.numberOfQuestions)
           : null,
-        language: bulkForm.language,
-        examFormat: bulkForm.examFormat,
-        difficulty: bulkForm.difficulty,
-      });
+        language: bulkForm.language || "english",
+        examFormat: bulkForm.examFormat || "general",
+        difficulty: bulkForm.difficulty || "medium",
+      };
+      console.log("Bulk Process Payload:", payload);
+      const response = await geminiAPI.processQuestions(payload);
       setProcessedQuestions(response.data.data.questions);
       toast.success(
         `Processed ${response.data.data.questions.length} questions`
       );
     } catch (error) {
+      console.error("Bulk Process Error:", error.response?.data || error);
       toast.error(
         error.response?.data?.message || "Failed to process questions"
       );
@@ -625,7 +661,7 @@ ${answersHTML}
     // Check current count + new files
     const currentCount = imageForm.images?.length || 0;
     const remainingSlots = 5 - currentCount;
-    
+
     if (remainingSlots <= 0) {
       toast.error("Maximum 5 images allowed");
       return;
@@ -637,7 +673,9 @@ ${answersHTML}
     }
 
     // Validate all files are images
-    const invalidFiles = filesToProcess.filter(f => !f.type.startsWith("image/"));
+    const invalidFiles = filesToProcess.filter(
+      (f) => !f.type.startsWith("image/")
+    );
     if (invalidFiles.length > 0) {
       toast.error("Please upload only image files (JPG, PNG, JPEG)");
       return;
@@ -688,7 +726,7 @@ ${answersHTML}
     setExtracting(true);
     try {
       const response = await geminiAPI.extractQuestionsFromImage({
-        images: imageForm.images.map(img => img.data), // Send array of base64 images
+        images: imageForm.images.map((img) => img.data), // Send array of base64 images
         maxMarks: imageForm.maxMarks,
         marksDistribution: imageForm.marksDistribution,
         additionalInstructions: imageForm.additionalInstructions,
@@ -746,8 +784,11 @@ ${answersHTML}
             </div>
             <div class="q-text">${q.questionText || ""}</div>
         `;
-        
-        if ((q.questionType === "mcq" || q.questionType === "truefalse") && q.options) {
+
+        if (
+          (q.questionType === "mcq" || q.questionType === "truefalse") &&
+          q.options
+        ) {
           questionsHTML += `
             <div class="options">
               <div class="opt-row">
@@ -761,7 +802,7 @@ ${answersHTML}
             </div>
           `;
         }
-        
+
         if (q.hasAlternative && q.alternativeQuestion) {
           questionsHTML += `
             <div class="or-section">
@@ -770,7 +811,7 @@ ${answersHTML}
             </div>
           `;
         }
-        
+
         questionsHTML += `</div>`;
       });
     });
@@ -787,24 +828,31 @@ ${answersHTML}
       }
       sectionQuestions.forEach((q) => {
         answersHTML += `<div class="answer"><div class="ans-num">उत्तर ${q.qNum}. [${q.marks} अंक]</div>`;
-        
-        if ((q.questionType === "mcq" || q.questionType === "truefalse") && q.options) {
+
+        if (
+          (q.questionType === "mcq" || q.questionType === "truefalse") &&
+          q.options
+        ) {
           const optLabels = ["अ", "ब", "स", "द"];
-          answersHTML += `<div class="ans-text correct">(${optLabels[q.correctOption || 0]}) ${q.options[q.correctOption] || ""}</div>`;
+          answersHTML += `<div class="ans-text correct">(${
+            optLabels[q.correctOption || 0]
+          }) ${q.options[q.correctOption] || ""}</div>`;
         }
-        
+
         if (q.questionType === "written" && q.correctAnswer) {
           answersHTML += `<div class="ans-text">${q.correctAnswer}</div>`;
         }
-        
+
         if (q.questionType === "fillblank" && q.blanks) {
-          answersHTML += `<div class="ans-text correct">${q.blanks.join(", ")}</div>`;
+          answersHTML += `<div class="ans-text correct">${q.blanks.join(
+            ", "
+          )}</div>`;
         }
-        
+
         if (q.hasAlternative && q.alternativeAnswer) {
           answersHTML += `<div class="or-ans"><b>अथवा:</b><br/>${q.alternativeAnswer}</div>`;
         }
-        
+
         answersHTML += `</div>`;
       });
     });
@@ -1130,178 +1178,217 @@ ${answersHTML}
                 if (!sections[section]) sections[section] = [];
                 sections[section].push({ ...q, originalIndex: idx });
               });
-              
-              return Object.entries(sections).map(([sectionName, sectionQuestions]) => (
-                <div key={sectionName}>
-                  {/* Section Header - only show if section exists and is not default */}
-                  {sectionName !== "Questions" && (
-                    <motion.div 
-                      className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-4 mb-4"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <p className="text-yellow-300 font-bold">{sectionName}</p>
-                      <p className="text-xs text-yellow-400/70 mt-1">
-                        {sectionQuestions.length} questions • {sectionQuestions.reduce((sum, q) => sum + q.marks, 0)} marks
-                      </p>
-                    </motion.div>
-                  )}
-                  
-                  {/* Questions in this section */}
-                  {sectionQuestions.map((question) => (
-              <motion.div
-                key={question._id}
-                className="glass-card"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: question.originalIndex * 0.05 }}
-              >
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-3 flex-wrap">
-                      <span className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 font-bold">
-                        {question.originalIndex + 1}
-                      </span>
-                      <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
-                        {question.marks} mark{question.marks > 1 ? "s" : ""}
-                      </span>
-                      <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full">
-                        {question.questionType === "mcq" && "📝 MCQ"}
-                        {question.questionType === "written" && "✍️ Written"}
-                        {question.questionType === "fillblank" &&
-                          "📄 Fill Blank"}
-                        {question.questionType === "matching" && "🔗 Matching"}
-                        {question.questionType === "truefalse" &&
-                          "✓✗ True/False"}
-                      </span>
-                      {question.hasAlternative && (
-                        <span className="text-xs px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">
-                          अथवा/OR
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-white mb-4 whitespace-pre-line">{question.questionText}</p>
 
-                    {/* Sub-parts for multi-part questions */}
-                    {question.subParts && question.subParts.length > 0 && (
-                      <div className="mb-4 space-y-2">
-                        {question.subParts.map((part, idx) => (
-                          <div key={idx} className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                            <p className="text-blue-400 font-medium">{part.part} ({part.marks} marks)</p>
-                            <p className="text-white text-sm mt-1">{part.question}</p>
-                            <p className="text-green-400 text-sm mt-1">Answer: {part.answer}</p>
-                          </div>
-                        ))}
-                      </div>
+              return Object.entries(sections).map(
+                ([sectionName, sectionQuestions]) => (
+                  <div key={sectionName}>
+                    {/* Section Header - only show if section exists and is not default */}
+                    {sectionName !== "Questions" && (
+                      <motion.div
+                        className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-4 mb-4"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                      >
+                        <p className="text-yellow-300 font-bold">
+                          {sectionName}
+                        </p>
+                        <p className="text-xs text-yellow-400/70 mt-1">
+                          {sectionQuestions.length} questions •{" "}
+                          {sectionQuestions.reduce(
+                            (sum, q) => sum + q.marks,
+                            0
+                          )}{" "}
+                          marks
+                        </p>
+                      </motion.div>
                     )}
 
-                    {/* MCQ and True/False options */}
-                    {(question.questionType === "mcq" ||
-                      question.questionType === "truefalse") &&
-                      question.options && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {question.options.map((option, optIndex) => (
-                            <div
-                              key={optIndex}
-                              className={`p-3 rounded-lg ${
-                                optIndex === question.correctOption
-                                  ? "bg-green-500/20 border border-green-500/30 text-green-300"
-                                  : "bg-white/5 border border-white/10 text-gray-400"
-                              }`}
-                            >
-                              <span className="font-medium mr-2">
-                                {String.fromCharCode(65 + optIndex)}.
+                    {/* Questions in this section */}
+                    {sectionQuestions.map((question) => (
+                      <motion.div
+                        key={question._id}
+                        className="glass-card"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: question.originalIndex * 0.05 }}
+                      >
+                        <div className="flex justify-between items-start gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-3 flex-wrap">
+                              <span className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 font-bold">
+                                {question.originalIndex + 1}
                               </span>
-                              {option}
-                              {optIndex === question.correctOption && (
-                                <FiCheckCircle className="inline ml-2 w-4 h-4" />
+                              <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
+                                {question.marks} mark
+                                {question.marks > 1 ? "s" : ""}
+                              </span>
+                              <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full">
+                                {question.questionType === "mcq" && "📝 MCQ"}
+                                {question.questionType === "written" &&
+                                  "✍️ Written"}
+                                {question.questionType === "fillblank" &&
+                                  "📄 Fill Blank"}
+                                {question.questionType === "matching" &&
+                                  "🔗 Matching"}
+                                {question.questionType === "truefalse" &&
+                                  "✓✗ True/False"}
+                              </span>
+                              {question.hasAlternative && (
+                                <span className="text-xs px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">
+                                  अथवा/OR
+                                </span>
                               )}
                             </div>
-                          ))}
-                        </div>
-                      )}
+                            <p className="text-white mb-4 whitespace-pre-line">
+                              {question.questionText}
+                            </p>
 
-                    {/* Written answer */}
-                    {question.questionType === "written" &&
-                      question.correctAnswer && (
-                        <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg text-green-300 text-sm">
-                          <span className="font-medium">Expected Answer: </span>
-                          <span className="whitespace-pre-line">{question.correctAnswer}</span>
-                        </div>
-                      )}
+                            {/* Sub-parts for multi-part questions */}
+                            {question.subParts &&
+                              question.subParts.length > 0 && (
+                                <div className="mb-4 space-y-2">
+                                  {question.subParts.map((part, idx) => (
+                                    <div
+                                      key={idx}
+                                      className="p-3 bg-white/5 border border-white/10 rounded-lg"
+                                    >
+                                      <p className="text-blue-400 font-medium">
+                                        {part.part} ({part.marks} marks)
+                                      </p>
+                                      <p className="text-white text-sm mt-1">
+                                        {part.question}
+                                      </p>
+                                      <p className="text-green-400 text-sm mt-1">
+                                        Answer: {part.answer}
+                                      </p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
 
-                    {/* Alternative question (OR) */}
-                    {question.hasAlternative && question.alternativeQuestion && (
-                      <div className="mt-4 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
-                        <p className="text-orange-400 font-medium mb-2">अथवा / OR:</p>
-                        <p className="text-white text-sm whitespace-pre-line">{question.alternativeQuestion}</p>
-                        {question.alternativeAnswer && (
-                          <p className="text-green-400 text-sm mt-2">
-                            <span className="font-medium">Answer: </span>
-                            <span className="whitespace-pre-line">{question.alternativeAnswer}</span>
-                          </p>
-                        )}
-                      </div>
-                    )}
+                            {/* MCQ and True/False options */}
+                            {(question.questionType === "mcq" ||
+                              question.questionType === "truefalse") &&
+                              question.options && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  {question.options.map((option, optIndex) => (
+                                    <div
+                                      key={optIndex}
+                                      className={`p-3 rounded-lg ${
+                                        optIndex === question.correctOption
+                                          ? "bg-green-500/20 border border-green-500/30 text-green-300"
+                                          : "bg-white/5 border border-white/10 text-gray-400"
+                                      }`}
+                                    >
+                                      <span className="font-medium mr-2">
+                                        {String.fromCharCode(65 + optIndex)}.
+                                      </span>
+                                      {option}
+                                      {optIndex === question.correctOption && (
+                                        <FiCheckCircle className="inline ml-2 w-4 h-4" />
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
 
-                    {/* Fill in blanks */}
-                    {question.questionType === "fillblank" &&
-                      question.blanks && (
-                        <div className="flex flex-wrap gap-2">
-                          {question.blanks.map((blank, idx) => (
-                            <span
-                              key={idx}
-                              className="px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 text-sm"
+                            {/* Written answer */}
+                            {question.questionType === "written" &&
+                              question.correctAnswer && (
+                                <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg text-green-300 text-sm">
+                                  <span className="font-medium">
+                                    Expected Answer:{" "}
+                                  </span>
+                                  <span className="whitespace-pre-line">
+                                    {question.correctAnswer}
+                                  </span>
+                                </div>
+                              )}
+
+                            {/* Alternative question (OR) */}
+                            {question.hasAlternative &&
+                              question.alternativeQuestion && (
+                                <div className="mt-4 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+                                  <p className="text-orange-400 font-medium mb-2">
+                                    अथवा / OR:
+                                  </p>
+                                  <p className="text-white text-sm whitespace-pre-line">
+                                    {question.alternativeQuestion}
+                                  </p>
+                                  {question.alternativeAnswer && (
+                                    <p className="text-green-400 text-sm mt-2">
+                                      <span className="font-medium">
+                                        Answer:{" "}
+                                      </span>
+                                      <span className="whitespace-pre-line">
+                                        {question.alternativeAnswer}
+                                      </span>
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+
+                            {/* Fill in blanks */}
+                            {question.questionType === "fillblank" &&
+                              question.blanks && (
+                                <div className="flex flex-wrap gap-2">
+                                  {question.blanks.map((blank, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 text-sm"
+                                    >
+                                      Blank {idx + 1}: {blank}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+
+                            {/* Matching pairs */}
+                            {question.questionType === "matching" &&
+                              question.matchPairs && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  {question.matchPairs.map((pair, idx) => (
+                                    <div
+                                      key={idx}
+                                      className="p-2 bg-white/5 border border-white/10 rounded-lg text-sm flex items-center gap-2"
+                                    >
+                                      <span className="text-blue-400">
+                                        {pair.left}
+                                      </span>
+                                      <span className="text-gray-500">→</span>
+                                      <span className="text-green-400">
+                                        {pair.right}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                          </div>
+
+                          <div className="flex gap-2">
+                            <motion.button
+                              onClick={() => handleEditQuestion(question)}
+                              className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
                             >
-                              Blank {idx + 1}: {blank}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                    {/* Matching pairs */}
-                    {question.questionType === "matching" &&
-                      question.matchPairs && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {question.matchPairs.map((pair, idx) => (
-                            <div
-                              key={idx}
-                              className="p-2 bg-white/5 border border-white/10 rounded-lg text-sm flex items-center gap-2"
+                              <FiEdit className="w-5 h-5" />
+                            </motion.button>
+                            <motion.button
+                              onClick={() => handleDeleteQuestion(question._id)}
+                              className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
                             >
-                              <span className="text-blue-400">{pair.left}</span>
-                              <span className="text-gray-500">→</span>
-                              <span className="text-green-400">
-                                {pair.right}
-                              </span>
-                            </div>
-                          ))}
+                              <FiTrash2 className="w-5 h-5" />
+                            </motion.button>
+                          </div>
                         </div>
-                      )}
+                      </motion.div>
+                    ))}
                   </div>
-
-                  <div className="flex gap-2">
-                    <motion.button
-                      onClick={() => handleEditQuestion(question)}
-                      className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <FiEdit className="w-5 h-5" />
-                    </motion.button>
-                    <motion.button
-                      onClick={() => handleDeleteQuestion(question._id)}
-                      className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <FiTrash2 className="w-5 h-5" />
-                    </motion.button>
-                  </div>
-                </div>
-              </motion.div>
-                  ))}
-                </div>
-              ));
+                )
+              );
             })()}
           </div>
         )}
@@ -1774,6 +1861,24 @@ ${answersHTML}
                               questionTypes: ["mcq", "written"],
                               numberOfQuestions: 30,
                             });
+                          } else if (format === "upboard_maths") {
+                            // Auto-configure for UP Board Mathematics
+                            setGenerateForm({
+                              ...generateForm,
+                              examFormat: format,
+                              language: "bilingual",
+                              questionTypes: ["mcq", "written"],
+                              numberOfQuestions: 25,
+                            });
+                          } else if (format === "upboard_sanskrit") {
+                            // Auto-configure for UP Board Sanskrit
+                            setGenerateForm({
+                              ...generateForm,
+                              examFormat: format,
+                              language: "sanskrit",
+                              questionTypes: ["mcq", "written"],
+                              numberOfQuestions: 31,
+                            });
                           } else {
                             setGenerateForm({
                               ...generateForm,
@@ -1784,22 +1889,78 @@ ${answersHTML}
                         className="glass-input"
                       >
                         <option value="general">General (Custom)</option>
-                        <option value="upboard_science">UP Board Science (Class 10)</option>
-                        <option value="upboard_english">UP Board English (Class 10)</option>
-                        <option value="upboard_hindi">UP Board Hindi (Class 10)</option>
-                        <option value="upboard_sanskrit">UP Board Sanskrit (Class 10)</option>
+                        <option value="upboard_science">
+                          UP Board Science (Class 10)
+                        </option>
+                        <option value="upboard_english">
+                          UP Board English (Class 10)
+                        </option>
+                        <option value="upboard_hindi">
+                          UP Board Hindi (Class 10)
+                        </option>
+                        <option value="upboard_sanskrit">
+                          UP Board Sanskrit (Class 10)
+                        </option>
+                        <option value="upboard_maths">
+                          UP Board Mathematics (Class 10)
+                        </option>
                       </select>
                     </div>
+                    {/* UP Board Mathematics Info Box */}
+                    {generateForm.examFormat === "upboard_maths" && (
+                      <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-lg p-4">
+                        <p className="text-blue-300 font-medium mb-3">
+                          📐 UP Board Mathematics Paper - 70 अंक (25 प्रश्न)
+                        </p>
+                        <p className="text-xs text-gray-400 mb-2">
+                          Paper Code: 822(BV)
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-yellow-400 font-medium mb-2">
+                              खण्ड 'अ' - 20 अंक
+                            </p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• प्र.1-20: MCQs (20 अंक)</li>
+                              <li>
+                                • Topics: संख्याएं, बहुपद, समीकरण, AP, ज्यामिति,
+                                त्रिकोणमिति
+                              </li>
+                            </ul>
+                          </div>
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-green-400 font-medium mb-2">
+                              खण्ड 'ब' - 50 अंक
+                            </p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• प्र.21: 6×2=12 अंक (सभी करें)</li>
+                              <li>• प्र.22: 5×4=20 अंक (6 में से 5)</li>
+                              <li>• प्र.23-25: 3×6=18 अंक (अथवा सहित)</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <p className="text-xs text-blue-400 mt-3">
+                          📝 Note: Diagram questions include [चित्र आवश्यक] tag
+                          - add diagrams manually
+                        </p>
+                      </div>
+                    )}
                     {/* UP Board Sanskrit - Simplified UI */}
                     {generateForm.examFormat === "upboard_sanskrit" ? (
                       <>
                         {/* UP Board Sanskrit Info Box */}
                         <div className="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-lg p-4">
-                          <p className="text-amber-300 font-medium mb-3">📋 UP Board Sanskrit Paper - 70 अंक (31 प्रश्न)</p>
-                          <p className="text-xs text-gray-400 mb-2">Paper Code: 818(BP)</p>
+                          <p className="text-amber-300 font-medium mb-3">
+                            📋 UP Board Sanskrit Paper - 70 अंक (31 प्रश्न)
+                          </p>
+                          <p className="text-xs text-gray-400 mb-2">
+                            Paper Code: 818(BP)
+                          </p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                             <div className="bg-white/5 rounded-lg p-3">
-                              <p className="text-yellow-400 font-medium mb-2">खण्ड 'अ' - 20 अंक</p>
+                              <p className="text-yellow-400 font-medium mb-2">
+                                खण्ड 'अ' - 20 अंक
+                              </p>
                               <ul className="text-xs text-gray-400 space-y-1">
                                 <li>• प्र.1-6: गद्यांश MCQs (6 अंक)</li>
                                 <li>• प्र.7-20: व्याकरण MCQs (14 अंक)</li>
@@ -1807,7 +1968,9 @@ ${answersHTML}
                               </ul>
                             </div>
                             <div className="bg-white/5 rounded-lg p-3">
-                              <p className="text-green-400 font-medium mb-2">खण्ड 'ब' - 50 अंक</p>
+                              <p className="text-green-400 font-medium mb-2">
+                                खण्ड 'ब' - 50 अंक
+                              </p>
                               <ul className="text-xs text-gray-400 space-y-1">
                                 <li>• गद्यांश/श्लोक/सारांश/चरित्र (23 अंक)</li>
                                 <li>• विभक्ति/प्रत्यय (4), वाच्य (3)</li>
@@ -1861,23 +2024,35 @@ ${answersHTML}
                       <>
                         {/* UP Board Hindi Info Box */}
                         <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-lg p-4">
-                          <p className="text-orange-300 font-medium mb-3">📋 UP Board Hindi Paper - 70 अंक (30 प्रश्न)</p>
-                          <p className="text-xs text-gray-400 mb-2">Paper Code: 801(BA)</p>
+                          <p className="text-orange-300 font-medium mb-3">
+                            📋 UP Board Hindi Paper - 70 अंक (30 प्रश्न)
+                          </p>
+                          <p className="text-xs text-gray-400 mb-2">
+                            Paper Code: 801(BA)
+                          </p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                             <div className="bg-white/5 rounded-lg p-3">
-                              <p className="text-yellow-400 font-medium mb-2">खण्ड 'अ' - 20 अंक</p>
+                              <p className="text-yellow-400 font-medium mb-2">
+                                खण्ड 'अ' - 20 अंक
+                              </p>
                               <ul className="text-xs text-gray-400 space-y-1">
                                 <li>• प्र.1-20: 20 MCQs × 1 = 20 अंक</li>
-                                <li>• साहित्य, व्याकरण, रस, अलंकार, छंद, समास</li>
+                                <li>
+                                  • साहित्य, व्याकरण, रस, अलंकार, छंद, समास
+                                </li>
                               </ul>
                             </div>
                             <div className="bg-white/5 rounded-lg p-3">
-                              <p className="text-green-400 font-medium mb-2">खण्ड 'ब' - 50 अंक</p>
+                              <p className="text-green-400 font-medium mb-2">
+                                खण्ड 'ब' - 50 अंक
+                              </p>
                               <ul className="text-xs text-gray-400 space-y-1">
                                 <li>• गद्यांश (6), पद्यांश (6)</li>
                                 <li>• संस्कृत अनुवाद (5+5)</li>
                                 <li>• खण्डकाव्य (3), लेखक/कवि (10)</li>
-                                <li>• श्लोक (2), पत्र (4), संस्कृत प्रश्न (2)</li>
+                                <li>
+                                  • श्लोक (2), पत्र (4), संस्कृत प्रश्न (2)
+                                </li>
                                 <li>• निबन्ध (7)</li>
                               </ul>
                             </div>
@@ -1928,10 +2103,14 @@ ${answersHTML}
                       <>
                         {/* UP Board Info Box */}
                         <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-4">
-                          <p className="text-blue-300 font-medium mb-3">📋 UP Board Science Paper - 70 Marks (31 Questions)</p>
+                          <p className="text-blue-300 font-medium mb-3">
+                            📋 UP Board Science Paper - 70 Marks (31 Questions)
+                          </p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                             <div className="bg-white/5 rounded-lg p-3">
-                              <p className="text-yellow-400 font-medium mb-2">खण्ड-अ (Part A) - 20 Marks</p>
+                              <p className="text-yellow-400 font-medium mb-2">
+                                खण्ड-अ (Part A) - 20 Marks
+                              </p>
                               <ul className="text-xs text-gray-400 space-y-1">
                                 <li>• उप-भाग I: 7 MCQs × 1 = 7 marks</li>
                                 <li>• उप-भाग II: 6 MCQs × 1 = 6 marks</li>
@@ -1939,7 +2118,9 @@ ${answersHTML}
                               </ul>
                             </div>
                             <div className="bg-white/5 rounded-lg p-3">
-                              <p className="text-green-400 font-medium mb-2">खण्ड-ब (Part B) - 50 Marks</p>
+                              <p className="text-green-400 font-medium mb-2">
+                                खण्ड-ब (Part B) - 50 Marks
+                              </p>
                               <ul className="text-xs text-gray-400 space-y-1">
                                 <li>• उप-भाग I: 4 × (2+2) = 16 marks</li>
                                 <li>• उप-भाग II: 4 × 4 = 16 marks</li>
@@ -1949,14 +2130,18 @@ ${answersHTML}
                           </div>
                           <div className="mt-3 pt-3 border-t border-white/10">
                             <p className="text-xs text-gray-400">
-                              ✓ 31 questions = 70 marks • ✓ Bilingual (Hindi/English) • ✓ Section headers • ✓ Single or multiple topics
+                              ✓ 31 questions = 70 marks • ✓ Bilingual
+                              (Hindi/English) • ✓ Section headers • ✓ Single or
+                              multiple topics
                             </p>
                           </div>
                         </div>
 
                         {/* Topic Input */}
                         <div className="form-group">
-                          <label className="input-label">Topic / Chapter(s) *</label>
+                          <label className="input-label">
+                            Topic / Chapter(s) *
+                          </label>
                           <input
                             type="text"
                             value={generateForm.topic}
@@ -1970,18 +2155,37 @@ ${answersHTML}
                             placeholder="e.g., प्रकाश - परावर्तन और अपवर्तन OR प्रकाश, रासायनिक अभिक्रियाएं, जीवन प्रक्रियाएं"
                           />
                           <p className="text-xs text-gray-500 mt-1">
-                            Enter single topic OR multiple topics (comma-separated) - questions will be distributed evenly
+                            Enter single topic OR multiple topics
+                            (comma-separated) - questions will be distributed
+                            evenly
                           </p>
                         </div>
 
                         {/* Difficulty Only */}
                         <div className="form-group">
-                          <label className="input-label">Difficulty Level</label>
+                          <label className="input-label">
+                            Difficulty Level
+                          </label>
                           <div className="grid grid-cols-3 gap-3">
                             {[
-                              { value: "easy", label: "Easy", desc: "Basic concepts", icon: "🟢" },
-                              { value: "medium", label: "Medium", desc: "Board level", icon: "🟡" },
-                              { value: "hard", label: "Hard", desc: "Competitive", icon: "🔴" },
+                              {
+                                value: "easy",
+                                label: "Easy",
+                                desc: "Basic concepts",
+                                icon: "🟢",
+                              },
+                              {
+                                value: "medium",
+                                label: "Medium",
+                                desc: "Board level",
+                                icon: "🟡",
+                              },
+                              {
+                                value: "hard",
+                                label: "Hard",
+                                desc: "Competitive",
+                                icon: "🔴",
+                              },
                             ].map((level) => (
                               <button
                                 key={level.value}
@@ -1999,8 +2203,12 @@ ${answersHTML}
                                 }`}
                               >
                                 <span className="text-xl">{level.icon}</span>
-                                <p className="font-medium mt-1">{level.label}</p>
-                                <p className="text-xs opacity-70">{level.desc}</p>
+                                <p className="font-medium mt-1">
+                                  {level.label}
+                                </p>
+                                <p className="text-xs opacity-70">
+                                  {level.desc}
+                                </p>
                               </button>
                             ))}
                           </div>
@@ -2010,16 +2218,22 @@ ${answersHTML}
                       <>
                         {/* UP Board English Info Box */}
                         <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
-                          <p className="text-green-300 font-medium mb-3">📋 UP Board English Paper - 70 Marks (31 Questions)</p>
+                          <p className="text-green-300 font-medium mb-3">
+                            📋 UP Board English Paper - 70 Marks (31 Questions)
+                          </p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                             <div className="bg-white/5 rounded-lg p-3">
-                              <p className="text-yellow-400 font-medium mb-2">PART-A - 20 Marks</p>
+                              <p className="text-yellow-400 font-medium mb-2">
+                                PART-A - 20 Marks
+                              </p>
                               <ul className="text-xs text-gray-400 space-y-1">
                                 <li>• Q1-Q20: 20 MCQs × 1 = 20 marks</li>
                               </ul>
                             </div>
                             <div className="bg-white/5 rounded-lg p-3">
-                              <p className="text-green-400 font-medium mb-2">PART-B - 50 Marks</p>
+                              <p className="text-green-400 font-medium mb-2">
+                                PART-B - 50 Marks
+                              </p>
                               <ul className="text-xs text-gray-400 space-y-1">
                                 <li>• Q21: Reading (8 marks)</li>
                                 <li>• Q22: Letter (4 marks) + OR</li>
@@ -2031,14 +2245,17 @@ ${answersHTML}
                           </div>
                           <div className="mt-3 pt-3 border-t border-white/10">
                             <p className="text-xs text-gray-400">
-                              ✓ 31 questions = 70 marks • ✓ English only • ✓ Long passages • ✓ Full letter format
+                              ✓ 31 questions = 70 marks • ✓ English only • ✓
+                              Long passages • ✓ Full letter format
                             </p>
                           </div>
                         </div>
 
                         {/* Topic Input */}
                         <div className="form-group">
-                          <label className="input-label">Topic / Chapter(s) *</label>
+                          <label className="input-label">
+                            Topic / Chapter(s) *
+                          </label>
                           <input
                             type="text"
                             value={generateForm.topic}
@@ -2052,18 +2269,36 @@ ${answersHTML}
                             placeholder="e.g., Reading Comprehension, Grammar, Letter Writing, First Flight Chapter 1"
                           />
                           <p className="text-xs text-gray-500 mt-1">
-                            Enter topic(s) - Grammar, Writing, Literature, or specific chapters
+                            Enter topic(s) - Grammar, Writing, Literature, or
+                            specific chapters
                           </p>
                         </div>
 
                         {/* Difficulty Only */}
                         <div className="form-group">
-                          <label className="input-label">Difficulty Level</label>
+                          <label className="input-label">
+                            Difficulty Level
+                          </label>
                           <div className="grid grid-cols-3 gap-3">
                             {[
-                              { value: "easy", label: "Easy", desc: "Basic concepts", icon: "🟢" },
-                              { value: "medium", label: "Medium", desc: "Board level", icon: "🟡" },
-                              { value: "hard", label: "Hard", desc: "Competitive", icon: "🔴" },
+                              {
+                                value: "easy",
+                                label: "Easy",
+                                desc: "Basic concepts",
+                                icon: "🟢",
+                              },
+                              {
+                                value: "medium",
+                                label: "Medium",
+                                desc: "Board level",
+                                icon: "🟡",
+                              },
+                              {
+                                value: "hard",
+                                label: "Hard",
+                                desc: "Competitive",
+                                icon: "🔴",
+                              },
                             ].map((level) => (
                               <button
                                 key={level.value}
@@ -2081,8 +2316,12 @@ ${answersHTML}
                                 }`}
                               >
                                 <span className="text-xl">{level.icon}</span>
-                                <p className="font-medium mt-1">{level.label}</p>
-                                <p className="text-xs opacity-70">{level.desc}</p>
+                                <p className="font-medium mt-1">
+                                  {level.label}
+                                </p>
+                                <p className="text-xs opacity-70">
+                                  {level.desc}
+                                </p>
                               </button>
                             ))}
                           </div>
@@ -2108,126 +2347,182 @@ ${answersHTML}
                           />
                         </div>
 
-                        {/* Number, Difficulty, Language Row */}
-                        <div className="grid grid-cols-3 gap-4">
-                          <div className="form-group">
-                            <label className="input-label">No. of Questions</label>
-                            <input
-                              type="number"
-                              value={generateForm.numberOfQuestions}
-                              onChange={(e) =>
-                                setGenerateForm({
-                                  ...generateForm,
-                                  numberOfQuestions: parseInt(e.target.value) || 5,
-                                })
-                              }
-                              className="glass-input"
-                              min={1}
-                              max={50}
-                            />
-                          </div>
-
-                          <div className="form-group">
-                            <label className="input-label">Difficulty</label>
-                            <select
-                              value={generateForm.difficulty}
-                              onChange={(e) =>
-                                setGenerateForm({
-                                  ...generateForm,
-                                  difficulty: e.target.value,
-                                })
-                              }
-                              className="glass-input"
-                            >
-                              <option value="easy">Easy</option>
-                              <option value="medium">Medium</option>
-                              <option value="hard">Hard</option>
-                            </select>
-                          </div>
-
-                          <div className="form-group">
-                            <label className="input-label">Language</label>
-                            <select
-                              value={generateForm.language || "english"}
-                              onChange={(e) =>
-                                setGenerateForm({
-                                  ...generateForm,
-                                  language: e.target.value,
-                                })
-                              }
-                              className="glass-input"
-                            >
-                              <option value="english">English</option>
-                              <option value="hindi">हिंदी (Hindi)</option>
-                              <option value="bilingual">द्विभाषी (Bilingual)</option>
-                              <option value="sanskrit">संस्कृत (Sanskrit)</option>
-                              <option value="spanish">Español (Spanish)</option>
-                              <option value="french">Français (French)</option>
-                              <option value="german">Deutsch (German)</option>
-                            </select>
-                          </div>
+                        {/* Difficulty - Always visible */}
+                        <div className="form-group">
+                          <label className="input-label">Difficulty</label>
+                          <select
+                            value={generateForm.difficulty}
+                            onChange={(e) =>
+                              setGenerateForm({
+                                ...generateForm,
+                                difficulty: e.target.value,
+                              })
+                            }
+                            className="glass-input"
+                          >
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                          </select>
                         </div>
 
-                    {/* Question Types */}
-                    <div className="form-group">
-                      <label className="input-label mb-2">Question Types</label>
-                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                        {[
-                          { value: "mcq", label: "MCQ", icon: "📝" },
-                          { value: "written", label: "Written", icon: "✍️" },
-                          { value: "fillblank", label: "Fill Blanks", icon: "📄" },
-                          { value: "matching", label: "Matching", icon: "🔗" },
-                          { value: "truefalse", label: "True/False", icon: "✓✗" },
-                        ].map((type) => (
-                          <label
-                            key={type.value}
-                            className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors text-sm ${
-                              (generateForm.questionTypes || ["mcq"]).includes(type.value)
-                                ? "bg-yellow-500/30 border border-yellow-500"
-                                : "bg-white/5 border border-white/10 hover:bg-white/10"
-                            }`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={(generateForm.questionTypes || ["mcq"]).includes(type.value)}
-                              onChange={() => {
-                                const currentTypes = generateForm.questionTypes || ["mcq"];
-                                const newTypes = currentTypes.includes(type.value)
-                                  ? currentTypes.filter((t) => t !== type.value)
-                                  : [...currentTypes, type.value];
+                        {/* Show Number, Language, Question Types only for General format */}
+                        {generateForm.examFormat === "general" && (
+                          <>
+                            {/* Number and Language Row */}
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="form-group">
+                                <label className="input-label">
+                                  No. of Questions
+                                </label>
+                                <input
+                                  type="number"
+                                  value={generateForm.numberOfQuestions}
+                                  onChange={(e) =>
+                                    setGenerateForm({
+                                      ...generateForm,
+                                      numberOfQuestions:
+                                        parseInt(e.target.value) || 5,
+                                    })
+                                  }
+                                  className="glass-input"
+                                  min={1}
+                                  max={50}
+                                />
+                              </div>
+
+                              <div className="form-group">
+                                <label className="input-label">Language</label>
+                                <select
+                                  value={generateForm.language || "english"}
+                                  onChange={(e) =>
+                                    setGenerateForm({
+                                      ...generateForm,
+                                      language: e.target.value,
+                                    })
+                                  }
+                                  className="glass-input"
+                                >
+                                  <option value="english">English</option>
+                                  <option value="hindi">हिंदी (Hindi)</option>
+                                  <option value="bilingual">
+                                    द्विभाषी (Bilingual)
+                                  </option>
+                                  <option value="sanskrit">
+                                    संस्कृत (Sanskrit)
+                                  </option>
+                                  <option value="spanish">
+                                    Español (Spanish)
+                                  </option>
+                                  <option value="french">
+                                    Français (French)
+                                  </option>
+                                  <option value="german">
+                                    Deutsch (German)
+                                  </option>
+                                </select>
+                              </div>
+                            </div>
+
+                            {/* Question Types */}
+                            <div className="form-group">
+                              <label className="input-label mb-2">
+                                Question Types
+                              </label>
+                              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                                {[
+                                  { value: "mcq", label: "MCQ", icon: "📝" },
+                                  {
+                                    value: "written",
+                                    label: "Written",
+                                    icon: "✍️",
+                                  },
+                                  {
+                                    value: "fillblank",
+                                    label: "Fill Blanks",
+                                    icon: "📄",
+                                  },
+                                  {
+                                    value: "matching",
+                                    label: "Matching",
+                                    icon: "🔗",
+                                  },
+                                  {
+                                    value: "truefalse",
+                                    label: "True/False",
+                                    icon: "✓✗",
+                                  },
+                                ].map((type) => (
+                                  <label
+                                    key={type.value}
+                                    className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors text-sm ${
+                                      (
+                                        generateForm.questionTypes || ["mcq"]
+                                      ).includes(type.value)
+                                        ? "bg-yellow-500/30 border border-yellow-500"
+                                        : "bg-white/5 border border-white/10 hover:bg-white/10"
+                                    }`}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={(
+                                        generateForm.questionTypes || ["mcq"]
+                                      ).includes(type.value)}
+                                      onChange={() => {
+                                        const currentTypes =
+                                          generateForm.questionTypes || ["mcq"];
+                                        const newTypes = currentTypes.includes(
+                                          type.value
+                                        )
+                                          ? currentTypes.filter(
+                                              (t) => t !== type.value
+                                            )
+                                          : [...currentTypes, type.value];
+                                        setGenerateForm({
+                                          ...generateForm,
+                                          questionTypes:
+                                            newTypes.length > 0
+                                              ? newTypes
+                                              : ["mcq"],
+                                        });
+                                      }}
+                                      className="hidden"
+                                    />
+                                    <span>{type.icon}</span>
+                                    <span className="text-white">
+                                      {type.label}
+                                    </span>
+                                  </label>
+                                ))}
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        {/* Additional Instructions - Only for General format */}
+                        {generateForm.examFormat === "general" && (
+                          <div className="form-group">
+                            <label className="input-label">
+                              Additional Instructions (Optional)
+                            </label>
+                            <textarea
+                              value={generateForm.description || ""}
+                              onChange={(e) =>
                                 setGenerateForm({
                                   ...generateForm,
-                                  questionTypes: newTypes.length > 0 ? newTypes : ["mcq"],
-                                });
-                              }}
-                              className="hidden"
+                                  description: e.target.value,
+                                })
+                              }
+                              className="glass-input h-24 resize-none"
+                              placeholder="e.g., Focus on chapter 5, include questions about key dates, avoid complex calculations, make questions suitable for beginners..."
+                              maxLength={1000}
                             />
-                            <span>{type.icon}</span>
-                            <span className="text-white">{type.label}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Additional Instructions */}
-                    <div className="form-group">
-                      <label className="input-label">Additional Instructions (Optional)</label>
-                      <textarea
-                        value={generateForm.description || ""}
-                        onChange={(e) =>
-                          setGenerateForm({
-                            ...generateForm,
-                            description: e.target.value,
-                          })
-                        }
-                        className="glass-input h-24 resize-none"
-                        placeholder="e.g., Focus on chapter 5, include questions about key dates, avoid complex calculations, make questions suitable for beginners..."
-                        maxLength={1000}
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Give specific instructions to guide AI question generation
-                      </p>
-                    </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Give specific instructions to guide AI question
+                              generation
+                            </p>
+                          </div>
+                        )}
                       </>
                     )}
 
@@ -2267,87 +2562,128 @@ ${answersHTML}
                           if (!sections[section]) sections[section] = [];
                           sections[section].push({ ...q, originalIndex: idx });
                         });
-                        
-                        return Object.entries(sections).map(([sectionName, sectionQuestions]) => (
-                          <div key={sectionName} className="mb-4">
-                            {/* Section Header */}
-                            {sectionName !== "Questions" && (
-                              <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-3 mb-3">
-                                <p className="text-yellow-300 font-bold text-sm">{sectionName}</p>
-                              </div>
-                            )}
-                            
-                            {/* Questions in this section */}
-                            {sectionQuestions.map((question) => (
-                              <div key={question.originalIndex} className="bg-white/5 rounded-lg p-4 mb-2">
-                                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                  <span className="text-blue-400 font-bold">Q{question.originalIndex + 1}.</span>
-                                  <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded-full">
-                                    {question.questionType === "mcq" && "📝 MCQ"}
-                                    {question.questionType === "written" && "✍️ Written"}
-                                    {question.questionType === "fillblank" && "📄 Fill Blank"}
-                                    {question.questionType === "matching" && "🔗 Matching"}
-                                    {question.questionType === "truefalse" && "✓✗ True/False"}
-                                  </span>
-                                  <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full">
-                                    {question.marks} mark{question.marks > 1 ? "s" : ""}
-                                  </span>
+
+                        return Object.entries(sections).map(
+                          ([sectionName, sectionQuestions]) => (
+                            <div key={sectionName} className="mb-4">
+                              {/* Section Header */}
+                              {sectionName !== "Questions" && (
+                                <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-3 mb-3">
+                                  <p className="text-yellow-300 font-bold text-sm">
+                                    {sectionName}
+                                  </p>
                                 </div>
-                                <p className="text-white mb-2 whitespace-pre-line">{question.questionText}</p>
-                                
-                                {/* MCQ/TrueFalse Options */}
-                                {(question.questionType === "mcq" || question.questionType === "truefalse") && question.options && (
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                                    {question.options.map((opt, optIdx) => (
-                                      <div
-                                        key={optIdx}
-                                        className={`p-2 rounded ${
-                                          optIdx === question.correctOption
-                                            ? "bg-green-500/20 text-green-300 border border-green-500/30"
-                                            : "bg-white/5 text-gray-400"
-                                        }`}
-                                      >
-                                        {String.fromCharCode(65 + optIdx)}. {opt}
+                              )}
+
+                              {/* Questions in this section */}
+                              {sectionQuestions.map((question) => (
+                                <div
+                                  key={question.originalIndex}
+                                  className="bg-white/5 rounded-lg p-4 mb-2"
+                                >
+                                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                    <span className="text-blue-400 font-bold">
+                                      Q{question.originalIndex + 1}.
+                                    </span>
+                                    <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded-full">
+                                      {question.questionType === "mcq" &&
+                                        "📝 MCQ"}
+                                      {question.questionType === "written" &&
+                                        "✍️ Written"}
+                                      {question.questionType === "fillblank" &&
+                                        "📄 Fill Blank"}
+                                      {question.questionType === "matching" &&
+                                        "🔗 Matching"}
+                                      {question.questionType === "truefalse" &&
+                                        "✓✗ True/False"}
+                                    </span>
+                                    <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full">
+                                      {question.marks} mark
+                                      {question.marks > 1 ? "s" : ""}
+                                    </span>
+                                  </div>
+                                  <p className="text-white mb-2 whitespace-pre-line">
+                                    {question.questionText}
+                                  </p>
+
+                                  {/* MCQ/TrueFalse Options */}
+                                  {(question.questionType === "mcq" ||
+                                    question.questionType === "truefalse") &&
+                                    question.options && (
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                                        {question.options.map((opt, optIdx) => (
+                                          <div
+                                            key={optIdx}
+                                            className={`p-2 rounded ${
+                                              optIdx === question.correctOption
+                                                ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                                                : "bg-white/5 text-gray-400"
+                                            }`}
+                                          >
+                                            {String.fromCharCode(65 + optIdx)}.{" "}
+                                            {opt}
+                                          </div>
+                                        ))}
                                       </div>
-                                    ))}
-                                  </div>
-                                )}
+                                    )}
 
-                                {/* Written Answer */}
-                                {question.questionType === "written" && question.correctAnswer && (
-                                  <div className="p-2 bg-green-500/10 border border-green-500/30 rounded text-green-300 text-sm mt-2">
-                                    <span className="font-medium">Expected: </span>
-                                    <span className="whitespace-pre-line">{question.correctAnswer}</span>
-                                  </div>
-                                )}
-
-                                {/* Fill Blanks */}
-                                {question.questionType === "fillblank" && question.blanks && (
-                                  <div className="flex flex-wrap gap-2 mt-2">
-                                    {question.blanks.map((blank, idx) => (
-                                      <span key={idx} className="px-2 py-1 bg-green-500/20 text-green-300 rounded text-sm">
-                                        Blank {idx + 1}: {blank}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-
-                                {/* Matching */}
-                                {question.questionType === "matching" && question.matchPairs && (
-                                  <div className="grid grid-cols-2 gap-2 text-sm mt-2">
-                                    {question.matchPairs.map((pair, idx) => (
-                                      <div key={idx} className="p-2 bg-white/5 rounded flex items-center gap-2">
-                                        <span className="text-blue-400">{pair.left}</span>
-                                        <span className="text-gray-500">→</span>
-                                        <span className="text-green-400">{pair.right}</span>
+                                  {/* Written Answer */}
+                                  {question.questionType === "written" &&
+                                    question.correctAnswer && (
+                                      <div className="p-2 bg-green-500/10 border border-green-500/30 rounded text-green-300 text-sm mt-2">
+                                        <span className="font-medium">
+                                          Expected:{" "}
+                                        </span>
+                                        <span className="whitespace-pre-line">
+                                          {question.correctAnswer}
+                                        </span>
                                       </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        ));
+                                    )}
+
+                                  {/* Fill Blanks */}
+                                  {question.questionType === "fillblank" &&
+                                    question.blanks && (
+                                      <div className="flex flex-wrap gap-2 mt-2">
+                                        {question.blanks.map((blank, idx) => (
+                                          <span
+                                            key={idx}
+                                            className="px-2 py-1 bg-green-500/20 text-green-300 rounded text-sm"
+                                          >
+                                            Blank {idx + 1}: {blank}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                  {/* Matching */}
+                                  {question.questionType === "matching" &&
+                                    question.matchPairs && (
+                                      <div className="grid grid-cols-2 gap-2 text-sm mt-2">
+                                        {question.matchPairs.map(
+                                          (pair, idx) => (
+                                            <div
+                                              key={idx}
+                                              className="p-2 bg-white/5 rounded flex items-center gap-2"
+                                            >
+                                              <span className="text-blue-400">
+                                                {pair.left}
+                                              </span>
+                                              <span className="text-gray-500">
+                                                →
+                                              </span>
+                                              <span className="text-green-400">
+                                                {pair.right}
+                                              </span>
+                                            </div>
+                                          )
+                                        )}
+                                      </div>
+                                    )}
+                                </div>
+                              ))}
+                            </div>
+                          )
+                        );
                       })()}
                     </div>
 
@@ -2446,6 +2782,18 @@ ${answersHTML}
                               examFormat: format,
                               language: "hindi",
                             });
+                          } else if (format === "upboard_sanskrit") {
+                            setBulkForm({
+                              ...bulkForm,
+                              examFormat: format,
+                              language: "sanskrit",
+                            });
+                          } else if (format === "upboard_maths") {
+                            setBulkForm({
+                              ...bulkForm,
+                              examFormat: format,
+                              language: "bilingual",
+                            });
                           } else {
                             setBulkForm({
                               ...bulkForm,
@@ -2456,28 +2804,77 @@ ${answersHTML}
                         className="glass-input"
                       >
                         <option value="general">General (Custom)</option>
-                        <option value="upboard_science">UP Board Science (Class 10)</option>
-                        <option value="upboard_english">UP Board English (Class 10)</option>
-                        <option value="upboard_hindi">UP Board Hindi (Class 10)</option>
-                        <option value="upboard_sanskrit">UP Board Sanskrit (Class 10)</option>
+                        <option value="upboard_science">
+                          UP Board Science (Class 10)
+                        </option>
+                        <option value="upboard_english">
+                          UP Board English (Class 10)
+                        </option>
+                        <option value="upboard_hindi">
+                          UP Board Hindi (Class 10)
+                        </option>
+                        <option value="upboard_sanskrit">
+                          UP Board Sanskrit (Class 10)
+                        </option>
+                        <option value="upboard_maths">
+                          UP Board Mathematics (Class 10)
+                        </option>
                       </select>
                     </div>
+
+                    {/* UP Board Mathematics Info Box */}
+                    {bulkForm.examFormat === "upboard_maths" && (
+                      <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-lg p-4">
+                        <p className="text-blue-300 font-medium mb-3">
+                          📐 UP Board Mathematics Paper - 70 अंक (25 प्रश्न)
+                        </p>
+                        <p className="text-xs text-gray-400 mb-2">
+                          Paper Code: 822(BV)
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-yellow-400 font-medium mb-2">
+                              खण्ड 'अ' - 20 अंक
+                            </p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• प्र.1-20: MCQs (20 अंक)</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-green-400 font-medium mb-2">
+                              खण्ड 'ब' - 50 अंक
+                            </p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• प्र.21-25: वर्णनात्मक (50 अंक)</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* UP Board Sanskrit Info Box */}
                     {bulkForm.examFormat === "upboard_sanskrit" && (
                       <div className="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-lg p-4">
-                        <p className="text-amber-300 font-medium mb-3">📋 UP Board Sanskrit Paper - 70 अंक (31 प्रश्न)</p>
-                        <p className="text-xs text-gray-400 mb-2">Paper Code: 818(BP)</p>
+                        <p className="text-amber-300 font-medium mb-3">
+                          📋 UP Board Sanskrit Paper - 70 अंक (31 प्रश्न)
+                        </p>
+                        <p className="text-xs text-gray-400 mb-2">
+                          Paper Code: 818(BP)
+                        </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-yellow-400 font-medium mb-2">खण्ड 'अ' - 20 अंक</p>
+                            <p className="text-yellow-400 font-medium mb-2">
+                              खण्ड 'अ' - 20 अंक
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• प्र.1-6: गद्यांश MCQs (6 अंक)</li>
                               <li>• प्र.7-20: व्याकरण MCQs (14 अंक)</li>
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">खण्ड 'ब' - 50 अंक</p>
+                            <p className="text-green-400 font-medium mb-2">
+                              खण्ड 'ब' - 50 अंक
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• गद्यांश/श्लोक/सारांश/चरित्र (23 अंक)</li>
                               <li>• व्याकरण/अनुवाद/निबन्ध (27 अंक)</li>
@@ -2490,17 +2887,25 @@ ${answersHTML}
                     {/* UP Board Hindi Info Box */}
                     {bulkForm.examFormat === "upboard_hindi" && (
                       <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-lg p-4">
-                        <p className="text-orange-300 font-medium mb-3">📋 UP Board Hindi Paper - 70 अंक (30 प्रश्न)</p>
-                        <p className="text-xs text-gray-400 mb-2">Paper Code: 801(BA)</p>
+                        <p className="text-orange-300 font-medium mb-3">
+                          📋 UP Board Hindi Paper - 70 अंक (30 प्रश्न)
+                        </p>
+                        <p className="text-xs text-gray-400 mb-2">
+                          Paper Code: 801(BA)
+                        </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-yellow-400 font-medium mb-2">खण्ड 'अ' - 20 अंक</p>
+                            <p className="text-yellow-400 font-medium mb-2">
+                              खण्ड 'अ' - 20 अंक
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• प्र.1-20: 20 MCQs × 1 = 20 अंक</li>
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">खण्ड 'ब' - 50 अंक</p>
+                            <p className="text-green-400 font-medium mb-2">
+                              खण्ड 'ब' - 50 अंक
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• गद्यांश (6), पद्यांश (6)</li>
                               <li>• संस्कृत अनुवाद (5+5), खण्डकाव्य (3)</li>
@@ -2511,7 +2916,8 @@ ${answersHTML}
                         </div>
                         <div className="mt-3 pt-3 border-t border-white/10">
                           <p className="text-xs text-gray-400">
-                            ✓ 30 प्रश्न = 70 अंक • ✓ हिन्दी में • ✓ अथवा विकल्प सहित
+                            ✓ 30 प्रश्न = 70 अंक • ✓ हिन्दी में • ✓ अथवा विकल्प
+                            सहित
                           </p>
                         </div>
                       </div>
@@ -2520,10 +2926,14 @@ ${answersHTML}
                     {/* UP Board Info Box */}
                     {bulkForm.examFormat === "upboard_science" && (
                       <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-4">
-                        <p className="text-blue-300 font-medium mb-3">📋 UP Board Science Paper - 70 Marks (31 Questions)</p>
+                        <p className="text-blue-300 font-medium mb-3">
+                          📋 UP Board Science Paper - 70 Marks (31 Questions)
+                        </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-yellow-400 font-medium mb-2">खण्ड-अ (Part A) - 20 Marks</p>
+                            <p className="text-yellow-400 font-medium mb-2">
+                              खण्ड-अ (Part A) - 20 Marks
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• उप-भाग I: 7 MCQs × 1 = 7 marks</li>
                               <li>• उप-भाग II: 6 MCQs × 1 = 6 marks</li>
@@ -2531,7 +2941,9 @@ ${answersHTML}
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">खण्ड-ब (Part B) - 50 Marks</p>
+                            <p className="text-green-400 font-medium mb-2">
+                              खण्ड-ब (Part B) - 50 Marks
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• उप-भाग I: 4 × (2+2) = 16 marks</li>
                               <li>• उप-भाग II: 4 × 4 = 16 marks</li>
@@ -2541,7 +2953,8 @@ ${answersHTML}
                         </div>
                         <div className="mt-3 pt-3 border-t border-white/10">
                           <p className="text-xs text-gray-400">
-                            ✓ 31 questions = 70 marks • ✓ Bilingual (Hindi/English) • ✓ Section headers
+                            ✓ 31 questions = 70 marks • ✓ Bilingual
+                            (Hindi/English) • ✓ Section headers
                           </p>
                         </div>
                       </div>
@@ -2550,16 +2963,22 @@ ${answersHTML}
                     {/* UP Board English Info Box */}
                     {bulkForm.examFormat === "upboard_english" && (
                       <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
-                        <p className="text-green-300 font-medium mb-3">📋 UP Board English Paper - 70 Marks (31 Questions)</p>
+                        <p className="text-green-300 font-medium mb-3">
+                          📋 UP Board English Paper - 70 Marks (31 Questions)
+                        </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-yellow-400 font-medium mb-2">PART-A - 20 Marks</p>
+                            <p className="text-yellow-400 font-medium mb-2">
+                              PART-A - 20 Marks
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• Q1-Q20: 20 MCQs × 1 = 20 marks</li>
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">PART-B - 50 Marks</p>
+                            <p className="text-green-400 font-medium mb-2">
+                              PART-B - 50 Marks
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• Q21: Reading (8 marks)</li>
                               <li>• Q22: Letter (4 marks) + OR</li>
@@ -2571,7 +2990,8 @@ ${answersHTML}
                         </div>
                         <div className="mt-3 pt-3 border-t border-white/10">
                           <p className="text-xs text-gray-400">
-                            ✓ 31 questions = 70 marks • ✓ English only • ✓ Long passages • ✓ Full letter format
+                            ✓ 31 questions = 70 marks • ✓ English only • ✓ Long
+                            passages • ✓ Full letter format
                           </p>
                         </div>
                       </div>
@@ -2582,9 +3002,24 @@ ${answersHTML}
                       <label className="input-label">Difficulty Level</label>
                       <div className="grid grid-cols-3 gap-3">
                         {[
-                          { value: "easy", label: "Easy", desc: "Board exam level", icon: "🟢" },
-                          { value: "medium", label: "Medium", desc: "Competitive level", icon: "🟡" },
-                          { value: "hard", label: "Hard", desc: "JEE/NEET/Olympiad", icon: "🔴" },
+                          {
+                            value: "easy",
+                            label: "Easy",
+                            desc: "Board exam level",
+                            icon: "🟢",
+                          },
+                          {
+                            value: "medium",
+                            label: "Medium",
+                            desc: "Competitive level",
+                            icon: "🟡",
+                          },
+                          {
+                            value: "hard",
+                            label: "Hard",
+                            desc: "JEE/NEET/Olympiad",
+                            icon: "🔴",
+                          },
                         ].map((level) => (
                           <button
                             key={level.value}
@@ -2609,23 +3044,32 @@ ${answersHTML}
                       </div>
                     </div>
 
-                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-blue-300 text-sm">
-                      <p className="font-semibold mb-2">📋 How it works:</p>
-                      <ul className="list-disc list-inside space-y-1">
-                        <li>Paste your raw questions below (any format)</li>
-                        <li>One-word answers will be converted to MCQ</li>
-                        <li>Word meanings will get random distractors</li>
-                        <li>
-                          AI will auto-detect True/False, Fill-in-blanks, etc.
-                        </li>
-                        <li>
-                          Marks will be distributed based on your instructions
-                        </li>
-                      </ul>
-                    </div>
+                    {/* Additional fields only for General format */}
+                    {bulkForm.examFormat === "general" && (
+                      <>
+                        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-blue-300 text-sm">
+                          <p className="font-semibold mb-2">📋 How it works:</p>
+                          <ul className="list-disc list-inside space-y-1">
+                            <li>Paste your raw questions below (any format)</li>
+                            <li>One-word answers will be converted to MCQ</li>
+                            <li>Word meanings will get random distractors</li>
+                            <li>
+                              AI will auto-detect True/False, Fill-in-blanks,
+                              etc.
+                            </li>
+                            <li>
+                              Marks will be distributed based on your
+                              instructions
+                            </li>
+                          </ul>
+                        </div>
+                      </>
+                    )}
 
                     <div className="form-group">
-                      <label className="input-label">Raw Questions / Topic</label>
+                      <label className="input-label">
+                        Raw Questions / Topic
+                      </label>
                       <textarea
                         value={bulkForm.rawQuestions}
                         onChange={(e) =>
@@ -2635,8 +3079,9 @@ ${answersHTML}
                           })
                         }
                         className="glass-input h-40 resize-none font-mono text-sm"
-                        placeholder={bulkForm.examFormat === "upboard_science" 
-                          ? `Enter topic(s) for UP Board Science paper...
+                        placeholder={
+                          bulkForm.examFormat === "upboard_science"
+                            ? `Enter topic(s) for UP Board Science paper...
 
 Example (Single topic):
 प्रकाश - परावर्तन और अपवर्तन
@@ -2645,8 +3090,8 @@ Example (Multiple topics - comma separated):
 प्रकाश, रासायनिक अभिक्रियाएं, जीवन प्रक्रियाएं
 
 OR paste raw questions in any format...`
-                          : bulkForm.examFormat === "upboard_english"
-                          ? `Enter topic(s) for UP Board English paper...
+                            : bulkForm.examFormat === "upboard_english"
+                            ? `Enter topic(s) for UP Board English paper...
 
 Example (Single topic):
 Reading Comprehension
@@ -2655,8 +3100,8 @@ Example (Multiple topics - comma separated):
 Grammar, Letter Writing, First Flight Chapter 1
 
 OR paste raw questions in any format...`
-                          : bulkForm.examFormat === "upboard_hindi"
-                          ? `UP Board Hindi Paper के लिए विषय दर्ज करें...
+                            : bulkForm.examFormat === "upboard_hindi"
+                            ? `UP Board Hindi Paper के लिए विषय दर्ज करें...
 
 उदाहरण (एक विषय):
 काव्य खण्ड - तुलसीदास
@@ -2665,8 +3110,8 @@ OR paste raw questions in any format...`
 गद्य खण्ड, काव्य खण्ड, व्याकरण, संस्कृत
 
 या कच्चे प्रश्न paste करें...`
-                          : bulkForm.examFormat === "upboard_sanskrit"
-                          ? `UP Board Sanskrit Paper के लिए विषय दर्ज करें...
+                            : bulkForm.examFormat === "upboard_sanskrit"
+                            ? `UP Board Sanskrit Paper के लिए विषय दर्ज करें...
 
 उदाहरण (एक विषय):
 व्याकरण - संधि, समास
@@ -2675,7 +3120,7 @@ OR paste raw questions in any format...`
 गद्य, पद्य, व्याकरण, निबन्ध
 
 या कच्चे प्रश्न paste करें...`
-                          : `Paste your questions here in any format...
+                            : `Paste your questions here in any format...
 
 Example:
 1. What is photosynthesis? (2 marks)
@@ -2684,102 +3129,108 @@ Example:
 4. True/False: Plants need sunlight to grow.
 5. Match: Vitamin C - Citrus fruits, Vitamin A - Carrots
 6. Meaning of "benevolent"
-7. Capital of France?`}
+7. Capital of France?`
+                        }
                       />
                     </div>
 
                     {/* Show these fields only for General format, not for UP Board */}
-                    {bulkForm.examFormat !== "upboard_science" && bulkForm.examFormat !== "upboard_english" && bulkForm.examFormat !== "upboard_hindi" && bulkForm.examFormat !== "upboard_sanskrit" && (
-                      <>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="form-group">
-                            <label className="input-label">
-                              Maximum Total Marks
-                            </label>
-                            <input
-                              type="number"
-                              value={bulkForm.maxMarks}
-                              onChange={(e) =>
-                                setBulkForm({
-                                  ...bulkForm,
-                                  maxMarks: parseInt(e.target.value) || 50,
-                                })
-                              }
-                              className="glass-input"
-                              min={10}
-                              max={200}
-                            />
+                    {bulkForm.examFormat !== "upboard_science" &&
+                      bulkForm.examFormat !== "upboard_english" &&
+                      bulkForm.examFormat !== "upboard_hindi" &&
+                      bulkForm.examFormat !== "upboard_sanskrit" && (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="form-group">
+                              <label className="input-label">
+                                Maximum Total Marks
+                              </label>
+                              <input
+                                type="number"
+                                value={bulkForm.maxMarks}
+                                onChange={(e) =>
+                                  setBulkForm({
+                                    ...bulkForm,
+                                    maxMarks: parseInt(e.target.value) || 50,
+                                  })
+                                }
+                                className="glass-input"
+                                min={10}
+                                max={200}
+                              />
+                            </div>
+
+                            <div className="form-group">
+                              <label className="input-label">
+                                Questions to Pick{" "}
+                                <span className="text-gray-500">
+                                  (optional, leave empty for all)
+                                </span>
+                              </label>
+                              <input
+                                type="number"
+                                value={bulkForm.numberOfQuestions}
+                                onChange={(e) =>
+                                  setBulkForm({
+                                    ...bulkForm,
+                                    numberOfQuestions: e.target.value,
+                                  })
+                                }
+                                className="glass-input"
+                                min={1}
+                                placeholder="All questions"
+                              />
+                            </div>
                           </div>
 
                           <div className="form-group">
                             <label className="input-label">
-                              Questions to Pick{" "}
-                              <span className="text-gray-500">
-                                (optional, leave empty for all)
-                              </span>
+                              Marks Distribution Instructions{" "}
+                              <span className="text-gray-500">(optional)</span>
                             </label>
-                            <input
-                              type="number"
-                              value={bulkForm.numberOfQuestions}
+                            <textarea
+                              value={bulkForm.marksDistribution}
                               onChange={(e) =>
                                 setBulkForm({
                                   ...bulkForm,
-                                  numberOfQuestions: e.target.value,
+                                  marksDistribution: e.target.value,
                                 })
                               }
-                              className="glass-input"
-                              min={1}
-                              placeholder="All questions"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="form-group">
-                          <label className="input-label">
-                            Marks Distribution Instructions{" "}
-                            <span className="text-gray-500">(optional)</span>
-                          </label>
-                          <textarea
-                            value={bulkForm.marksDistribution}
-                            onChange={(e) =>
-                              setBulkForm({
-                                ...bulkForm,
-                                marksDistribution: e.target.value,
-                              })
-                            }
-                            className="glass-input h-20 resize-none text-sm"
-                            placeholder={`Examples:
+                              className="glass-input h-20 resize-none text-sm"
+                              placeholder={`Examples:
 - MCQs: 1 mark each, Written: 3-5 marks each
 - Easy questions: 1 mark, Medium: 2 marks, Hard: 3 marks
 - Distribute marks equally among all questions`}
-                          />
-                        </div>
+                            />
+                          </div>
 
-                        <div className="form-group">
-                          <label className="input-label">Language</label>
-                          <select
-                            value={bulkForm.language}
-                            onChange={(e) =>
-                              setBulkForm({
-                                ...bulkForm,
-                                language: e.target.value,
-                              })
-                            }
-                            className="glass-input"
-                          >
-                            <option value="english">English</option>
-                            <option value="hindi">हिंदी (Hindi)</option>
-                            <option value="bilingual">द्विभाषी (Bilingual)</option>
-                            <option value="spanish">Spanish</option>
-                            <option value="french">French</option>
-                            <option value="german">German</option>
-                            <option value="chinese">Chinese</option>
-                            <option value="japanese">Japanese</option>
-                            <option value="arabic">Arabic</option>
-                          </select>
-                        </div>
-                      </>
-                    )}
+                          <div className="form-group">
+                            <label className="input-label">Language</label>
+                            <select
+                              value={bulkForm.language}
+                              onChange={(e) =>
+                                setBulkForm({
+                                  ...bulkForm,
+                                  language: e.target.value,
+                                })
+                              }
+                              className="glass-input"
+                            >
+                              <option value="english">English</option>
+                              <option value="hindi">हिंदी (Hindi)</option>
+                              <option value="bilingual">
+                                द्विभाषी (Bilingual)
+                              </option>
+                              <option value="spanish">Spanish</option>
+                              <option value="french">French</option>
+                              <option value="german">German</option>
+                              <option value="chinese">Chinese</option>
+                              <option value="japanese">Japanese</option>
+                              <option value="arabic">Arabic</option>
+                            </select>
+                          </div>
+                        </>
+                      )}
 
                     <motion.button
                       onClick={handleProcessBulk}
@@ -2997,6 +3448,12 @@ Example:
                               examFormat: format,
                               language: "sanskrit",
                             });
+                          } else if (format === "upboard_maths") {
+                            setImageForm({
+                              ...imageForm,
+                              examFormat: format,
+                              language: "bilingual",
+                            });
                           } else {
                             setImageForm({
                               ...imageForm,
@@ -3007,28 +3464,77 @@ Example:
                         className="glass-input"
                       >
                         <option value="general">General (Custom)</option>
-                        <option value="upboard_science">UP Board Science (Class 10)</option>
-                        <option value="upboard_english">UP Board English (Class 10)</option>
-                        <option value="upboard_hindi">UP Board Hindi (Class 10)</option>
-                        <option value="upboard_sanskrit">UP Board Sanskrit (Class 10)</option>
+                        <option value="upboard_science">
+                          UP Board Science (Class 10)
+                        </option>
+                        <option value="upboard_english">
+                          UP Board English (Class 10)
+                        </option>
+                        <option value="upboard_hindi">
+                          UP Board Hindi (Class 10)
+                        </option>
+                        <option value="upboard_sanskrit">
+                          UP Board Sanskrit (Class 10)
+                        </option>
+                        <option value="upboard_maths">
+                          UP Board Mathematics (Class 10)
+                        </option>
                       </select>
                     </div>
+
+                    {/* UP Board Mathematics Info Box */}
+                    {imageForm.examFormat === "upboard_maths" && (
+                      <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-lg p-4">
+                        <p className="text-blue-300 font-medium mb-3">
+                          📐 UP Board Mathematics Paper - 70 अंक (25 प्रश्न)
+                        </p>
+                        <p className="text-xs text-gray-400 mb-2">
+                          Paper Code: 822(BV)
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-yellow-400 font-medium mb-2">
+                              खण्ड 'अ' - 20 अंक
+                            </p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• प्र.1-20: MCQs (20 अंक)</li>
+                            </ul>
+                          </div>
+                          <div className="bg-white/5 rounded-lg p-3">
+                            <p className="text-green-400 font-medium mb-2">
+                              खण्ड 'ब' - 50 अंक
+                            </p>
+                            <ul className="text-xs text-gray-400 space-y-1">
+                              <li>• प्र.21-25: वर्णनात्मक (50 अंक)</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* UP Board Sanskrit Info Box */}
                     {imageForm.examFormat === "upboard_sanskrit" && (
                       <div className="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-lg p-4">
-                        <p className="text-amber-300 font-medium mb-3">📋 UP Board Sanskrit Paper - 70 अंक (31 प्रश्न)</p>
-                        <p className="text-xs text-gray-400 mb-2">Paper Code: 818(BP)</p>
+                        <p className="text-amber-300 font-medium mb-3">
+                          📋 UP Board Sanskrit Paper - 70 अंक (31 प्रश्न)
+                        </p>
+                        <p className="text-xs text-gray-400 mb-2">
+                          Paper Code: 818(BP)
+                        </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-yellow-400 font-medium mb-2">खण्ड 'अ' - 20 अंक</p>
+                            <p className="text-yellow-400 font-medium mb-2">
+                              खण्ड 'अ' - 20 अंक
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• प्र.1-6: गद्यांश MCQs (6 अंक)</li>
                               <li>• प्र.7-20: व्याकरण MCQs (14 अंक)</li>
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">खण्ड 'ब' - 50 अंक</p>
+                            <p className="text-green-400 font-medium mb-2">
+                              खण्ड 'ब' - 50 अंक
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• गद्यांश/श्लोक/सारांश/चरित्र (23 अंक)</li>
                               <li>• व्याकरण/अनुवाद/निबन्ध (27 अंक)</li>
@@ -3037,7 +3543,8 @@ Example:
                         </div>
                         <div className="mt-3 pt-3 border-t border-white/10">
                           <p className="text-xs text-gray-400">
-                            ✓ 31 प्रश्न = 70 अंक • ✓ संस्कृत/हिन्दी • ✓ अथवा विकल्प सहित
+                            ✓ 31 प्रश्न = 70 अंक • ✓ संस्कृत/हिन्दी • ✓ अथवा
+                            विकल्प सहित
                           </p>
                         </div>
                       </div>
@@ -3046,10 +3553,14 @@ Example:
                     {/* UP Board Info Box */}
                     {imageForm.examFormat === "upboard_science" && (
                       <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-4">
-                        <p className="text-blue-300 font-medium mb-3">📋 UP Board Science Paper - 70 Marks (31 Questions)</p>
+                        <p className="text-blue-300 font-medium mb-3">
+                          📋 UP Board Science Paper - 70 Marks (31 Questions)
+                        </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-yellow-400 font-medium mb-2">खण्ड-अ (Part A) - 20 Marks</p>
+                            <p className="text-yellow-400 font-medium mb-2">
+                              खण्ड-अ (Part A) - 20 Marks
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• उप-भाग I: 7 MCQs × 1 = 7 marks</li>
                               <li>• उप-भाग II: 6 MCQs × 1 = 6 marks</li>
@@ -3057,7 +3568,9 @@ Example:
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">खण्ड-ब (Part B) - 50 Marks</p>
+                            <p className="text-green-400 font-medium mb-2">
+                              खण्ड-ब (Part B) - 50 Marks
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• उप-भाग I: 4 × (2+2) = 16 marks</li>
                               <li>• उप-भाग II: 4 × 4 = 16 marks</li>
@@ -3067,7 +3580,8 @@ Example:
                         </div>
                         <div className="mt-3 pt-3 border-t border-white/10">
                           <p className="text-xs text-gray-400">
-                            ✓ 31 questions = 70 marks • ✓ Bilingual (Hindi/English) • ✓ Section headers
+                            ✓ 31 questions = 70 marks • ✓ Bilingual
+                            (Hindi/English) • ✓ Section headers
                           </p>
                         </div>
                       </div>
@@ -3076,16 +3590,22 @@ Example:
                     {/* UP Board English Info Box */}
                     {imageForm.examFormat === "upboard_english" && (
                       <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
-                        <p className="text-green-300 font-medium mb-3">📋 UP Board English Paper - 70 Marks (31 Questions)</p>
+                        <p className="text-green-300 font-medium mb-3">
+                          📋 UP Board English Paper - 70 Marks (31 Questions)
+                        </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-yellow-400 font-medium mb-2">PART-A - 20 Marks</p>
+                            <p className="text-yellow-400 font-medium mb-2">
+                              PART-A - 20 Marks
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• Q1-Q20: 20 MCQs × 1 = 20 marks</li>
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">PART-B - 50 Marks</p>
+                            <p className="text-green-400 font-medium mb-2">
+                              PART-B - 50 Marks
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• Q21: Reading (8 marks)</li>
                               <li>• Q22: Letter (4 marks) + OR</li>
@@ -3097,7 +3617,8 @@ Example:
                         </div>
                         <div className="mt-3 pt-3 border-t border-white/10">
                           <p className="text-xs text-gray-400">
-                            ✓ 31 questions = 70 marks • ✓ English only • ✓ Long passages • ✓ Full letter format
+                            ✓ 31 questions = 70 marks • ✓ English only • ✓ Long
+                            passages • ✓ Full letter format
                           </p>
                         </div>
                       </div>
@@ -3106,17 +3627,25 @@ Example:
                     {/* UP Board Hindi Info Box */}
                     {imageForm.examFormat === "upboard_hindi" && (
                       <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-lg p-4">
-                        <p className="text-orange-300 font-medium mb-3">📋 UP Board Hindi Paper - 70 अंक (30 प्रश्न)</p>
-                        <p className="text-xs text-gray-400 mb-2">Paper Code: 801(BA)</p>
+                        <p className="text-orange-300 font-medium mb-3">
+                          📋 UP Board Hindi Paper - 70 अंक (30 प्रश्न)
+                        </p>
+                        <p className="text-xs text-gray-400 mb-2">
+                          Paper Code: 801(BA)
+                        </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-yellow-400 font-medium mb-2">खण्ड 'अ' - 20 अंक</p>
+                            <p className="text-yellow-400 font-medium mb-2">
+                              खण्ड 'अ' - 20 अंक
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• प्र.1-20: 20 MCQs × 1 = 20 अंक</li>
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">खण्ड 'ब' - 50 अंक</p>
+                            <p className="text-green-400 font-medium mb-2">
+                              खण्ड 'ब' - 50 अंक
+                            </p>
                             <ul className="text-xs text-gray-400 space-y-1">
                               <li>• गद्यांश (6), पद्यांश (6)</li>
                               <li>• संस्कृत अनुवाद (5+5), खण्डकाव्य (3)</li>
@@ -3127,7 +3656,8 @@ Example:
                         </div>
                         <div className="mt-3 pt-3 border-t border-white/10">
                           <p className="text-xs text-gray-400">
-                            ✓ 30 प्रश्न = 70 अंक • ✓ हिन्दी में • ✓ अथवा विकल्प सहित
+                            ✓ 30 प्रश्न = 70 अंक • ✓ हिन्दी में • ✓ अथवा विकल्प
+                            सहित
                           </p>
                         </div>
                       </div>
@@ -3138,9 +3668,24 @@ Example:
                       <label className="input-label">Difficulty Level</label>
                       <div className="grid grid-cols-3 gap-3">
                         {[
-                          { value: "easy", label: "Easy", desc: "Board exam level", icon: "🟢" },
-                          { value: "medium", label: "Medium", desc: "Competitive level", icon: "🟡" },
-                          { value: "hard", label: "Hard", desc: "JEE/NEET/Olympiad", icon: "🔴" },
+                          {
+                            value: "easy",
+                            label: "Easy",
+                            desc: "Board exam level",
+                            icon: "🟢",
+                          },
+                          {
+                            value: "medium",
+                            label: "Medium",
+                            desc: "Competitive level",
+                            icon: "🟡",
+                          },
+                          {
+                            value: "hard",
+                            label: "Hard",
+                            desc: "JEE/NEET/Olympiad",
+                            icon: "🔴",
+                          },
                         ].map((level) => (
                           <button
                             key={level.value}
@@ -3165,6 +3710,33 @@ Example:
                       </div>
                     </div>
 
+                    {/* Language - Only for General format */}
+                    {imageForm.examFormat === "general" && (
+                      <div className="form-group">
+                        <label className="input-label">Language</label>
+                        <select
+                          value={imageForm.language || "english"}
+                          onChange={(e) =>
+                            setImageForm({
+                              ...imageForm,
+                              language: e.target.value,
+                            })
+                          }
+                          className="glass-input"
+                        >
+                          <option value="english">English</option>
+                          <option value="hindi">हिंदी (Hindi)</option>
+                          <option value="bilingual">
+                            द्विभाषी (Bilingual)
+                          </option>
+                          <option value="sanskrit">संस्कृत (Sanskrit)</option>
+                          <option value="spanish">Español (Spanish)</option>
+                          <option value="french">Français (French)</option>
+                          <option value="german">Deutsch (German)</option>
+                        </select>
+                      </div>
+                    )}
+
                     <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-blue-300 text-sm">
                       <p className="font-semibold mb-2">📸 How it works:</p>
                       <ul className="list-disc list-inside space-y-1">
@@ -3184,12 +3756,12 @@ Example:
                     {/* Image Upload - Multiple Images */}
                     <div className="form-group">
                       <label className="input-label">
-                        Upload Images 
+                        Upload Images
                         <span className="text-gray-500 ml-2">
                           ({imageForm.images?.length || 0}/5 images)
                         </span>
                       </label>
-                      
+
                       {/* Image Previews Grid */}
                       {imageForm.images && imageForm.images.length > 0 && (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-3">
@@ -3233,8 +3805,8 @@ Example:
                             <div>
                               <FiPlus className="w-10 h-10 mx-auto mb-2 text-gray-400" />
                               <p className="text-gray-400">
-                                {imageForm.images?.length > 0 
-                                  ? "Click to add more images" 
+                                {imageForm.images?.length > 0
+                                  ? "Click to add more images"
                                   : "Click to upload images"}
                               </p>
                               <p className="text-gray-500 text-sm mt-1">
@@ -3253,91 +3825,100 @@ Example:
                     </div>
 
                     {/* Show these fields only for General format, not for UP Board */}
-                    {imageForm.examFormat !== "upboard_science" && imageForm.examFormat !== "upboard_english" && imageForm.examFormat !== "upboard_hindi" && imageForm.examFormat !== "upboard_sanskrit" && (
-                      <>
-                        <div className="grid grid-cols-2 gap-4">
+                    {imageForm.examFormat !== "upboard_science" &&
+                      imageForm.examFormat !== "upboard_english" &&
+                      imageForm.examFormat !== "upboard_hindi" &&
+                      imageForm.examFormat !== "upboard_sanskrit" && (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="form-group">
+                              <label className="input-label">
+                                Maximum Total Marks
+                              </label>
+                              <input
+                                type="number"
+                                value={imageForm.maxMarks}
+                                onChange={(e) =>
+                                  setImageForm({
+                                    ...imageForm,
+                                    maxMarks: parseInt(e.target.value) || 50,
+                                  })
+                                }
+                                className="glass-input"
+                                min={10}
+                                max={200}
+                              />
+                            </div>
+
+                            <div className="form-group">
+                              <label className="input-label">Language</label>
+                              <select
+                                value={imageForm.language}
+                                onChange={(e) =>
+                                  setImageForm({
+                                    ...imageForm,
+                                    language: e.target.value,
+                                  })
+                                }
+                                className="glass-input"
+                              >
+                                <option value="english">English</option>
+                                <option value="hindi">हिंदी (Hindi)</option>
+                                <option value="bilingual">
+                                  द्विभाषी (Bilingual)
+                                </option>
+                                <option value="spanish">Spanish</option>
+                                <option value="french">French</option>
+                                <option value="german">German</option>
+                              </select>
+                            </div>
+                          </div>
+
                           <div className="form-group">
                             <label className="input-label">
-                              Maximum Total Marks
+                              Marks Distribution{" "}
+                              <span className="text-gray-500">(optional)</span>
                             </label>
-                            <input
-                              type="number"
-                              value={imageForm.maxMarks}
+                            <textarea
+                              value={imageForm.marksDistribution}
                               onChange={(e) =>
                                 setImageForm({
                                   ...imageForm,
-                                  maxMarks: parseInt(e.target.value) || 50,
+                                  marksDistribution: e.target.value,
                                 })
                               }
-                              className="glass-input"
-                              min={10}
-                              max={200}
+                              className="glass-input h-20 resize-none text-sm"
+                              placeholder="E.g., MCQs: 1 mark, Written: 3-5 marks, Easy: 1 mark, Hard: 3 marks"
                             />
                           </div>
 
                           <div className="form-group">
-                            <label className="input-label">Language</label>
-                            <select
-                              value={imageForm.language}
+                            <label className="input-label">
+                              Additional Instructions{" "}
+                              <span className="text-gray-500">(optional)</span>
+                            </label>
+                            <textarea
+                              value={imageForm.additionalInstructions}
                               onChange={(e) =>
                                 setImageForm({
                                   ...imageForm,
-                                  language: e.target.value,
+                                  additionalInstructions: e.target.value,
                                 })
                               }
-                              className="glass-input"
-                            >
-                              <option value="english">English</option>
-                              <option value="hindi">हिंदी (Hindi)</option>
-                              <option value="bilingual">द्विभाषी (Bilingual)</option>
-                              <option value="spanish">Spanish</option>
-                              <option value="french">French</option>
-                              <option value="german">German</option>
-                            </select>
+                              className="glass-input h-20 resize-none text-sm"
+                              placeholder="E.g., Convert one-word answers to MCQ, Skip diagram questions, etc."
+                            />
                           </div>
-                        </div>
-
-                        <div className="form-group">
-                          <label className="input-label">
-                            Marks Distribution{" "}
-                            <span className="text-gray-500">(optional)</span>
-                          </label>
-                          <textarea
-                            value={imageForm.marksDistribution}
-                            onChange={(e) =>
-                              setImageForm({
-                                ...imageForm,
-                                marksDistribution: e.target.value,
-                              })
-                            }
-                            className="glass-input h-20 resize-none text-sm"
-                            placeholder="E.g., MCQs: 1 mark, Written: 3-5 marks, Easy: 1 mark, Hard: 3 marks"
-                          />
-                        </div>
-
-                        <div className="form-group">
-                          <label className="input-label">
-                            Additional Instructions{" "}
-                            <span className="text-gray-500">(optional)</span>
-                          </label>
-                          <textarea
-                            value={imageForm.additionalInstructions}
-                            onChange={(e) =>
-                              setImageForm({
-                                ...imageForm,
-                                additionalInstructions: e.target.value,
-                              })
-                            }
-                            className="glass-input h-20 resize-none text-sm"
-                            placeholder="E.g., Convert one-word answers to MCQ, Skip diagram questions, etc."
-                          />
-                        </div>
-                      </>
-                    )}
+                        </>
+                      )}
 
                     <motion.button
                       onClick={handleExtractFromImage}
-                      disabled={extracting || !imageForm.images || imageForm.images.length === 0}
+                      disabled={
+                        extracting ||
+                        !imageForm.images ||
+                        imageForm.images.length === 0
+                      }
                       className="btn-primary w-full flex items-center justify-center gap-2"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -3386,97 +3967,125 @@ Example:
                           if (!sections[section]) sections[section] = [];
                           sections[section].push({ ...q, originalIndex: idx });
                         });
-                        
-                        return Object.entries(sections).map(([sectionName, sectionQuestions]) => (
-                          <div key={sectionName}>
-                            {sectionName !== "Questions" && (
-                              <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-3 mb-3">
-                                <p className="text-yellow-300 font-bold text-sm">{sectionName}</p>
-                              </div>
-                            )}
-                            {sectionQuestions.map((question) => (
-                        <div key={question.originalIndex} className="bg-white/5 rounded-lg p-4 mb-2">
-                          <div className="flex justify-between items-start mb-2">
-                            <p className="text-white flex-1">
-                              <span className="text-blue-400 font-bold">
-                                Q{question.originalIndex + 1}.
-                              </span>{" "}
-                              {question.questionText}
-                            </p>
-                            <div className="flex gap-2 ml-2">
-                              <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full whitespace-nowrap">
-                                {question.marks} mark
-                                {question.marks > 1 ? "s" : ""}
-                              </span>
-                              <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full whitespace-nowrap">
-                                {question.questionType}
-                              </span>
-                            </div>
-                          </div>
 
-                          {/* Show options for MCQ and True/False */}
-                          {(question.questionType === "mcq" ||
-                            question.questionType === "truefalse") && (
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              {question.options?.map((opt, optIdx) => (
+                        return Object.entries(sections).map(
+                          ([sectionName, sectionQuestions]) => (
+                            <div key={sectionName}>
+                              {sectionName !== "Questions" && (
+                                <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-3 mb-3">
+                                  <p className="text-yellow-300 font-bold text-sm">
+                                    {sectionName}
+                                  </p>
+                                </div>
+                              )}
+                              {sectionQuestions.map((question) => (
                                 <div
-                                  key={optIdx}
-                                  className={`p-2 rounded ${
-                                    optIdx === question.correctOption
-                                      ? "bg-green-500/20 text-green-300"
-                                      : "bg-white/5 text-gray-400"
-                                  }`}
+                                  key={question.originalIndex}
+                                  className="bg-white/5 rounded-lg p-4 mb-2"
                                 >
-                                  {String.fromCharCode(65 + optIdx)}. {opt}
+                                  <div className="flex justify-between items-start mb-2">
+                                    <p className="text-white flex-1">
+                                      <span className="text-blue-400 font-bold">
+                                        Q{question.originalIndex + 1}.
+                                      </span>{" "}
+                                      {question.questionText}
+                                    </p>
+                                    <div className="flex gap-2 ml-2">
+                                      <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full whitespace-nowrap">
+                                        {question.marks} mark
+                                        {question.marks > 1 ? "s" : ""}
+                                      </span>
+                                      <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full whitespace-nowrap">
+                                        {question.questionType}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {/* Show options for MCQ and True/False */}
+                                  {(question.questionType === "mcq" ||
+                                    question.questionType === "truefalse") && (
+                                    <div className="grid grid-cols-2 gap-2 text-sm">
+                                      {question.options?.map((opt, optIdx) => (
+                                        <div
+                                          key={optIdx}
+                                          className={`p-2 rounded ${
+                                            optIdx === question.correctOption
+                                              ? "bg-green-500/20 text-green-300"
+                                              : "bg-white/5 text-gray-400"
+                                          }`}
+                                        >
+                                          {String.fromCharCode(65 + optIdx)}.{" "}
+                                          {opt}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+
+                                  {question.questionType === "written" &&
+                                    question.correctAnswer && (
+                                      <div className="text-sm text-gray-400 mt-2 max-h-24 overflow-y-auto">
+                                        <span className="text-green-400">
+                                          Answer:{" "}
+                                        </span>
+                                        <span className="whitespace-pre-line">
+                                          {question.correctAnswer.substring(
+                                            0,
+                                            200
+                                          )}
+                                          {question.correctAnswer.length > 200
+                                            ? "..."
+                                            : ""}
+                                        </span>
+                                      </div>
+                                    )}
+
+                                  {/* Show alternative question if exists */}
+                                  {question.hasAlternative &&
+                                    question.alternativeQuestion && (
+                                      <div className="mt-2 p-2 bg-orange-500/10 border border-orange-500/30 rounded text-sm">
+                                        <span className="text-orange-400 font-medium">
+                                          अथवा/OR:{" "}
+                                        </span>
+                                        <span className="text-gray-300">
+                                          {question.alternativeQuestion}
+                                        </span>
+                                      </div>
+                                    )}
+
+                                  {question.questionType === "fillblank" && (
+                                    <div className="text-sm text-gray-400 mt-2">
+                                      <span className="text-green-400">
+                                        Blanks:{" "}
+                                      </span>
+                                      {question.blanks?.join(", ")}
+                                    </div>
+                                  )}
+
+                                  {question.questionType === "matching" && (
+                                    <div className="grid grid-cols-2 gap-2 text-sm mt-2">
+                                      {question.matchPairs?.map(
+                                        (pair, pIdx) => (
+                                          <div
+                                            key={pIdx}
+                                            className="flex items-center gap-2 text-gray-400"
+                                          >
+                                            <span className="text-blue-400">
+                                              {pair.left}
+                                            </span>
+                                            <span>→</span>
+                                            <span className="text-green-400">
+                                              {pair.right}
+                                            </span>
+                                          </div>
+                                        )
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               ))}
                             </div>
-                          )}
-
-                          {question.questionType === "written" && question.correctAnswer && (
-                            <div className="text-sm text-gray-400 mt-2 max-h-24 overflow-y-auto">
-                              <span className="text-green-400">Answer: </span>
-                              <span className="whitespace-pre-line">{question.correctAnswer.substring(0, 200)}{question.correctAnswer.length > 200 ? "..." : ""}</span>
-                            </div>
-                          )}
-
-                          {/* Show alternative question if exists */}
-                          {question.hasAlternative && question.alternativeQuestion && (
-                            <div className="mt-2 p-2 bg-orange-500/10 border border-orange-500/30 rounded text-sm">
-                              <span className="text-orange-400 font-medium">अथवा/OR: </span>
-                              <span className="text-gray-300">{question.alternativeQuestion}</span>
-                            </div>
-                          )}
-
-                          {question.questionType === "fillblank" && (
-                            <div className="text-sm text-gray-400 mt-2">
-                              <span className="text-green-400">Blanks: </span>
-                              {question.blanks?.join(", ")}
-                            </div>
-                          )}
-
-                          {question.questionType === "matching" && (
-                            <div className="grid grid-cols-2 gap-2 text-sm mt-2">
-                              {question.matchPairs?.map((pair, pIdx) => (
-                                <div
-                                  key={pIdx}
-                                  className="flex items-center gap-2 text-gray-400"
-                                >
-                                  <span className="text-blue-400">
-                                    {pair.left}
-                                  </span>
-                                  <span>→</span>
-                                  <span className="text-green-400">
-                                    {pair.right}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                            ))}
-                          </div>
-                        ));
+                          )
+                        );
                       })()}
                     </div>
 
