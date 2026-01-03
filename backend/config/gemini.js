@@ -1294,20 +1294,21 @@ Paper Code: 347(JZ)
 
 TOPIC(S) FOR THIS PAPER: "${topic}"
 
-⚠️⚠️⚠️ CRITICAL - SMART TOPIC INTERPRETATION ⚠️⚠️⚠️
+⚠️⚠️⚠️ CRITICAL - TOPIC RESTRICTION ⚠️⚠️⚠️
 =================================================================
 
 MANDATORY TOPIC HANDLING RULES:
-1. ✓ IF GENERAL TOPIC (topic is "Chemistry" or "Chemistry Class 12"):
-   → USE VARIETY from ALL units
-   → Mix questions from Physical, Organic, and Inorganic Chemistry
-   → Cover different chapters: Solutions, Electrochemistry, Chemical Kinetics, d-f block, Coordination Compounds, Haloalkanes, Alcohols, Aldehydes, Amines, Biomolecules, Polymers
+1. ⚠️ **ALL QUESTIONS MUST BE FROM THE SPECIFIED TOPIC ONLY** ⚠️
+   → If topic is "Electrochemistry" → ALL 12 questions from Electrochemistry ONLY
+   → If topic is "Aldehydes and Ketones" → ALL questions from Aldehydes and Ketones ONLY
+   → If topic is "Coordination Compounds" → ALL questions from Coordination Compounds ONLY
+   → DO NOT MIX topics - stay focused on the given topic
    
-2. ✗ IF SPECIFIC CHAPTER/TOPIC (e.g., "Electrochemistry", "Coordination Compounds", "Aldehydes and Ketones"):
-   → Focus primarily on THAT TOPIC
-   → Can include related concepts but emphasize the specified topic
+2. ✓ IF GENERAL TOPIC (topic is "Chemistry" or "Chemistry Class 12" or "रसायन विज्ञान"):
+   → ONLY THEN use variety from ALL units
+   → Mix questions from Physical, Organic, and Inorganic Chemistry
 
-=== PAPER STRUCTURE (Total 70 Marks, 7 Questions) ===
+=== PAPER STRUCTURE (Total 70 Marks, 12 Questions) ===
 
 **Questions 1-6: Individual MCQs (6 marks total)**
 - Question 1: MCQ (1 mark)
@@ -1317,7 +1318,7 @@ MANDATORY TOPIC HANDLING RULES:
 - Question 5: MCQ (1 mark)
 - Question 6: MCQ (1 mark)
 - Each MCQ has four options (A), (B), (C), (D)
-- Topics: Solid solutions, magnetic moment, coordination complexes, organic reactions, IUPAC nomenclature, sugars, reagents, etc.
+- ALL MCQs from topic "${topic}" ONLY
 
 **Question 7: Short Answer Questions (8 marks)**
 - 4 sub-parts × 2 marks = 8 marks
@@ -1427,6 +1428,187 @@ Chemical Reaction (1 mark):
 4. Show step-by-step calculations
 5. Structural formulas should be clear
 6. Include proper reaction conditions
+7. OR options should be of similar difficulty
+
+Return ONLY valid JSON array with all questions. No markdown, no explanation.
+`;
+
+    // UP Board Physics Class 12 Format - Exact Paper Structure (70 Marks) - Paper Code 346
+    const upBoardPhysicsClass12Format = `
+⚠️ CONTENT GENERATION INSTRUCTIONS:
+====================================
+- Reference NCERT Physics textbook (Class 12) and previous UP Board papers
+- Use similar question patterns from standard materials
+- Include proper formulas, equations, and SI units
+- Maintain difficulty level appropriate for Class 12
+
+UP BOARD CLASS 12 PHYSICS PAPER (भौतिक विज्ञान) - TOTAL 70 MARKS
+Paper Code: 346
+
+TOPIC(S) FOR THIS PAPER: "${topic}"
+
+⚠️⚠️⚠️ CRITICAL - SMART TOPIC INTERPRETATION ⚠️⚠️⚠️
+=================================================================
+
+MANDATORY TOPIC HANDLING RULES:
+1. ⚠️ **ALL QUESTIONS MUST BE FROM THE SPECIFIED TOPIC ONLY** ⚠️
+   → If topic is "Current Electricity" - ALL questions from Current Electricity ONLY
+   → If topic is "Ray Optics" - ALL questions from Ray Optics ONLY
+   → If topic is "Semiconductors" - ALL questions from Semiconductors ONLY
+   → DO NOT MIX topics - stay focused on the given topic
+   
+2. ✓ IF GENERAL TOPIC (topic is "Physics" or "Physics Class 12" or "भौतिक विज्ञान"):
+   → ONLY THEN use variety from multiple units
+   → Mix questions from Electrostatics, Current Electricity, Magnetism, Optics, Modern Physics
+
+=== PAPER STRUCTURE (Total 70 Marks, 9 Questions) ===
+
+**Question 1: MCQs Section A (खण्ड-'अ') (6 marks)**
+- 6 sub-parts: (क), (ख), (ग), (घ), (ङ), (च)
+- Each MCQ: 1 mark
+- Four options each: (i), (ii), (iii), (iv)
+- Topics: SI units, conductivity formulas, magnetic permeability, alternating current, diffraction, p-type semiconductors, etc.
+
+**Question 2: Very Short Answer Section B (खण्ड-'ब') (3 marks)**
+- 3 sub-parts: (क), (ख), (ग)
+- Each: 1 mark
+- Brief definitions, unit dimensions, formulas
+- Examples: Define capacity dimension, Lenz's Law, name of largest/smallest wavelength bands, examples of Gamma rays
+
+**Question 3: Short Answer Section C (खण्ड-'स') (6 marks)**
+- 3 sub-parts: (क), (ख), (ग)
+- Each: 2 marks
+- Conceptual questions with brief explanations
+- Examples: Prove energy formula, state Faraday's Law, explain Curie's coil, calculate capacitance, explain semiconductors
+
+**Question 4: Numerical & Theory Section D (खण्ड-'द') (15 marks)**
+- (क) 1+2=3 marks: Definition + numerical
+- (ख) 1+1+1=3 marks: L-C-R circuit theory and calculations
+- (ग) 3 marks: Numerical problem
+- (घ) 1+2=3 marks: Definition + calculation
+- (ङ) 1½+1½=3 marks: Theory question with parts
+
+**Question 5: Mixed Problems (9 marks)**
+- (क) 1+2=3 marks: Theory + numerical
+- (ख) 2+1=3 marks: Circuit diagrams or theory
+- (ग) 1½+1½=3 marks: Calculate or explain concepts
+
+**Question 6: Comprehensive Problem (5 marks)**
+- Single long question: 2+1½+1½=5 marks
+- Complex numerical or theoretical problem
+- Examples: Photon energy calculations, semiconductor properties, capacitor networks
+
+**Question 7: Long Answer with OR (5 marks)**
+- 2+2+1=5 marks
+- Detailed explanations with diagrams or derivations
+- OR option provided
+
+**Question 8: Numerical Problem with OR (5 marks)**
+- Main: 3+2=5 marks OR Alternative: 1+3+1=5 marks
+- Complex calculations
+- Examples: Lens maker's formula, thin lens problems, magnification
+
+**Question 9: Theory with OR (5 marks)**
+- Main: 2+1+1+1+1=5 marks OR Alternative: 2+2+1=5 marks
+- Conceptual explanations
+- Examples: p-n junction, semiconductor applications, rectifiers
+
+=== MARKS DISTRIBUTION ===
+- Question 1: 6 marks (6 MCQs × 1 mark)
+- Question 2: 3 marks (3 very short × 1 mark)
+- Question 3: 6 marks (3 short × 2 marks)
+- Question 4: 15 marks (5 parts with varying marks)
+- Question 5: 9 marks (3 parts with varying marks)
+- Question 6: 5 marks (Complex problem)
+- Question 7: 5 marks (Long answer with OR)
+- Question 8: 5 marks (Numerical with OR)
+- Question 9: 5 marks (Theory with OR)
+TOTAL: 70 marks
+
+=== MAJOR TOPICS (Class 12 Physics) ===
+
+**Electrostatics:**
+- Electric field, potential, capacitance
+- Capacitors in series and parallel
+- Energy stored in capacitors
+- Dielectric constant and permittivity
+
+**Current Electricity:**
+- Ohm's law, resistance, resistivity, conductivity
+- Kirchhoff's laws, Wheatstone bridge
+- Cells in series and parallel
+- Heating effect of current
+
+**Magnetic Effects of Current:**
+- Biot-Savart law, Ampere's law
+- Magnetic field due to current-carrying conductor
+- Force on current-carrying conductor
+- Moving coil galvanometer
+
+**Electromagnetic Induction:**
+- Faraday's laws, Lenz's law
+- Induced EMF, eddy currents
+- Self and mutual inductance
+- AC generator
+
+**Alternating Current:**
+- AC voltage and current
+- LCR circuits, resonance
+- Power factor, impedance
+- Transformer principle
+
+**Ray Optics:**
+- Reflection, refraction, total internal reflection
+- Lens formula, lens maker's equation
+- Magnification, optical instruments
+- Prism, dispersion
+
+**Wave Optics:**
+- Interference, Young's double slit
+- Diffraction, resolving power
+- Polarization
+
+**Atoms and Nuclei:**
+- Bohr's model, energy levels
+- Radioactivity, half-life
+- Nuclear reactions, binding energy
+
+**Semiconductors:**
+- Intrinsic and extrinsic semiconductors
+- p-n junction, diode
+- Rectifiers, transistors
+- Logic gates
+
+=== ANSWER LENGTH GUIDELINES ===
+- 1 mark: 20-25 words, definition or brief statement
+- 2 marks: 40-50 words, concept with explanation
+- 3 marks: 60-80 words, detailed explanation with formula/derivation
+- 5 marks: 100-120 words, comprehensive answer with diagrams/calculations
+
+=== JSON STRUCTURE EXAMPLES ===
+
+MCQ (1 mark):
+{"questionType":"mcq","questionText":"वैद्युत फ्लक्स का मात्रक है: / The SI unit of electric flux is:","options":["(i) वोल्ट/मीटर / Volt/meter","(ii) न्यूटन/कूलॉम / Newton/Coulomb","(iii) वोल्ट×मीटर / Volt×meter","(iv) वेबर / Weber"],"correctOption":2,"marks":1,"section":"Question 1 - MCQ Section A"}
+
+Very Short Answer (1 mark):
+{"questionType":"written","questionText":"विशिष्ट चालकता का मात्रक लिखिए। / Write the SI unit of specific conductivity.","correctAnswer":"विशिष्ट चालकता का मात्रक = ओम⁻¹ मीटर⁻¹ (Ω⁻¹ m⁻¹) या सीमेन/मीटर (S/m) / SI unit of specific conductivity = ohm⁻¹ meter⁻¹ (Ω⁻¹ m⁻¹) or siemen/meter (S/m)","marks":1,"section":"Question 2 - Very Short Answer Section B"}
+
+Short Answer (2 marks):
+{"questionType":"written","questionText":"सिद्ध कीजिए कि आवेशित चालक की स्थितिज ऊर्जा u=1/2cv² है। / Prove that the potential energy of a charged conductor is u=1/2cv².","correctAnswer":"आवेशित चालक की स्थितिज ऊर्जा का व्युत्पन्न: / Derivation:\\n\\nमाना धारिता C के चालक पर q आवेश है और विभव V है। / Let charge q be on conductor of capacitance C at potential V.\\n\\nहम जानते हैं: q = CV\\n\\ndq आवेश को अनन्त से लाने में कार्य / Work to bring charge dq from infinity:\\ndW = V × dq = (q/C) × dq\\n\\nकुल कार्य / Total work:\\nW = ∫₀ᵠ (q/C)dq = (1/C) × [q²/2]₀ᵠ\\nW = q²/2C = (CV)²/2C = ½CV²\\n\\nअतः स्थितिज ऊर्जा U = ½CV² / Hence potential energy U = ½CV²","marks":2,"section":"Question 3 - Short Answer Section C"}
+
+Numerical Problem (3 marks):
+{"questionType":"written","questionText":"एक कुण्डली का स्व-प्रेरण गुणांक 10 मिली हेनरी है। इसमें वैद्युत धारा 5 मिली सेकेण्ड में 5 ऐम्पियर से 15 ऐम्पियर हो जाती है। कुण्डली में प्रेरित विद्युत वाहक बल का मान ज्ञात कीजिए। / A coil has self-inductance of 10 millihenry. Current in it changes from 5 ampere to 15 ampere in 5 milliseconds. Calculate the induced EMF.","correctAnswer":"दिया है / Given:\\nस्व-प्रेरण गुणांक L = 10 mH = 10 × 10⁻³ H\\nप्रारम्भिक धारा i₁ = 5 A\\nअन्तिम धारा i₂ = 15 A\\nसमय t = 5 ms = 5 × 10⁻³ s\\n\\nधारा में परिवर्तन / Change in current:\\ndi = i₂ - i₁ = 15 - 5 = 10 A\\n\\nप्रेरित विद्युत वाहक बल / Induced EMF:\\ne = -L × (di/dt)\\ne = -(10 × 10⁻³) × (10/(5 × 10⁻³))\\ne = -(10 × 10⁻³) × 2000\\ne = -20 V\\n\\nप्रेरित विद्युत वाहक बल का परिमाण = 20 वोल्ट / Magnitude of induced EMF = 20 Volt","marks":3,"section":"Question 4 - Numerical Problem"}
+
+Long Answer (5 marks):
+{"questionType":"written","questionText":"बायोट-सावर्ट नियम का उपयोग करते हुए एक धारावाही वृत्ताकार लूप की अक्षीय रेखा पर चुम्बकीय क्षेत्र का सूत्र प्राप्त कीजिए। / Using Biot-Savart law, derive the formula for magnetic field on the axial line of a current-carrying circular loop.","correctAnswer":"बायोट-सावर्ट नियम / Biot-Savart Law:\\n\\nमाना त्रिज्या R के वृत्ताकार लूप में I धारा प्रवाहित हो रही है। / Let current I flow through circular loop of radius R.\\n\\nअक्ष पर केन्द्र से x दूरी पर बिन्दु P पर चुम्बकीय क्षेत्र ज्ञात करना है। / To find magnetic field at point P on axis at distance x from center.\\n\\ndl लम्बाई के अवयव के कारण dB = (μ₀/4π) × (I dl sin90°)/r²\\nजहाँ r² = R² + x² / where r² = R² + x²\\n\\ndB का अक्षीय घटक = dB × cosα\\nजहाँ cosα = R/r = R/√(R²+x²) / where cosα = R/r\\n\\nसम्पूर्ण लूप के लिए / For complete loop:\\nB = ∫dB cosα = (μ₀I/4π) × (R/(R²+x²)^(3/2)) × ∫dl\\n\\nचूँकि ∫dl = 2πR / Since ∫dl = 2πR\\n\\nB = (μ₀IR²)/(2(R²+x²)^(3/2))\\n\\nकेन्द्र पर (x=0): B = μ₀I/2R / At center (x=0): B = μ₀I/2R","marks":5,"section":"Question 7 - Long Answer with OR"}
+
+=== IMPORTANT REMINDERS ===
+1. All formulas must use proper notation
+2. Include SI units in all numerical answers
+3. Show step-by-step calculations
+4. Draw circuit diagrams where necessary
+5. Use proper symbols (μ₀, ε₀, λ, etc.)
+6. Include vector directions where relevant
 7. OR options should be of similar difficulty
 
 Return ONLY valid JSON array with all questions. No markdown, no explanation.
@@ -2995,41 +3177,146 @@ Questions 1-6: Individual MCQs (6 marks total)
 - Question 3: MCQ (1 mark) - Coordination complexes
 - Question 4: MCQ (1 mark) - Organic reactions
 - Question 5: MCQ (1 mark) - IUPAC nomenclature
-- Question 6: MCQ (1 mark) - Sugars/Biomolecules
+- Question 6: MCQ (1 mark)
 - Each as SEPARATE JSON object with section "Question 1", "Question 2", etc.
+- ALL MCQs from topic "${topic}" ONLY
 
 Question 7 (8 marks): Short answers
 - 4 sub-parts (क), (ख), (ग), (घ) × 2 marks each
 - Numerical calculations and brief explanations
+- ALL from topic "${topic}" ONLY
 
 Question 8 (8 marks): Short answers with OR
 - 4 sub-parts (क), (ख), (ग), (घ) × 2 marks each
 - Explain reactions, distinguish compounds, OR options
+- ALL from topic "${topic}" ONLY
 
 Question 9 (12 marks): Numerical/calculations
-- Raoult's Law, electrochemistry calculations (resistance, conductivity)
+- Numerical problems from topic "${topic}" ONLY
 - Explain concepts with reasoning
-- Order of reaction calculations
+- Show step-by-step calculations
 
 Question 10 (12 marks): Theory questions  
-- Kohlrausch Law, conductivity concepts
-- Chemical kinetics
-- IUPAC nomenclature of complexes
-- DNA and RNA differences
+- Theory from topic "${topic}" ONLY
+- Definitions, laws, concepts
+- Diagrams where applicable
 
-Question 11 (12 marks): Organic chemistry
-- Part (a): 5 structures with IUPAC names OR explain reactions
-- Part (b): 5 conversion reactions with equations OR synthesis reactions
+Question 11 (12 marks): Organic chemistry / Detailed questions
+- Part (a): 5 structures/examples from topic "${topic}" OR explain reactions
+- Part (b): 5 conversion reactions OR synthesis reactions
 
-Question 12 (12 marks): Organic concepts
+Question 12 (12 marks): Advanced concepts
 - Part (a): Define 5 terms with examples OR write reaction products
 - Part (b): Arrange in order (5 comparisons) OR give reasons (3 reasons)
+
+⚠️ CRITICAL: ALL 12 questions MUST be from topic "${topic}" ONLY ⚠️
 
 **LANGUAGE:** Mix of Hindi and English (technical terms in English)
 **EQUATIONS:** Balanced chemical equations required
 **FORMAT:** Include proper chemical formulas and structures
 
 Return ONLY valid JSON array with 12 questions.`;
+    } else if (examFormat === "upboard_physicsclass12") {
+      prompt = `UP BOARD CLASS 12 PHYSICS PAPER (भौतिक विज्ञान) - 70 अंक बनाएं।
+Paper Code: 346, कोड-151
+
+विषय/Topic: "${topic}"
+
+⚠️⚠️⚠️ CRITICAL RULE - TOPIC RESTRICTION ⚠️⚠️⚠️
+=================================================================
+**ALL QUESTIONS MUST BE GENERATED ONLY FROM THE TOPIC: "${topic}"**
+
+- If topic is "Current Electricity" → ALL 9 questions from Current Electricity
+- If topic is "Ray Optics" → ALL 9 questions from Ray Optics  
+- If topic is "Semiconductors" → ALL 9 questions from Semiconductors
+- DO NOT add questions from other topics
+- ONLY if topic is "Physics" or "भौतिक विज्ञान" → then mix topics
+
+${upBoardPhysicsClass12Format}
+
+⚠️⚠️⚠️ GENERATE EXACTLY 9 QUESTIONS = 70 MARKS ⚠️⚠️⚠️
+
+**EXACT PAPER STRUCTURE (as per UP Board Paper 346):**
+
+**प्रश्न 1 - खण्ड-'अ' (Section A) - 6 अंक:**
+Generate 6 MCQs as sub-parts (क), (ख), (ग), (घ), (ङ), (च)
+- Each MCQ: 1 mark with 4 options (i), (ii), (iii), (iv)
+- Format: "प्रश्न 1 (क) Question text / English text"
+- Topics from "${topic}" ONLY: units, formulas, definitions, concepts
+- ALL 6 MCQs in ONE JSON object
+
+**प्रश्न 2 - खण्ड-'ब' (Section B) - 3 अंक:**
+Generate 3 Very Short Answers as sub-parts (क), (ख), (ग)
+- Each: 1 mark (20-25 words answer)
+- Format: "प्रश्न 2 (क) Question / English"
+- Types: Write dimension/unit, define term, name examples
+- ALL 3 parts in ONE JSON object
+
+**प्रश्न 3 - खण्ड-'स' (Section C) - 8 अंक:**
+Generate 4 Short Answers as sub-parts (क), (ख), (ग), (घ)
+- Each: 2 marks (40-50 words answer)
+- Format: "प्रश्न 3 (क) Question / English"
+- Types: Prove formula, state law, explain concept, solve numerical
+- ALL 4 parts in ONE JSON object
+
+**प्रश्न 4 - खण्ड-'द' (Section D) - 15 अंक:**
+Generate 5 parts: (क) 1+2=3, (ख) 1+1+1=3, (ग) 3, (घ) 1+2=3, (ङ) 1½+1½=3
+- Numerical problems with theory
+- Format with sub-questions where needed
+- ALL 5 parts in ONE JSON object
+
+**प्रश्न 5 - Mixed Problems - 12 अंक:**
+Generate 4 parts: (क) 3, (ख) 3, (ग) 3, (घ) 3
+- Mix of theory and numerical
+- Circuit/ray diagram problems
+- ALL 4 parts in ONE JSON object
+
+**प्रश्न 6 - खण्ड-'य' (Section Y) - 5 अंक (with अथवा/OR):**
+- Main question: 2+1½+1½=5 marks
+- OR alternative question: 2+1½+1½=5 marks
+- Long derivation or proof with numerical
+- Include hasAlternative, alternativeQuestion, alternativeAnswer
+
+**प्रश्न 7 - Long Answer - 5 अंक (with अथवा/OR):**
+- Main question: 2+2+1=5 marks
+- OR alternative question: 2+2+1=5 marks
+- Detailed derivation with diagram
+- Include hasAlternative, alternativeQuestion, alternativeAnswer
+
+**प्रश्न 8 - Numerical Problem - 5 अंक (with अथवा/OR):**
+- Main question: 1+3+1=5 marks
+- OR alternative question: 1+3+1=5 marks
+- Complex lens/mirror/circuit numerical
+- Include hasAlternative, alternativeQuestion, alternativeAnswer
+
+**प्रश्न 9 - Theory - 5 अंक (with अथवा/OR):**
+- Main question: 2+1+1+1+1=5 marks
+- OR alternative question: 2+2+1=5 marks
+- Conceptual explanation with examples
+- Include hasAlternative, alternativeQuestion, alternativeAnswer
+
+=== JSON FORMAT EXAMPLES ===
+
+Q1 MCQs (6 marks):
+{"questionType":"mcq","questionText":"खण्ड-'अ'\\n\\n(क) वैद्युत फ्लक्स का मात्रक है: / The SI unit of electric flux is:\\n(i) वोल्ट/मीटर (ii) न्यूटन/कूलॉम (iii) वोल्ट×मीटर (iv) वेबर\\n\\n(ख) विशिष्ट चालकता का मात्रक है:- / Unit of specific conductivity is:\\n(i) ओम-मीटर (ii) ओम-मीटर⁻¹ (iii) ओम⁻¹-मीटर⁻¹ (iv) ओम⁻¹-मीटर\\n\\n(ग) √μ₀/ε₀ का मात्रक है:– / The unit of √μ₀/ε₀ is:\\n(i) न्यूटन/कूलॉम (ii) ओम (iii) फैरेड (iv) हेनरी\\n\\n(घ) किसी परिपथ में v(t)=30Sin(1000t) वोल्ट लगाने से i(t)=0.3Sin(1000t-60°) एम्पियर धारा प्रवाहित होती है। औसत शक्ति होगी– / Average power will be:\\n(i) 2.25 वाट (ii) 4.5 वाट (iii) 9.0 वाट (iv) 18.0 वाट\\n\\n(ङ) एक अकेली झिर्री के विवर्तन में जिसकी चौड़ाई e है तथा प्रकाश की तरंग दैर्ध्य λ है, मुख्य उच्चिष्ठ के बीच कोणीय दूरी θ होगी:– / Angular distance will be:\\n(i) λ/e (ii) λ/2e (iii) λ/4e (iv) π/2\\n\\n(च) शुद्ध जर्मेनियम को p-टाइप अर्द्धचालक बनाने के लिए उसमें मिलाया जाने वाला अपद्रव्य है– / Impurity added is:\\n(i) ऐलुमीनियम (ii) फास्फोरस (iii) ऐण्टिमनी (iv) आर्सेनिक","options":["See sub-parts above"],"correctOption":0,"marks":6,"section":"प्रश्न 1 - खण्ड-'अ' MCQs (6 अंक)","expectedAnswers":"(क) (iii), (ख) (iii), (ग) (ii), (घ) (ii), (ङ) (i), (च) (i)"}
+
+Q2 Very Short (3 marks):
+{"questionType":"written","questionText":"खण्ड-'ब'\\n\\n(क) निर्वात की चुम्बकशीलता की विमा व मात्रक लिखिए। / Write the dimension and unit of permeability of vacuum.\\n\\n(ख) किसी कुण्डली में प्रेरित विद्युत धारा किन-किन बातों पर निर्भर करती है। / On what factors does induced current in a coil depend?\\n\\n(ग) विद्युत चुम्बकीय स्पेक्ट्रम में सबसे बड़ी तथा सबसे छोटी तरंगदैर्ध्य की तरंगों का नाम लिखिए। / Name the waves with largest and smallest wavelength in EM spectrum.","correctAnswer":"(क) निर्वात की चुम्बकशीलता μ₀:\\n   विमा = [MLT⁻²A⁻²]\\n   मात्रक = हेनरी/मीटर (H/m) या Wb/A-m\\n\\n(ख) प्रेरित विद्युत धारा निर्भर करती है:\\n   (i) चुम्बकीय फ्लक्स परिवर्तन की दर पर\\n   (ii) कुण्डली के फेरों की संख्या पर\\n   (iii) कुण्डली के प्रतिरोध पर\\n\\n(ग) सबसे बड़ी तरंगदैर्ध्य: रेडियो तरंगें (Radio waves)\\n   सबसे छोटी तरंगदैर्ध्य: गामा किरणें (Gamma rays)","marks":3,"section":"प्रश्न 2 - खण्ड-'ब' अति लघु उत्तरीय (3 अंक)"}
+
+Q3 Short (8 marks):
+{"questionType":"written","questionText":"खण्ड-'स'\\n\\n(क) सिद्ध कीजिए कि आवेशित चालक की स्थितिज ऊर्जा u=1/2cv² है। / Prove that potential energy of charged conductor is u=1/2cv². (2 अंक)\\n\\n(ख) एम्पियर के परिपथीय नियम का कथन लिखें एवं इसे प्राप्त करें। / State Ampere's circuital law and derive it. (2 अंक)\\n\\n(ग) एक कुण्डली का स्व-प्रेरण गुणांक 10 मिली हेनरी है। इसमें वैद्युत धारा 5 मिली सेकेण्ड में 5 ऐम्पियर से 15 ऐम्पियर हो जाती है। कुण्डली में प्रेरित विद्युत वाहक बल का मान ज्ञात कीजिए। / Calculate induced EMF. (2 अंक)\\n\\n(घ) यदि अर्द्धचालक डायोड का अग्रदिशिक अभिनति प्रतिरोध 50 ओम हो तो संलग्न परिपथ में सेल से प्रवाहित धारा का मान ज्ञात कीजिए। / Find current in the circuit. (2 अंक)","correctAnswer":"(क) स्थितिज ऊर्जा का व्युत्पन्न:\\n   माना धारिता C के चालक पर आवेश q और विभव V है।\\n   dq आवेश लाने में कार्य dW = V×dq = (q/C)×dq\\n   कुल कार्य W = ∫₀ᵠ (q/C)dq = q²/2C = ½CV²\\n   अतः U = ½CV² सिद्ध हुआ।\\n\\n(ख) एम्पियर का परिपथीय नियम:\\n   किसी बंद पथ पर चुम्बकीय क्षेत्र का रेखा समाकलन उस पथ से घिरी धारा के μ₀ गुना होता है।\\n   ∮B⃗.dl⃗ = μ₀I\\n\\n(ग) दिया है: L = 10 mH, di = 10 A, dt = 5 ms\\n   e = -L(di/dt) = -10×10⁻³ × (10/5×10⁻³)\\n   e = -10×10⁻³ × 2000 = -20 V\\n   प्रेरित विद्युत वाहक बल = 20 वोल्ट\\n\\n(घ) परिपथ में कुल प्रतिरोध = 50 + R (external)\\n   I = V/(R_total) द्वारा धारा ज्ञात करें।","marks":8,"section":"प्रश्न 3 - खण्ड-'स' लघु उत्तरीय (8 अंक)"}
+
+Q6-Q9 with OR (5 marks each):
+{"questionType":"written","questionText":"खण्ड-'य'\\n\\nगौस का प्रमेय लिखिए। इसकी सहायता से किसी अनन्त विस्तार वाली आवेशित समतल चादर के समीप वैद्युत-क्षेत्र की तीव्रता ज्ञात कीजिए।\\nहाइड्रोजन परमाणु में इलेक्ट्रान व प्रोटॉन के बीच की दूरी 0.5 A° है। इनकी पारस्परिक वैद्युत स्थितिज ऊर्जा क्या होगी?\\n\\nState Gauss's theorem. Use it to derive expression for electric field intensity near an infinitely charged plane sheet.\\nIn hydrogen atom distance between electron and proton is 0.5 A°. What will be mutual electric potential energy?\\n(2+1½+1½=5 marks)","correctAnswer":"गौस का प्रमेय:\\nकिसी बंद पृष्ठ से गुजरने वाला कुल वैद्युत फ्लक्स उस पृष्ठ के अन्दर स्थित कुल आवेश के 1/ε₀ गुना होता है।\\n∮E⃗.dA⃗ = q/ε₀\\n\\nअनन्त आवेशित समतल चादर के लिए:\\nमाना σ आवेश पृष्ठ घनत्व है।\\nगॉसियन पृष्ठ लेने पर: 2EA = σA/ε₀\\nE = σ/2ε₀\\n\\nसंख्यात्मक:\\nr = 0.5 A° = 0.5 × 10⁻¹⁰ m\\nU = kq₁q₂/r = 9×10⁹ × (1.6×10⁻¹⁹)² / (0.5×10⁻¹⁰)\\nU = -4.6 × 10⁻¹⁸ J = -28.8 eV","marks":5,"section":"प्रश्न 6 - खण्ड-'य' (5 अंक)","hasAlternative":true,"alternativeQuestion":"अथवा\\n\\nसमान्तर प्लेट संधारित्र की धारिता के लिए सूत्र निगमित कीजिए।\\nएक समान्तर प्लेट वायु-संधारित्र की प्लेटों का क्षेत्रफल 100 सेमी² व इनके बीच दूरी 5 मिमी है। इसकी प्लेटों के बीच बैटरी द्वारा 300 वोल्ट का विभवान्तर स्थापित किया गया है। बैटरी को हटाकर प्लेटों के बीच का स्थान एवोनाइट (k=2.6) से भर दिया जाता है।\\nज्ञात कीजिए (i) प्लेटों के बीच नया विभवान्तर (ii) संधारित्र की प्रारम्भिक व अन्तिम धारिताएँ।\\n\\nDerive formula for capacitance of parallel plate capacitor.\\nA parallel plate air capacitor has plate area 100 cm² and separation 5 mm. 300 V potential difference is applied. Battery is removed and space is filled with ebonite (k=2.6).\\nFind (i) new potential difference (ii) initial and final capacitances.\\n(2+1½+1½=5 marks)","alternativeAnswer":"समान्तर प्लेट संधारित्र:\\nC = ε₀A/d\\n\\nदिया है: A = 100 cm² = 10⁻² m², d = 5 mm = 5×10⁻³ m, V₁ = 300 V, k = 2.6\\n\\nप्रारम्भिक धारिता: C₁ = ε₀A/d = 8.85×10⁻¹² × 10⁻² / 5×10⁻³\\nC₁ = 1.77 × 10⁻¹¹ F = 17.7 pF\\n\\nअन्तिम धारिता: C₂ = kC₁ = 2.6 × 17.7 = 46 pF\\n\\nआवेश संरक्षित: Q = C₁V₁ = C₂V₂\\nV₂ = C₁V₁/C₂ = 300/2.6 = 115.4 V"}
+
+**STRICT RULES:**
+1. Generate ALL questions from topic "${topic}" ONLY
+2. Bilingual format (Hindi / English)
+3. Q6-Q9 MUST have hasAlternative, alternativeQuestion, alternativeAnswer
+4. Include step-by-step solutions with formulas and SI units
+5. Mention where diagrams are needed
+
+Return ONLY valid JSON array with 9 questions.`;
     } else if (examFormat === "upboard_biology") {
       prompt = `UP BOARD CLASS 12 BIOLOGY PAPER (जीव विज्ञान) - 70 अंक बनाएं।
 Paper Code: 348(KH)
@@ -3803,6 +4090,45 @@ BREAKDOWN:
 - खण्ड-ख: 10 questions (45m)
 
 TOTAL: 20 JSON objects = 100 marks
+
+Return ONLY valid JSON array.`;
+    } else if (examFormat === "upboard_physicsclass12") {
+      prompt = `Extract questions from images for UP BOARD CLASS 12 PHYSICS PAPER (भौतिक विज्ञान) - 70 marks.
+Paper Code: 346
+
+EXTRACT ONLY what is visible in images. Do NOT generate new questions.
+
+${upBoardPhysicsClass12Format}
+
+⚠️⚠️⚠️ EXTRACT EXACTLY 9 QUESTIONS FROM IMAGES = 70 MARKS ⚠️⚠️⚠️
+
+BREAKDOWN:
+- Question 1: 6 MCQs Section A (6m)
+- Question 2: 3 Very Short Answers Section B (3m)
+- Question 3: 3 Short Answers Section C (6m)
+- Question 4: 5 parts Numerical & Theory Section D (15m)
+- Question 5: 3 parts Mixed Problems (9m)
+- Question 6: Comprehensive Problem (5m)
+- Question 7: Long Answer with OR (5m)
+- Question 8: Numerical Problem with OR (5m)
+- Question 9: Theory with OR (5m)
+
+TOTAL: 9 questions = 70 marks
+
+=== ANSWER LENGTH ===
+- 1 अंक: 20-25 words
+- 2 अंक: 40-50 words
+- 3 अंक: 60-80 words
+- 5 अंक: 100-120 words
+
+JSON FORMAT: (Same as Generate with AI)
+
+STRICT RULES:
+1. Extract from images only - DO NOT generate
+2. Bilingual format (Hindi / English)
+3. Include OR options where visible
+4. Complete step-by-step solutions
+5. Include formulas and SI units
 
 Return ONLY valid JSON array.`;
     } else if (examFormat === "upboard_chemistryclass12") {

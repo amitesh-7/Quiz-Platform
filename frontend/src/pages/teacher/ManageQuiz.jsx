@@ -1914,6 +1914,15 @@ ${answersHTML}
                               questionTypes: ["mcq", "written"],
                               numberOfQuestions: 12,
                             });
+                          } else if (format === "upboard_physicsclass12") {
+                            // Auto-configure for UP Board Physics (Class 12)
+                            setGenerateForm({
+                              ...generateForm,
+                              examFormat: format,
+                              language: "bilingual",
+                              questionTypes: ["mcq", "written"],
+                              numberOfQuestions: 9,
+                            });
                           } else if (format === "upboard_sanskrit") {
                             // Auto-configure for UP Board Sanskrit
                             setGenerateForm({
@@ -1961,7 +1970,10 @@ ${answersHTML}
                           UP Board Hindi (Class 12)
                         </option>
                         <option value="upboard_chemistryclass12">
-                          UP Board Chemistry (Class 12) - 70 Marks
+                          UP Board Chemistry (Class 12)
+                        </option>
+                        <option value="upboard_physicsclass12">
+                          UP Board Physics (Class 12)
                         </option>
                       </select>
                     </div>
@@ -2091,6 +2103,47 @@ ${answersHTML}
                             💡 Enter "Chemistry" for variety or specific
                             "Electrochemistry", "Coordination Compounds",
                             "Aldehydes and Ketones"
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {/* UP Board Physics Class 12 Info Box */}
+                    {generateForm.examFormat === "upboard_physicsclass12" && (
+                      <div className="rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 border border-blue-200 dark:border-blue-700">
+                        <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
+                          ⚡ UP Board Physics Paper (Class 12) - 70 Marks | 9
+                          Questions
+                        </h4>
+                        <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                          <p>📋 Paper Code: 346</p>
+                          <p>
+                            ✓ Q1: 6 MCQs Section A (खण्ड-'अ') = 6 marks - SI
+                            units, formulas, concepts
+                          </p>
+                          <p>
+                            ✓ Q2: 3 Very Short Answers Section B (खण्ड-'ब') = 3
+                            marks - Definitions, units
+                          </p>
+                          <p>
+                            ✓ Q3: 3 Short Answers Section C (खण्ड-'स') = 6 marks
+                            - Prove formulas, explain
+                          </p>
+                          <p>
+                            ✓ Q4-Q5: Numerical & Theory (खण्ड-'द') = 24 marks -
+                            Calculations, circuits
+                          </p>
+                          <p>
+                            ✓ Q6-Q9: Long Answers with OR = 20 marks -
+                            Derivations, numerical problems
+                          </p>
+                          <p className="font-medium mt-2 text-blue-900 dark:text-blue-100">
+                            Topics: Electrostatics, Current Electricity, EMI, AC
+                            Circuits, Ray Optics, Wave Optics, Atoms,
+                            Semiconductors
+                          </p>
+                          <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
+                            💡 Enter "Physics" for variety or specific "Current
+                            Electricity", "Ray Optics", "Semiconductors"
                           </p>
                         </div>
                       </div>
@@ -3047,6 +3100,12 @@ ${answersHTML}
                               examFormat: format,
                               language: "bilingual",
                             });
+                          } else if (format === "upboard_physicsclass12") {
+                            setBulkForm({
+                              ...bulkForm,
+                              examFormat: format,
+                              language: "bilingual",
+                            });
                           } else {
                             setBulkForm({
                               ...bulkForm,
@@ -3085,7 +3144,10 @@ ${answersHTML}
                           UP Board Hindi (Class 12)
                         </option>
                         <option value="upboard_chemistryclass12">
-                          UP Board Chemistry (Class 12) - 70 Marks
+                          UP Board Chemistry (Class 12)
+                        </option>
+                        <option value="upboard_physicsclass12">
+                          UP Board Physics (Class 12)
                         </option>
                       </select>
                     </div>
@@ -3185,6 +3247,29 @@ ${answersHTML}
                           <p className="text-xs mt-2 text-green-700 dark:text-green-300">
                             💡 Paste questions with chemical equations and
                             formulas
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* UP Board Physics Class 12 Info Box */}
+                    {bulkForm.examFormat === "upboard_physicsclass12" && (
+                      <div className="rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 border border-blue-200 dark:border-blue-700">
+                        <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
+                          ⚡ UP Board Physics Paper (Class 12) - 70 Marks | 9
+                          Questions
+                        </h4>
+                        <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                          <p>📋 Paper Code: 346</p>
+                          <p>
+                            ✓ Q1: 6 MCQs Section A = 6m | Q2: 3 Very Short = 3m
+                            | Q3: 3 Short = 6m
+                          </p>
+                          <p>✓ Q4-Q5: Numerical & Theory = 24m</p>
+                          <p>✓ Q6-Q9: Long Answers with OR = 20m</p>
+                          <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
+                            💡 Paste questions with formulas, calculations, and
+                            diagrams
                           </p>
                         </div>
                       </div>
@@ -3871,6 +3956,12 @@ Example:
                               examFormat: format,
                               language: "bilingual",
                             });
+                          } else if (format === "upboard_physicsclass12") {
+                            setImageForm({
+                              ...imageForm,
+                              examFormat: format,
+                              language: "bilingual",
+                            });
                           } else {
                             setImageForm({
                               ...imageForm,
@@ -3909,7 +4000,10 @@ Example:
                           UP Board Hindi (Class 12)
                         </option>
                         <option value="upboard_chemistryclass12">
-                          UP Board Chemistry (Class 12) - 70 Marks
+                          UP Board Chemistry (Class 12)
+                        </option>
+                        <option value="upboard_physicsclass12">
+                          UP Board Physics (Class 12)
                         </option>
                       </select>
                     </div>
@@ -4017,6 +4111,31 @@ Example:
                           <p className="text-xs mt-2 text-green-700 dark:text-green-300">
                             💡 Upload clear images showing all chemical
                             equations and structural formulas
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* UP Board Physics Class 12 Info Box */}
+                    {imageForm.examFormat === "upboard_physicsclass12" && (
+                      <div className="bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-500/30 rounded-lg p-4">
+                        <p className="text-blue-300 font-medium mb-3">
+                          ⚡ UP Board Class 12 Physics - 70 Marks
+                        </p>
+                        <div className="text-xs text-gray-400 space-y-2">
+                          <p>📋 Paper Code: 346 | 9 Questions Total</p>
+                          <p>✓ Q1: 6 MCQs Section A (खण्ड-'अ') = 6 marks</p>
+                          <p>
+                            ✓ Q2: 3 Very Short Section B (खण्ड-'ब') = 3 marks
+                          </p>
+                          <p>✓ Q3: 3 Short Section C (खण्ड-'स') = 6 marks</p>
+                          <p>
+                            ✓ Q4-Q5: Numerical & Theory (खण्ड-'द') = 24 marks
+                          </p>
+                          <p>✓ Q6-Q9: Long Answers with OR = 20 marks</p>
+                          <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
+                            💡 Upload clear images showing all formulas, circuit
+                            diagrams, and calculations
                           </p>
                         </div>
                       </div>

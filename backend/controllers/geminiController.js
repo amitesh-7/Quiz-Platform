@@ -61,6 +61,7 @@ const generateValidation = [
       "upboard_englishclass12",
       "upboard_hindiclass12",
       "upboard_chemistryclass12",
+      "upboard_physicsclass12",
     ])
     .withMessage("Invalid exam format"),
 ];
@@ -123,7 +124,11 @@ const generateQuestionsController = async (req, res) => {
       language = "hindi";
       questionTypes = ["mcq", "written"];
     } else if (examFormat === "upboard_chemistryclass12") {
-      numberOfQuestions = 7; // Q1(6 MCQs) + Q2-7(Short+Long answers with numericals and organic chemistry)
+      numberOfQuestions = 12; // Q1-Q6 (Individual MCQs) + Q7-Q12 (Short+Long answers with numericals and organic chemistry)
+      language = "bilingual";
+      questionTypes = ["mcq", "written"];
+    } else if (examFormat === "upboard_physicsclass12") {
+      numberOfQuestions = 9; // Q1(6 MCQs) + Q2(3 Very Short) + Q3(3 Short) + Q4-Q9(Numerical & Theory)
       language = "bilingual";
       questionTypes = ["mcq", "written"];
     }
@@ -304,6 +309,10 @@ const processQuestionsController = async (req, res) => {
       finalMaxMarks = 70;
       finalLanguage = "bilingual";
       finalNumberOfQuestions = 12;
+    } else if (examFormat === "upboard_physicsclass12") {
+      finalMaxMarks = 70;
+      finalLanguage = "bilingual";
+      finalNumberOfQuestions = 9;
     }
 
     // Process raw questions with exam format and difficulty
