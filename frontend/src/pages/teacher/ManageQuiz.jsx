@@ -1897,6 +1897,15 @@ ${answersHTML}
                               questionTypes: ["mcq", "written"],
                               numberOfQuestions: 20,
                             });
+                          } else if (format === "upboard_hindiclass12") {
+                            // Auto-configure for UP Board Hindi (Class 12)
+                            setGenerateForm({
+                              ...generateForm,
+                              examFormat: format,
+                              language: "hindi",
+                              questionTypes: ["mcq", "written"],
+                              numberOfQuestions: 20,
+                            });
                           } else if (format === "upboard_sanskrit") {
                             // Auto-configure for UP Board Sanskrit
                             setGenerateForm({
@@ -1939,6 +1948,9 @@ ${answersHTML}
                         </option>
                         <option value="upboard_englishclass12">
                           UP Board English (Class 12)
+                        </option>
+                        <option value="upboard_hindiclass12">
+                          UP Board Hindi (Class 12)
                         </option>
                       </select>
                     </div>
@@ -2003,6 +2015,34 @@ ${answersHTML}
                           <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
                             💡 Enter "English" for variety or specific "My
                             Mother at Sixty-six"
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {/* UP Board Hindi Class 12 Info Box */}
+                    {generateForm.examFormat === "upboard_hindiclass12" && (
+                      <div className="rounded-lg bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 p-4 border border-orange-200 dark:border-orange-700">
+                        <h4 className="font-semibold text-orange-900 dark:text-orange-100 mb-2 flex items-center gap-2">
+                          📝 UP Board Hindi Paper (Class 12) - 100 अंक | 20
+                          Questions
+                        </h4>
+                        <div className="text-sm text-orange-800 dark:text-orange-200 space-y-1">
+                          <p>📋 Paper Code: 301(HA)</p>
+                          <p>
+                            ✓ खण्ड-क (55 marks) - 10 questions (MCQs, गद्यांश,
+                            पद्यांश, लेखक/कवि परिचय)
+                          </p>
+                          <p>
+                            ✓ खण्ड-ख (45 marks) - 10 questions (संस्कृत, निबंध,
+                            व्याकरण, पत्र)
+                          </p>
+                          <p className="font-medium mt-2 text-orange-900 dark:text-orange-100">
+                            Topics: जैनेन्द्रकुमार, पं. दीनदयाल उपाध्याय,
+                            कामायनी, रश्मिरथी
+                          </p>
+                          <p className="text-xs mt-2 text-orange-700 dark:text-orange-300">
+                            💡 Enter "Hindi" for variety or specific "कामायनी"
+                            or "जैनेन्द्रकुमार"
                           </p>
                         </div>
                       </div>
@@ -2943,6 +2983,12 @@ ${answersHTML}
                               examFormat: format,
                               language: "english",
                             });
+                          } else if (format === "upboard_hindiclass12") {
+                            setBulkForm({
+                              ...bulkForm,
+                              examFormat: format,
+                              language: "hindi",
+                            });
                           } else {
                             setBulkForm({
                               ...bulkForm,
@@ -2976,6 +3022,9 @@ ${answersHTML}
                         </option>
                         <option value="upboard_englishclass12">
                           UP Board English (Class 12)
+                        </option>
+                        <option value="upboard_hindiclass12">
+                          UP Board Hindi (Class 12)
                         </option>
                       </select>
                     </div>
@@ -3028,6 +3077,29 @@ ${answersHTML}
                           </p>
                           <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
                             💡 Paste all questions from your paper with sections
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* UP Board Hindi Class 12 Info Box */}
+                    {bulkForm.examFormat === "upboard_hindiclass12" && (
+                      <div className="rounded-lg bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 p-4 border border-orange-200 dark:border-orange-700">
+                        <h4 className="font-semibold text-orange-900 dark:text-orange-100 mb-2 flex items-center gap-2">
+                          📝 UP Board Hindi Paper (Class 12) - 100 अंक | 20
+                          Questions
+                        </h4>
+                        <div className="text-sm text-orange-800 dark:text-orange-200 space-y-1">
+                          <p>📋 Paper Code: 301(HA)</p>
+                          <p>
+                            ✓ खण्ड-क: 10 questions (MCQs + passages + authors)
+                          </p>
+                          <p>
+                            ✓ खण्ड-ख: 10 questions (Sanskrit + essay + grammar +
+                            letter)
+                          </p>
+                          <p className="text-xs mt-2 text-orange-700 dark:text-orange-300">
+                            💡 Paste your questions from all sections
                           </p>
                         </div>
                       </div>
@@ -3700,6 +3772,12 @@ Example:
                               examFormat: format,
                               language: "english",
                             });
+                          } else if (format === "upboard_hindiclass12") {
+                            setImageForm({
+                              ...imageForm,
+                              examFormat: format,
+                              language: "hindi",
+                            });
                           } else {
                             setImageForm({
                               ...imageForm,
@@ -3733,6 +3811,9 @@ Example:
                         </option>
                         <option value="upboard_englishclass12">
                           UP Board English (Class 12)
+                        </option>
+                        <option value="upboard_hindiclass12">
+                          UP Board Hindi (Class 12)
                         </option>
                       </select>
                     </div>
@@ -3785,6 +3866,30 @@ Example:
                           <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
                             💡 Upload clear images of all sections including
                             passages
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* UP Board Hindi Class 12 Info Box */}
+                    {imageForm.examFormat === "upboard_hindiclass12" && (
+                      <div className="bg-gradient-to-r from-orange-500/20 to-amber-500/20 border border-orange-500/30 rounded-lg p-4">
+                        <p className="text-orange-300 font-medium mb-3">
+                          📚 UP Board Class 12 Hindi - 100 अंक
+                        </p>
+                        <div className="text-xs text-gray-400 space-y-2">
+                          <p>📋 Paper Code: 301(HA) | 20 Questions Total</p>
+                          <p>
+                            ✓ खण्ड-क (55 अंक): MCQs, गद्यांश, पद्यांश, लेखक/कवि
+                            परिचय, खण्डकाव्य
+                          </p>
+                          <p>
+                            ✓ खण्ड-ख (45 अंक): संस्कृत, निबंध, व्याकरण
+                            (संधि-विच्छेद, समास), पत्र
+                          </p>
+                          <p className="text-xs mt-2 text-orange-700 dark:text-orange-300">
+                            💡 Upload clear images of all sections - both Hindi
+                            and Sanskrit portions
                           </p>
                         </div>
                       </div>

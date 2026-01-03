@@ -59,6 +59,7 @@ const generateValidation = [
       "upboard_socialscience",
       "upboard_biology",
       "upboard_englishclass12",
+      "upboard_hindiclass12",
     ])
     .withMessage("Invalid exam format"),
 ];
@@ -115,6 +116,10 @@ const generateQuestionsController = async (req, res) => {
     } else if (examFormat === "upboard_englishclass12") {
       numberOfQuestions = 20; // Reading(5) + Writing(2) + Grammar(6) + Literature(7)
       language = "english";
+      questionTypes = ["mcq", "written"];
+    } else if (examFormat === "upboard_hindiclass12") {
+      numberOfQuestions = 20; // MCQs(10) + Passages(2) + Authors(2) + Literature(4) + Sanskrit(4) + Essay + Grammar + Letter
+      language = "hindi";
       questionTypes = ["mcq", "written"];
     }
 
@@ -286,6 +291,10 @@ const processQuestionsController = async (req, res) => {
       finalMaxMarks = 100;
       finalLanguage = "english";
       finalNumberOfQuestions = 20;
+    } else if (examFormat === "upboard_hindiclass12") {
+      finalMaxMarks = 100;
+      finalLanguage = "hindi";
+      finalNumberOfQuestions = 20;
     }
 
     // Process raw questions with exam format and difficulty
@@ -411,6 +420,9 @@ const extractQuestionsFromImageController = async (req, res) => {
     } else if (examFormat === "upboard_englishclass12") {
       finalMaxMarks = 100;
       finalLanguage = "english";
+    } else if (examFormat === "upboard_hindiclass12") {
+      finalMaxMarks = 100;
+      finalLanguage = "hindi";
     }
 
     // Extract questions from image(s) with exam format and difficulty

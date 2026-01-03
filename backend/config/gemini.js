@@ -897,6 +897,389 @@ For Map Questions:
 }
 `;
 
+    // UP Board Hindi Class 12 Format - Exact Paper Structure (100 Marks) - Paper Code 301(HA)
+    const upBoardHindiClass12Format = `
+⚠️ CONTENT GENERATION INSTRUCTIONS:
+====================================
+- Reference NCERT Hindi textbook (Class 12) and previous UP Board papers
+- Use similar question patterns from standard materials
+- Modify details to create variations
+- Maintain difficulty level and concept coverage
+
+UP BOARD CLASS 12 HINDI PAPER (हिंदी) - TOTAL 100 MARKS
+Paper Code: 301(HA)
+
+⚠️⚠️⚠️ CRITICAL - SMART TOPIC INTERPRETATION ⚠️⚠️⚠️
+=================================================================
+
+MANDATORY TOPIC HANDLING RULES:
+1. ✓ IF GENERAL TOPIC (topic is "Hindi" or "Hindi Class 12"):
+   → USE VARIETY from MULTIPLE chapters/poets/authors
+   → Mix questions from different prose, poetry, and grammar topics
+   
+2. ✗ IF SPECIFIC CHAPTER/TOPIC (e.g., "कामायनी", "जैनेन्द्रकुमार"):
+   → Focus on THAT TOPIC
+   → All relevant questions from that chapter/author
+
+=== CRITICAL: PAPER STRUCTURE (Total 100 Marks, 20 Questions) ===
+
+⚠️⚠️⚠️ MUST GENERATE EXACTLY 20 SEPARATE QUESTIONS ⚠️⚠️⚠️
+
+**खण्ड - क (Section A): बहुविकल्पीय और वर्णनात्मक प्रश्न**
+
+=== CRITICAL: MCQ FORMAT (Q1-Q10) - GENERATE 10 SEPARATE MCQs ===
+
+Q1-Q10: बहुविकल्पीय प्रश्न (10 INDIVIDUAL MCQs) = 10 marks (1 mark each)
+
+⚠️ IMPORTANT: Generate 10 SEPARATE question objects, NOT grouped together ⚠️
+
+Each MCQ should be a SEPARATE JSON object with:
+- questionType: "mcq"
+- 4 options: (A), (B), (C), (D)
+- 1 mark each
+- Different topics for variety
+
+Topics for Q1-Q10:
+- Q1: रचनाकार और रचना (Author and Work)
+- Q2: साहित्यकाल (Literary Period)
+- Q3: काव्य विधा (Poetry Genre)
+- Q4: संधि-विच्छेद (Sandhi)
+- Q5: समास (Compound)
+- Q6: पत्रिका/संपादक (Magazine/Editor)
+- Q7: साहित्यिक विशेषता (Literary Feature)
+- Q8: छंद/अलंकार (Meter/Figure of Speech)
+- Q9: गद्य विधा (Prose Genre)
+- Q10: व्याकरण (Grammar)
+
+Format for EACH individual MCQ:
+{"questionType":"mcq","questionText":"'त्यागपत्र' किसकी रचना है?","options":["(A) प्रेमचंद","(B) जैनेन्द्रकुमार","(C) हरिशंकर परसाई","(D) जयशंकर प्रसाद"],"correctOption":1,"marks":1,"section":"खण्ड-क बहुविकल्पीय प्रश्न"}
+
+=== CRITICAL: गद्यांश FORMAT (Q11) - MINIMUM 1 PAGE ===
+Q11: गद्यांश आधारित प्रश्न (Prose Passage) = 10 marks
+
+गद्यांश 300-400 शब्दों का होना चाहिए (लगभग 1 पेज):
+- किसी प्रसिद्ध लेखक की रचना से (जैनेन्द्रकुमार, हरिशंकर परसाई, जयशंकर प्रसाद, महादेवी वर्मा आदि)
+- गद्यांश में गहरा अर्थ और साहित्यिक महत्व होना चाहिए
+- प्रश्न में पूरा गद्यांश (300-400 शब्द) + 5 उप-प्रश्न होने चाहिए
+- 5 उप-प्रश्न (प्रत्येक 2 अंक):
+  (क) गद्यांश का शीर्षक और लेखक (2 अंक)
+  (ख) उपर्युक्त गद्यांश का केंद्रीय भाव क्या है? (2 अंक)
+  (ग) लेखक के अनुसार [specific question from passage] (2 अंक)
+  (घ) रेखांकित अंश की व्याख्या कीजिए। (2 अंक)
+  (ड) [Critical thinking question] (2 अंक)
+- उत्तर प्रत्येक भाग के लिए 80-100 शब्द का हो
+- अथवा में दूसरा गद्यांश समान प्रारूप में (300-400 शब्द)
+
+=== CRITICAL: पद्यांश FORMAT (Q12) - MINIMUM 1 PAGE ===
+Q12: पद्यांश आधारित प्रश्न (Poetry Passage) = 10 marks
+
+पद्यांश 16-20 पंक्तियों का होना चाहिए (लगभग 1 पेज):
+- किसी प्रसिद्ध कवि की रचना से (रामधारी सिंह दिनकर, जयशंकर प्रसाद, सुमित्रानन्दन पन्त, महादेवी वर्मा, मुक्तिबोध आदि)
+- पूर्ण पद/छंद होना चाहिए, अधूरा नहीं
+- प्रश्न में पूरा पद्यांश (16-20 पंक्तियाँ) + 5 उप-प्रश्न होने चाहिए
+- 5 उप-प्रश्न (प्रत्येक 2 अंक):
+  (क) उपर्युक्त पद्यांश की कविता और कवि का नाम लिखिए। (2 अंक)
+  (ख) पद्यांश का केंद्रीय भाव क्या है? (2 अंक)
+  (ग) [Specific question about imagery/symbolism] (2 अंक)
+  (घ) रेखांकित अंश की व्याख्या कीजिए। (2 अंक)
+  (ड) पद्यांश में प्रयुक्त अलंकार बताइए। (2 अंक)
+- उत्तर प्रत्येक भाग के लिए 80-100 शब्द का हो
+- अथवा में दूसरा पद्यांश समान प्रारूप में (16-20 पंक्तियाँ)
+
+=== CRITICAL: लेखक/कवि परिचय FORMAT (Q13) ===
+Q13: लेखक/कवि परिचय (Author/Poet Introduction) = 5 marks
+
+(क) लेखक परिचय (3 अंक):
+- 3 लेखकों में से किसी एक का जीवन-परिचय देना है
+- उत्तर 200-250 शब्दों में विस्तृत होना चाहिए
+- जीवन परिचय में शामिल करें: जन्म, शिक्षा, साहित्यिक योगदान, प्रमुख रचनाएँ, पुरस्कार, साहित्यिक विशेषताएँ
+- लेखक: जैनेन्द्रकुमार, पं. दीनदयाल उपाध्याय, हरिशंकर परसाई, जयशंकर प्रसाद
+
+(ख) कवि परिचय (2 अंक):
+- 3 कवियों में से किसी एक का जीवन-परिचय देना है
+- उत्तर 150-180 शब्दों में होना चाहिए
+- जीवन परिचय में शामिल करें: जन्म, काव्य शैली, प्रमुख रचनाएँ, काव्यगत विशेषताएँ
+- कवि: रामधारी सिंह दिनकर, जयशंकर प्रसाद, सुमित्रानन्दन पन्त, महादेवी वर्मा, मुक्तिबोध
+
+=== CRITICAL: कहानी/निबंध FORMAT (Q14) ===
+Q14: कहानी/निबंध सारांश (Story/Essay Summary) = 5 marks
+
+- प्रमुख पाठ का सारांश लिखना है
+- उत्तर 250-300 शब्दों में विस्तृत होना चाहिए
+- सारांश में मुख्य घटनाएँ, पात्र, संदेश और निष्कर्ष शामिल हों
+- पाठों के विकल्प: जैनेन्द्रकुमार की कहानी, हरिशंकर परसाई के निबंध, पं. दीनदयाल उपाध्याय के निबंध
+- अथवा विकल्प में दूसरा पाठ
+
+=== CRITICAL: खण्डकाव्य FORMAT (Q15) ===
+Q15: खण्डकाव्य (Epic Poetry) = 5 marks
+
+6 खण्डकाव्यों में से प्रश्न:
+(क) 'रश्मिरथी' - (i) चरित्र-चित्रण (ii) कथावस्तु
+(ख) 'मुक्तियज्ञ' - (i) चरित्र-चित्रण (ii) कथावस्तु
+(ग) 'त्यागपथी' - (i) चरित्र-चित्रण (ii) कथावस्तु
+(घ) 'सत्य की जीत' - (i) चरित्र-चित्रण (ii) कथावस्तु
+(ड) 'मातृभूमि' - (i) चरित्र-चित्रण (ii) कथावस्तु
+(च) 'कर्ण' - (i) चरित्र-चित्रण (ii) कथावस्तु
+
+- उत्तर 250-300 शब्दों में विस्तृत होना चाहिए
+- चरित्र-चित्रण में: चरित्र के गुण, विशेषताएँ, कार्य, महत्व
+- कथावस्तु में: घटनाओं का क्रम, मुख्य प्रसंग, संदेश
+
+**खण्ड - ख (Section B): वर्णनात्मक प्रश्न**
+
+=== CRITICAL: संस्कृत पद्यांश FORMAT (Q16) ===
+Q16: संस्कृत पद्यांश (Sanskrit Passages) = 10 marks
+
+(क) संस्कृत पद्यांश का हिंदी अनुवाद (5 अंक):
+- 4-6 पंक्तियों का संस्कृत श्लोक देवनागरी में
+- हिंदी अनुवाद 100-120 शब्दों में होना चाहिए
+- अर्थ स्पष्ट और भावपूर्ण होना चाहिए
+- अथवा में दूसरा संस्कृत श्लोक
+
+(ख) संस्कृत गद्यांश की व्याख्या (5 अंक):
+- संस्कृत गद्यांश (80-100 शब्द) देवनागरी में
+- सन्दर्भ (पाठ, लेखक) + हिंदी में व्याख्या
+- व्याख्या 250-300 शब्दों में विस्तृत होनी चाहिए
+- व्याख्या में भावार्थ, प्रसंग और महत्व शामिल हो
+- अथवा में दूसरा संस्कृत गद्यांश
+
+=== CRITICAL: संस्कृत लघु प्रश्न FORMAT (Q9) ===
+Q9: संस्कृत में उत्तर (Sanskrit Short Questions) = 2+2 = 4 marks
+
+- 4 प्रश्न दिए जाएं, किन्हीं 2 के उत्तर देने हैं
+- प्रत्येक उत्तर संस्कृत में 40-50 शब्दों में
+- प्रश्न संस्कृत व्याकरण, साहित्य या दर्शन से संबंधित
+- उत्तर पूर्ण वाक्यों में होने चाहिए
+
+=== CRITICAL: शब्द अर्थ FORMAT (Q10) ===
+Q10: शब्द अर्थ (Word Meanings) = 1+1+1 = 3 marks
+
+- (क), (ख), (ग) तीन भागों में शब्द अर्थ
+- प्रत्येक भाग में 2-3 शब्दों के अर्थ देने हैं
+- अर्थ संक्षिप्त और स्पष्ट हो (20-30 शब्द प्रति शब्द)
+
+=== CRITICAL: निबंध FORMAT (Q17) - MINIMUM 1.5 PAGES ===
+Q17: निबंध (Essay Writing) = 9 marks
+
+निबंध का उत्तर 500-600 शब्दों का होना चाहिए (लगभग 1.5-2 पेज):
+
+(क) निबंध की रूपरेखा (2 अंक):
+- भूमिका, मुख्य बिंदु (3-4), उपसंहार
+- 80-100 शब्दों में संक्षिप्त रूपरेखा
+
+(ख) निबंध लेखन (7 अंक):
+- भूमिका (100-120 शब्द) - विषय का परिचय, महत्व, परिभाषा
+- मुख्य भाग (300-350 शब्द):
+  * प्रथम बिंदु (100-120 शब्द) - मुख्य पहलू, पृष्ठभूमि
+  * द्वितीय बिंदु (100-120 शब्द) - वर्तमान स्थिति, लाभ/हानि
+  * तृतीय बिंदु (100-120 शब्द) - समस्याएं, समाधान
+- उपसंहार (80-100 शब्द) - निष्कर्ष, सुझाव, अंतिम विचार
+
+- विषय: राष्ट्रीय एकता, पर्यावरण संरक्षण, शिक्षा का महत्व, भारतीय संस्कृति, रोजगार की समस्या, महिला सशक्तीकरण, विज्ञान के चमत्कार आदि
+
+=== CRITICAL: व्याकरण FORMAT (Q12-Q13) ===
+Q12: संधि-विच्छेद/समास (Grammar) = 3×1 = 3 marks
+
+(क) संधि-विच्छेद (1 अंक × 3 शब्द):
+- प्रत्येक शब्द का संधि-विच्छेद + संधि का नाम
+- उदाहरण: महोत्सव = महा + उत्सव (गुण संधि)
+- 30-40 शब्द प्रति उत्तर
+
+(ख) समास (1 अंक):
+- समास विग्रह + समास का नाम बताना
+- तत्पुरुष, द्वंद्व, कर्मधारय, बहुव्रीहि, द्विगु
+- 30-40 शब्द
+
+Q13: अन्य व्याकरण (Other Grammar) = 4×1 = 4 marks
+- प्रत्यय पहचान और प्रयोग
+- उपसर्ग पहचान और प्रयोग
+- पर्यायवाची/विलोम शब्द
+- शब्द शुद्धि और वाक्य शुद्धि
+- प्रत्येक उत्तर 30-40 शब्द में
+
+=== CRITICAL: पत्र लेखन FORMAT (Q18) ===
+Q18: आवेदन पत्र/शिकायती पत्र (Application/Complaint Letter) = 8 marks
+
+पत्र प्रश्न में बिंदु दिए जाएं (विषय के साथ 4-5 बिंदु):
+- प्रश्न में विषय + बिंदु होने चाहिए जिन पर पत्र लिखना है
+- उत्तर में पूर्ण पत्र हो (350-400 शब्द)
+- पत्र प्रारूप: 
+  * प्रेषक का पता और दिनांक
+  * प्रापक का पता और पदनाम
+  * विषय (Subject line)
+  * संबोधन (महोदय/महोदया)
+  * मुख्य भाग (3-4 अनुच्छेद में 250-300 शब्द):
+    - प्रथम अनुच्छेद: समस्या/विषय का परिचय
+    - द्वितीय अनुच्छेद: विस्तृत विवरण
+    - तृतीय अनुच्छेद: अनुरोध/सुझाव
+  * समापन (भवदीय/प्रार्थी)
+  * नाम और हस्ताक्षर
+  
+- पत्र के प्रकार:
+  * औपचारिक: स्थानीय अधिकारी को शिकायत, प्रधानाचार्य को आवेदन, नगर निगम को शिकायत
+  * अर्धसरकारी: सरकारी विभाग को प्रार्थना-पत्र, सेवा में आवेदन
+
+**MARKS DISTRIBUTION:**
+- खण्ड-क: Q1-Q10 (MCQs 10m) + Q11 (10m) + Q12 (10m) + Q13 (5m) + Q14 (5m) + Q15 (5m) = 45 marks
+- खण्ड-ख: Q16 (10m) + Q17 (9m) + Q18 (8m) + Q19 (14m व्याकरण) + Q20 (14m व्याकरण/शब्द) = 55 marks
+- TOTAL: 20 questions = 100 marks
+
+⚠️⚠️⚠️ CRITICAL: GENERATE EXACTLY 20 SEPARATE JSON OBJECTS ⚠️⚠️⚠️
+Each question number (Q1, Q2, Q3... Q20) must be a SEPARATE JSON object.
+DO NOT combine multiple questions into one JSON object.
+DO NOT group MCQs together - each MCQ is a separate question.
+
+=== COMPLETE QUESTION-WISE BREAKDOWN (20 Questions) ===
+
+**खण्ड - क (Section A): 45 marks**
+
+Q1 (1 mark): MCQ - रचनाकार और रचना
+Q2 (1 mark): MCQ - साहित्यकाल  
+Q3 (1 mark): MCQ - काव्य विधा
+Q4 (1 mark): MCQ - संधि-विच्छेद
+Q5 (1 mark): MCQ - समास
+Q6 (1 mark): MCQ - पत्रिका/संपादक
+Q7 (1 mark): MCQ - साहित्यिक विशेषता
+Q8 (1 mark): MCQ - छंद/अलंकार
+Q9 (1 mark): MCQ - गद्य विधा
+Q10 (1 mark): MCQ - व्याकरण/शब्द अर्थ
+
+Q11 (10 marks): गद्यांश आधारित प्रश्न
+- गद्यांश 300-400 शब्द + 5 उप-प्रश्न
+- अथवा option
+
+Q12 (10 marks): पद्यांश आधारित प्रश्न
+- पद्यांश 16-20 पंक्तियाँ + 5 उप-प्रश्न
+- अथवा option
+
+Q13 (5 marks): लेखक/कवि परिचय
+- (क) लेखक (3m) + (ख) कवि (2m)
+
+Q14 (5 marks): कहानी/निबंध सारांश
+- 250-300 शब्द, अथवा option
+
+Q15 (5 marks): खण्डकाव्य
+- 250-300 शब्द, 6 options
+
+**खण्ड - ख (Section B): 55 marks**
+
+Q16 (10 marks): संस्कृत गद्यांश/पद्यांश
+- (क) अनुवाद (5m) + (ख) व्याख्या (5m)
+- अथवा option
+
+Q17 (9 marks): निबंध
+- (क) रूपरेखा (2m) + (ख) विस्तृत निबंध (7m)
+- 500-600 शब्द
+
+Q18 (8 marks): पत्र लेखन
+- औपचारिक/शिकायती पत्र (350-400 शब्द)
+
+Q19 (14 marks): व्याकरण प्रश्न (Grammar Questions)
+- संधि-विच्छेद: 3 शब्दों का (1+1+1 = 3 marks)
+- समास विग्रह: 3 शब्दों का (1+1+1 = 3 marks)
+- प्रत्यय: 2 शब्दों में प्रत्यय पहचान (1+1 = 2 marks)
+- उपसर्ग: 2 शब्दों में उपसर्ग पहचान (1+1 = 2 marks)
+- पर्यायवाची: 2 शब्दों के (1+1 = 2 marks)
+- विलोम: 2 शब्दों के (1+1 = 2 marks)
+Format: Single question with clear 6 parts
+
+Q20 (14 marks): संस्कृत और शब्द ज्ञान (Sanskrit & Word Knowledge)
+- संस्कृत लघु प्रश्न: 2 प्रश्नों के उत्तर संस्कृत में (2+2 = 4 marks)
+- शब्द अर्थ: 3 शब्दों के अर्थ (1+1+1 = 3 marks)
+- वाक्य शुद्धि: 3 वाक्यों को शुद्ध करके लिखें (2+2+3 = 7 marks)
+Format: Single question with clear 3 parts
+
+=== IMPORTANT AUTHORS & WORKS ===
+
+**गद्य (Prose):**
+- जैनेन्द्रकुमार, पं. दीनदयाल उपाध्याय, हरिशंकर परसाई
+- जयशंकर प्रसाद, सुमित्रानन्दन पन्त, रामधारी सिंह 'दिनकर'
+- महादेवी वर्मा
+
+**काव्य (Poetry):**
+- कामायनी (जयशंकर प्रसाद), रश्मिरथी (रामधारी सिंह दिनकर)
+- मुक्तिबोध, अज्ञेय, नागार्जुन
+
+**खण्डकाव्य (Epic Poetry):**
+- रश्मिरथी, त्यागपथी, मुक्तियज्ञ, सत्य की जीत, मातृभूमि
+
+=== ANSWER LENGTH PROPORTIONAL TO MARKS ===
+- 1 mark (MCQ): केवल सही विकल्प
+- 2 marks: 80-100 शब्द (विस्तृत उत्तर)
+- 3 marks: 200-250 शब्द (लेखक/कवि परिचय का एक भाग)
+- 4 marks: 30-40 शब्द (संस्कृत में उत्तर)
+- 5 marks: 250-300 शब्द (खण्डकाव्य, संस्कृत व्याख्या, कहानी सारांश)
+- 7 marks: 250-300 शब्द (निबंध मुख्य भाग)
+- 8 marks: 350-400 शब्द (पत्र लेखन - पूर्ण प्रारूप)
+- 9 marks: 500-600 शब्द (निबंध - पूर्ण)
+- 10 marks: गद्यांश/पद्यांश में 300-400 शब्द का passage + 5 उप-प्रश्न (प्रत्येक उत्तर 80-100 शब्द)
+
+=== JSON STRUCTURE EXAMPLES ===
+
+⚠️ INDIVIDUAL MCQ FORMAT (Q1-Q10) - Each MCQ is SEPARATE:
+
+Q1 Example (1 mark):
+{"questionType":"mcq","questionText":"'त्यागपत्र' किसकी रचना है?","options":["(A) प्रेमचंद","(B) जैनेन्द्रकुमार","(C) हरिशंकर परसाई","(D) जयशंकर प्रसाद"],"correctOption":1,"marks":1,"section":"खण्ड-क बहुविकल्पीय प्रश्न"}
+
+Q2 Example (1 mark):
+{"questionType":"mcq","questionText":"'रश्मिरथी' के रचयिता कौन हैं?","options":["(A) जयशंकर प्रसाद","(B) रामधारी सिंह दिनकर","(C) महादेवी वर्मा","(D) सूर्यकांत त्रिपाठी निराला"],"correctOption":1,"marks":1,"section":"खण्ड-क बहुविकल्पीय प्रश्न"}
+
+Q3 Example (1 mark):
+{"questionType":"mcq","questionText":"'कामायनी' किस काव्य विधा की रचना है?","options":["(A) प्रबंध काव्य","(B) मुक्तक काव्य","(C) खंड काव्य","(D) गीति काव्य"],"correctOption":0,"marks":1,"section":"खण्ड-क बहुविकल्पीय प्रश्न"}
+
+Q4 Example (1 mark):
+{"questionType":"mcq","questionText":"'महोत्सव' का संधि-विच्छेद है:","options":["(A) मह + उत्सव","(B) महा + उत्सव","(C) महो + त्सव","(D) मही + उत्सव"],"correctOption":1,"marks":1,"section":"खण्ड-क बहुविकल्पीय प्रश्न"}
+
+Q5 Example (1 mark):
+{"questionType":"mcq","questionText":"'राजपुत्र' में कौन-सा समास है?","options":["(A) तत्पुरुष समास","(B) द्वंद्व समास","(C) कर्मधारय समास","(D) बहुव्रीहि समास"],"correctOption":0,"marks":1,"section":"खण्ड-क बहुविकल्पीय प्रश्न"}
+
+Prose Passage (Q11 - 10 marks):
+{"questionType":"written","questionText":"निम्नलिखित गद्यांश पर आधारित पाँच प्रश्नों के उत्तर दीजिए:\\n\\n[गद्यांश 300-400 शब्द - पूरा गद्यांश यहाँ लिखें - किसी प्रसिद्ध लेखक की रचना से]\\n\\n(क) उपर्युक्त गद्यांश का शीर्षक और लेखक का नाम लिखिए।\\n(ख) गद्यांश का केंद्रीय भाव क्या है?\\n(ग) [Specific question from passage]\\n(घ) रेखांकित अंश की व्याख्या कीजिए।\\n(ड) [Critical thinking question]","correctAnswer":"(क) उत्तर (80-100 शब्द): [शीर्षक और लेखक के साथ संक्षिप्त परिचय]\\n\\n(ख) उत्तर (80-100 शब्द): [केंद्रीय भाव की विस्तृत व्याख्या]\\n\\n(ग) उत्तर (80-100 शब्द): [प्रश्न का विस्तृत उत्तर]\\n\\n(घ) उत्तर (80-100 शब्द): [रेखांकित अंश की पूर्ण व्याख्या]\\n\\n(ड) उत्तर (80-100 शब्द): [विचारात्मक प्रश्न का विस्तृत उत्तर]","marks":10,"section":"खण्ड-क गद्यांश","hasAlternative":true,"alternativeQuestion":"अथवा\\n\\n[दूसरा गद्यांश 300-400 शब्द + 5 समान प्रश्न]","alternativeAnswer":"(क) से (ड) तक समान प्रारूप में उत्तर"}
+
+Poetry Passage (10 marks):
+{"questionType":"written","questionText":"निम्नलिखित पद्यांश पर आधारित पाँच प्रश्नों के उत्तर दीजिए:\\n\\n[पद्यांश 16-20 पंक्तियाँ - पूर्ण पद/छंद यहाँ लिखें]\\n\\n(क) उपर्युक्त पद्यांश की कविता और कवि का नाम लिखिए।\\n(ख) पद्यांश का केंद्रीय भाव क्या है?\\n(ग) [Specific question about imagery]\\n(घ) रेखांकित अंश की व्याख्या कीजिए।\\n(ड) पद्यांश में प्रयुक्त अलंकार बताइए।","correctAnswer":"(क) उत्तर (80-100 शब्द): [कविता, कवि और संक्षिप्त परिचय]\\n\\n(ख) उत्तर (80-100 शब्द): [केंद्रीय भाव की विस्तृत व्याख्या]\\n\\n(ग) उत्तर (80-100 शब्द): [बिम्ब/प्रतीक की व्याख्या]\\n\\n(घ) उत्तर (80-100 शब्द): [रेखांकित अंश की पूर्ण व्याख्या]\\n\\n(ड) उत्तर (80-100 शब्द): [अलंकार का नाम और उदाहरण सहित व्याख्या]","marks":10,"section":"खण्ड-क पद्यांश","hasAlternative":true,"alternativeQuestion":"अथवा\\n\\n[दूसरा पद्यांश 16-20 पंक्तियाँ + 5 समान प्रश्न]","alternativeAnswer":"(क) से (ड) तक समान प्रारूप में उत्तर"}
+
+Author/Poet Bio (5 marks):
+{"questionType":"written","questionText":"(क) निम्नलिखित में से किसी एक लेखक का जीवन-परिचय दीजिए:\\n(i) जैनेन्द्रकुमार\\n(ii) पं. दीनदयाल उपाध्याय\\n(iii) हरिशंकर परसाई\\n\\n(ख) निम्नलिखित में से किसी एक कवि का जीवन-परिचय दीजिए:\\n(i) रामधारी सिंह दिनकर\\n(ii) जयशंकर प्रसाद\\n(iii) सुमित्रानन्दन पन्त","correctAnswer":"(क) [लेखक का नाम] (200-250 शब्द):\\n\\n[विस्तृत जीवन-परिचय: जन्म, शिक्षा, साहित्यिक योगदान, प्रमुख रचनाएँ (3-4 नाम), लेखन शैली, भाषा शैली, पुरस्कार और सम्मान, साहित्यिक महत्व]\\n\\n(ख) [कवि का नाम] (150-180 शब्द):\\n\\n[विस्तृत जीवन-परिचय: जन्म, काव्य शैली, प्रमुख काव्य रचनाएँ, काव्यगत विशेषताएँ, भाषा और अलंकार, साहित्यिक योगदान]","marks":5,"section":"खण्ड-क लेखक/कवि परिचय"}
+
+Essay (9 marks):
+{"questionType":"written","questionText":"निम्नलिखित में से किसी एक विषय पर निबंध लिखिए:\\n\\n(i) राष्ट्रीय एकता और अखंडता\\n(ii) पर्यावरण संरक्षण की आवश्यकता\\n(iii) शिक्षा का महत्व\\n(iv) भारतीय संस्कृति और परंपरा\\n(v) रोजगार की समस्या और समाधान\\n\\n(क) रूपरेखा (2 अंक)\\n(ख) विस्तृत निबंध (7 अंक)","correctAnswer":"(क) रूपरेखा (80-100 शब्द):\\n1. भूमिका\\n2. [मुख्य बिंदु 1]\\n3. [मुख्य बिंदु 2]\\n4. [मुख्य बिंदु 3]\\n5. उपसंहार\\n\\n(ख) [शीर्षक]\\n\\nभूमिका (100-120 शब्द):\\n[विषय का परिचय, महत्व, परिभाषा]\\n\\nमुख्य भाग:\\n\\n[प्रथम बिंदु] (100-120 शब्द):\\n[मुख्य पहलू, पृष्ठभूमि, ऐतिहासिक संदर्भ]\\n\\n[द्वितीय बिंदु] (100-120 शब्द):\\n[वर्तमान स्थिति, लाभ/हानि, प्रभाव]\\n\\n[तृतीय बिंदु] (100-120 शब्द):\\n[समस्याएं, चुनौतियाँ, समाधान, भविष्य की दिशा]\\n\\nउपसंहार (80-100 शब्द):\\n[निष्कर्ष, सुझाव, अंतिम विचार]","marks":9,"section":"खण्ड-ख निबंध"}
+
+Sanskrit Passage (7 marks):
+{"questionType":"written","questionText":"(क) निम्नलिखित संस्कृत पद्यांश का हिंदी में अनुवाद कीजिए:\\n\\n[4-6 पंक्तियों का संस्कृत श्लोक देवनागरी में]\\n\\n(ख) निम्नलिखित संस्कृत गद्यांश की सन्दर्भ सहित व्याख्या कीजिए:\\n\\n[संस्कृत गद्यांश 80-100 शब्द देवनागरी में]","correctAnswer":"(क) हिंदी अनुवाद (100-120 शब्द):\\n[पूर्ण और भावपूर्ण हिंदी अनुवाद]\\n\\n(ख) व्याख्या (250-300 शब्द):\\n\\nसन्दर्भ: [पाठ का नाम, लेखक]\\n\\nप्रसंग: [गद्यांश का संदर्भ]\\n\\nव्याख्या: [विस्तृत हिंदी व्याख्या - भावार्थ, महत्व, संदेश]","marks":7,"section":"खण्ड-ख संस्कृत","hasAlternative":true,"alternativeQuestion":"अथवा\\n\\n[alternative Sanskrit passages]","alternativeAnswer":"समान प्रारूप में उत्तर"}
+
+Letter (8 marks):
+{"questionType":"written","questionText":"स्थानीय प्रशासन निगम के मुख्य प्रबन्धक को बस चालक के अशिष्ट व्यवहार का उल्लेख करते हुए एक शिकायती पत्र लिखिए।\\n\\nबिंदु:\\n1. घटना की तिथि और समय\\n2. बस संख्या और मार्ग\\n3. चालक का व्यवहार\\n4. यात्रियों पर प्रभाव\\n5. कार्यवाही का अनुरोध","correctAnswer":"प्रेषक का पता:\\n[पूरा पता]\\n\\nदिनांक: [Date]\\n\\nसेवा में,\\nमुख्य प्रबन्धक महोदय\\nस्थानीय प्रशासन निगम\\n[शहर]\\n\\nविषय: बस चालक के अशिष्ट व्यवहार की शिकायत\\n\\nमहोदय,\\n\\n[प्रथम अनुच्छेद - 80-100 शब्द: समस्या का परिचय, घटना की तिथि और समय]\\n\\n[द्वितीय अनुच्छेद - 100-120 शब्द: विस्तृत विवरण - बस संख्या, मार्ग, चालक का व्यवहार, यात्रियों पर प्रभाव]\\n\\n[तृतीय अनुच्छेद - 80-100 शब्द: कार्यवाही का अनुरोध, भविष्य में सुधार की अपेक्षा]\\n\\nआशा है कि आप इस विषय में शीघ्र कार्यवाही करेंगे।\\n\\nभवदीय/प्रार्थी\\n[नाम]","marks":8,"section":"खण्ड-ख पत्र"}
+
+Grammar:
+{"questionType":"written","questionText":"(क) निम्नलिखित शब्दों का संधि-विच्छेद कीजिए और संधि का नाम बताइए:\\n(i) महोत्सव\\n(ii) रामायण\\n(iii) सदैव\\n\\n(ख) निम्नलिखित का समास विग्रह करके समास का नाम लिखिए:\\n(i) राजपुत्र","correctAnswer":"(क) संधि-विच्छेद (30-40 शब्द प्रति उत्तर):\\n(i) महोत्सव = महा + उत्सव (गुण संधि - अ + उ = ओ)\\n(ii) रामायण = राम + अयन (अयादि संधि)\\n(iii) सदैव = सदा + एव (वृद्धि संधि - आ + ए = ऐ)\\n\\n(ख) समास विग्रह (30-40 शब्द):\\n(i) राजपुत्र = राजा का पुत्र (तत्पुरुष समास - षष्ठी तत्पुरुष)","marks":3,"section":"खण्ड-ख व्याकरण"}
+
+⚠️ Q19 - व्याकरण प्रश्न (14 marks) - PROPER FORMATTING:
+{"questionType":"written","questionText":"प्रश्न 19. व्याकरण प्रश्न:\\n\\n(क) निम्नलिखित शब्दों का संधि-विच्छेद कीजिए और संधि का नाम बताइए (3 अंक):\\n(i) परमौषधि\\n(ii) सदैव\\n(iii) महोत्सव\\n\\n(ख) निम्नलिखित का समास विग्रह करके समास का नाम लिखिए (3 अंक):\\n(i) राजपुत्र\\n(ii) चतुर्भुज\\n(iii) नीलकमल\\n\\n(ग) निम्नलिखित शब्दों में प्रत्यय पहचानिए (2 अंक):\\n(i) लेखक\\n(ii) मानवता\\n\\n(घ) निम्नलिखित शब्दों में उपसर्ग पहचानिए (2 अंक):\\n(i) अनुकूल\\n(ii) प्रगति\\n\\n(ङ) निम्नलिखित शब्दों के पर्यायवाची शब्द लिखिए (2 अंक):\\n(i) पुस्तक\\n(ii) सूर्य\\n\\n(च) निम्नलिखित शब्दों के विलोम शब्द लिखिए (2 अंक):\\n(i) सुख\\n(ii) दिन","correctAnswer":"(क) संधि-विच्छेद:\\n(i) परमौषधि = परम + औषधि (वृद्धि संधि)\\n(ii) सदैव = सदा + एव (वृद्धि संधि)\\n(iii) महोत्सव = महा + उत्सव (गुण संधि)\\n\\n(ख) समास विग्रह:\\n(i) राजपुत्र = राजा का पुत्र (तत्पुरुष समास)\\n(ii) चतुर्भुज = चार भुजाओं वाला (बहुव्रीहि समास)\\n(iii) नीलकमल = नीला है जो कमल (कर्मधारय समास)\\n\\n(ग) प्रत्यय:\\n(i) लेखक में 'अक' प्रत्यय है\\n(ii) मानवता में 'ता' प्रत्यय है\\n\\n(घ) उपसर्ग:\\n(i) अनुकूल में 'अनु' उपसर्ग है\\n(ii) प्रगति में 'प्र' उपसर्ग है\\n\\n(ङ) पर्यायवाची:\\n(i) पुस्तक = ग्रंथ, किताब\\n(ii) सूर्य = रवि, दिनकर\\n\\n(च) विलोम:\\n(i) सुख × दुःख\\n(ii) दिन × रात","marks":14,"section":"खण्ड-ख व्याकरण"}
+
+⚠️ Q20 - संस्कृत और शब्द ज्ञान (14 marks) - PROPER FORMATTING:
+{"questionType":"written","questionText":"प्रश्न 20. संस्कृत और शब्द ज्ञान:\\n\\n(क) निम्नलिखित में से किन्हीं दो प्रश्नों के उत्तर संस्कृत में दीजिए (4 अंक):\\n(i) संस्कृत भाषायाः किं महत्त्वं वर्तते?\\n(ii) सिद्धार्थः कः आसीत्?\\n(iii) हस्तिनापुरा कस्य दुहिता आसीत्?\\n(iv) शिक्षायाः उद्देश्यं किम्?\\n\\n(ख) निम्नलिखित शब्दों के अर्थ हिंदी में लिखिए (3 अंक):\\n(i) सर्वसिम्\\n(ii) गंगानर्णी\\n(iii) वसुधा\\n\\n(ग) निम्नलिखित वाक्यों को शुद्ध करके पुनः लिखिए (7 अंक):\\n(i) उसने नौकर को आज्ञा दिया। (2 अंक)\\n(ii) केवल दस रुपया मात्र दीजिए। (2 अंक)\\n(iii) श्रीकृष्ण के अनेकों नाम हैं। (3 अंक)","correctAnswer":"(क) संस्कृत उत्तर (किन्हीं दो):\\n(i) संस्कृत भाषा विश्वस्य सर्वाधिक प्राचीना भाषा अस्ति। एषा भाषा सर्वेषां भाषाणां जननी अस्ति। संस्कृतेन ज्ञानस्य प्रसारः भवति।\\n\\n(ii) सिद्धार्थः शाक्यवंशस्य राजपुत्रः आसीत्। सः कपिलवस्तुनः राज्ञः शुद्धोदनस्य पुत्रः आसीत्। सः भगवान् बुद्धः इति ज्ञायते।\\n\\n(iii) हस्तिनापुरा कुरुराजस्य दुहिता आसीत्। सा अत्यन्तं रूपवती च गुणवती आसीत्। तस्याः विवाहः महान् राजकुमारेण सह अभवत्।\\n\\n(ख) शब्द अर्थ:\\n(i) सर्वसिम् = सबका हित करने वाला\\n(ii) गंगानर्णी = गंगा की नदी\\n(iii) वसुधा = पृथ्वी\\n\\n(ग) शुद्ध वाक्य:\\n(i) उसने नौकर को आज्ञा दी। (क्रिया लिंग सुधार)\\n(ii) केवल दस रुपये दीजिए। (अनावश्यक शब्द हटाया)\\n(iii) श्रीकृष्ण के अनेक नाम हैं। ('अनेकों' के स्थान पर 'अनेक')","marks":14,"section":"खण्ड-ख संस्कृत और शब्द ज्ञान"}
+
+=== IMPORTANT REMINDERS ===
+1. गद्यांश MUST be 300-400 words (लगभग 1 page)
+2. पद्यांश MUST be 16-20 lines (पूर्ण पद/छंद)
+3. Each answer for 2-mark questions: 80-100 words
+4. Author/Poet bio: 200-250 words (for 3 marks), 150-180 words (for 2 marks)
+5. Essay: 500-600 words total with proper structure
+6. Letter: 350-400 words with complete format
+7. Sanskrit explanation: 250-300 words
+8. All written answers should be DETAILED and COMPREHENSIVE
+
+STRICT RULES:
+1. Generate all sections = 100 marks total
+2. HINDI language throughout
+3. Include OR options where specified
+4. Proper word limits for all answers
+5. Mix of prose, poetry, Sanskrit, grammar, essay, letter
+
+Return ONLY valid JSON array with all questions. No markdown, no explanation.
+`;
+
     // UP Board English Class 12 Format - Exact Paper Structure (100 Marks) - Paper Code 316(HV)
     const upBoardEnglishClass12Format = `
 ⚠️ CONTENT GENERATION INSTRUCTIONS:
@@ -2390,6 +2773,58 @@ STRICT RULES:
 6. Include sample passages, articles, letters, and literary analysis
 
 Return ONLY valid JSON array with all questions. No markdown, no explanation.`;
+    } else if (examFormat === "upboard_hindiclass12") {
+      prompt = `UP BOARD CLASS 12 HINDI PAPER (हिंदी) - 100 अंक बनाएं।
+Paper Code: 301(HA)
+
+विषय/Topic: "${topic}"
+
+${upBoardHindiClass12Format}
+
+⚠️⚠️⚠️ CRITICAL: GENERATE EXACTLY 20 SEPARATE JSON OBJECTS = 100 MARKS ⚠️⚠️⚠️
+
+**QUESTION BREAKDOWN:**
+
+खण्ड-क (10 questions = 55 marks):
+1-2. MCQs (10 questions total, but treat as 2 groups) = 10 marks
+3. Prose passage (10 marks)
+4. Poetry passage (10 marks)
+5. Author bio (3 marks)
+6. Poet bio (2 marks)
+7. Story/Essay summary (5 marks)
+8. Epic poetry (5 marks)
+9. Another epic poetry question (5 marks)
+10. Additional literature (5 marks)
+
+खण्ड-ख (10 questions = 45 marks):
+11. Sanskrit passage translation (2 marks)
+12. Sanskrit passage explanation (5 marks)
+13. Sanskrit short answer 1 (2 marks)
+14. Sanskrit short answer 2 (2 marks)
+15. Word meanings (3 marks)
+16. Essay (9 marks)
+17. Sandhi-vichchhed (1 mark)
+18. Samas (1 mark)
+19. Grammar (1 mark)
+20. Letter writing (8 marks)
+
+TOTAL: 20 JSON objects = 100 marks
+
+=== ANSWER LENGTH ===
+- 1 अंक: 10-20 शब्द
+- 2 अंक: 30-40 शब्द
+- 3 अंक: 40-50 शब्द
+- 5 अंक: 70-80 शब्द
+- 7-8 अंक: 80-100 शब्द
+- 9 अंक: 100-120 शब्द
+
+STRICT RULES:
+1. Generate all sections = 100 marks
+2. HINDI language
+3. Include OR options
+4. Proper word limits
+
+Return ONLY valid JSON array.`;
     } else if (examFormat === "upboard_biology") {
       prompt = `UP BOARD CLASS 12 BIOLOGY PAPER (जीव विज्ञान) - 70 अंक बनाएं।
 Paper Code: 348(KH)
@@ -3148,6 +3583,23 @@ STRICT RULES:
 4. Complete answers with proper word count
 
 Return ONLY valid JSON array.`;
+    } else if (examFormat === "upboard_hindiclass12") {
+      prompt = `Extract questions from images for UP BOARD CLASS 12 HINDI PAPER (हिंदी) - 100 marks.
+Paper Code: 301(HA)
+
+EXTRACT ONLY what is visible in images. Do NOT generate new questions.
+
+${upBoardHindiClass12Format}
+
+⚠️⚠️⚠️ EXTRACT EXACTLY 20 SEPARATE JSON OBJECTS FROM IMAGES ⚠️⚠️⚠️
+
+BREAKDOWN:
+- खण्ड-क: 10 questions (55m)
+- खण्ड-ख: 10 questions (45m)
+
+TOTAL: 20 JSON objects = 100 marks
+
+Return ONLY valid JSON array.`;
     } else if (examFormat === "upboard_biology") {
       prompt = `Extract questions from images for UP BOARD CLASS 12 BIOLOGY PAPER (जीव विज्ञान) - 70 marks.
 Paper Code: 348(KH)
@@ -3848,6 +4300,23 @@ STRICT RULES:
 2. ENGLISH language throughout
 3. OR options in writing and literature sections
 4. Complete answers with proper formatting
+
+Return ONLY valid JSON array.`;
+    } else if (examFormat === "upboard_hindiclass12") {
+      prompt = `UP BOARD CLASS 12 HINDI PAPER (हिंदी) - 100 अंक बनाएं।
+Paper Code: 301(HA)
+
+INPUT विषय/सामग्री: "${rawQuestions}"
+
+${upBoardHindiClass12Format}
+
+⚠️⚠️⚠️ GENERATE EXACTLY 20 SEPARATE JSON OBJECTS = 100 MARKS ⚠️⚠️⚠️
+
+BREAKDOWN:
+- खण्ड-क: 10 questions (55m) - MCQs, passages, authors, literature
+- खण्ड-ख: 10 questions (45m) - Sanskrit, essay, grammar, letter
+
+TOTAL: 20 JSON objects = 100 marks
 
 Return ONLY valid JSON array.`;
     } else if (examFormat === "upboard_biology") {
