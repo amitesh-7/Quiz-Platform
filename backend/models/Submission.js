@@ -3,8 +3,7 @@ const mongoose = require("mongoose");
 const answerSchema = new mongoose.Schema(
   {
     questionId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Question",
+      type: mongoose.Schema.Types.Mixed, // Can be ObjectId (manual quiz) or String (AI-generated)
     },
     questionText: {
       type: String,

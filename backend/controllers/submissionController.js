@@ -702,6 +702,10 @@ const updateSubmissionMarks = async (req, res) => {
     const { submissionId } = req.params;
     const { updatedAnswers } = req.body;
 
+    console.log("=== UPDATE MARKS DEBUG ===");
+    console.log("submissionId:", submissionId);
+    console.log("updatedAnswers:", JSON.stringify(updatedAnswers, null, 2));
+
     if (!Array.isArray(updatedAnswers) || updatedAnswers.length === 0) {
       return res.status(400).json({
         success: false,
@@ -718,6 +722,12 @@ const updateSubmissionMarks = async (req, res) => {
       });
     }
 
+    console.log("Found submission with", submission.answers.length, "answers");
+    console.log(
+      "Answer questionIds:",
+      submission.answers.map((a, i) => `[${i}]: ${a.questionId}`)
+    );
+
     // Update marks for each answer
     updatedAnswers.forEach((update) => {
       let answerIndex = -1;
@@ -725,6 +735,7 @@ const updateSubmissionMarks = async (req, res) => {
       // Check if it's an AI-generated question ID (format: ai-0, ai-1, etc.)
       if (update.questionId?.startsWith("ai-")) {
         const indexNum = parseInt(update.questionId.replace("ai-", ""), 10);
+        console.log(`AI format detected: ai-${indexNum}`);
         if (
           !isNaN(indexNum) &&
           indexNum >= 0 &&
@@ -734,10 +745,13 @@ const updateSubmissionMarks = async (req, res) => {
         }
       } else {
         // Regular questionId lookup
+        console.log(`Regular questionId lookup: ${update.questionId}`);
         answerIndex = submission.answers.findIndex(
           (a) => a.questionId?.toString() === update.questionId?.toString()
         );
       }
+
+      console.log(`answerIndex found: ${answerIndex}`);
 
       if (answerIndex !== -1) {
         // Update earned marks if provided
@@ -760,6 +774,31 @@ const updateSubmissionMarks = async (req, res) => {
         if (update.correctAnswer !== undefined) {
           submission.answers[answerIndex].correctAnswer = update.correctAnswer;
         }
+      } else if (update.questionId && !update.questionId.startsWith("ai-")) {
+        // Answer not found - this is an unattempted question, create a new entry
+        console.log(
+          `Creating new answer entry for unattempted question: ${update.questionId}`
+        );
+
+        // The marks will be set properly from frontend's maxMarks
+        const newAnswer = {
+          questionId: update.questionId,
+          marks: update.maxMarks || 1,
+          earnedMarks: Math.max(
+            0,
+            Math.min(update.earnedMarks || 0, update.maxMarks || 1)
+          ),
+        };
+
+        if (update.correctOption !== undefined) {
+          newAnswer.correctOption = update.correctOption;
+        }
+        if (update.correctAnswer !== undefined) {
+          newAnswer.correctAnswer = update.correctAnswer;
+        }
+
+        submission.answers.push(newAnswer);
+        console.log(`Added new answer entry:`, newAnswer);
       }
     });
 

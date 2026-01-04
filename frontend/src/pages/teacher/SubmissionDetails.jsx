@@ -50,35 +50,60 @@ const SubmissionDetails = () => {
     return "text-red-400";
   };
 
-  const handleEditMarks = (questionId, currentMarks, maxMarks) => {
+  const handleEditMarks = (questionId, currentMarks, maxMarks, index) => {
     // Validate marks don't exceed maximum
     const marks = parseFloat(currentMarks);
     const cappedMarks = marks > maxMarks ? maxMarks : marks;
 
     setEditedMarks((prev) => ({
       ...prev,
-      [questionId]: cappedMarks,
+      [questionId]: { marks: cappedMarks, index, maxMarks },
     }));
   };
 
-  const handleEditCorrectAnswer = (questionId, value, type = "option") => {
+  const handleEditCorrectAnswer = (
+    questionId,
+    value,
+    type = "option",
+    index
+  ) => {
     setEditedCorrectAnswers((prev) => ({
       ...prev,
-      [questionId]: { value, type },
+      [questionId]: { value, type, index },
     }));
   };
 
   const handleSaveMarks = async () => {
     try {
       setSaving(true);
+
+      console.log("=== SAVE MARKS DEBUG ===");
+      console.log("editedMarks:", editedMarks);
+      console.log("editedCorrectAnswers:", editedCorrectAnswers);
+
       const updatedAnswers = Object.keys({
         ...editedMarks,
         ...editedCorrectAnswers,
       }).map((questionId) => {
-        const update = { questionId };
+        const update = {};
+
+        // Use index if questionId is a fallback ID
+        if (questionId.startsWith("fallback-")) {
+          const index = parseInt(questionId.replace("fallback-", ""));
+          update.questionId = `ai-${index}`;
+        } else {
+          update.questionId = questionId;
+        }
 
         if (editedMarks[questionId] !== undefined) {
-          update.earnedMarks = parseFloat(editedMarks[questionId]);
+          const marksData = editedMarks[questionId];
+          update.earnedMarks = parseFloat(
+            typeof marksData === "object" ? marksData.marks : marksData
+          );
+          // Include maxMarks for unattempted questions
+          if (typeof marksData === "object" && marksData.maxMarks) {
+            update.maxMarks = marksData.maxMarks;
+          }
         }
 
         if (editedCorrectAnswers[questionId]) {
@@ -93,6 +118,8 @@ const SubmissionDetails = () => {
         return update;
       });
 
+      console.log("updatedAnswers to send:", updatedAnswers);
+
       await submissionAPI.updateMarks(submissionId, { updatedAnswers });
 
       toast.success("Marks and answers updated successfully");
@@ -101,6 +128,7 @@ const SubmissionDetails = () => {
       setEditedCorrectAnswers({});
       fetchSubmissionDetails();
     } catch (error) {
+      console.error("Save marks error:", error);
       toast.error("Failed to update marks and answers");
     } finally {
       setSaving(false);
@@ -347,14 +375,17 @@ const SubmissionDetails = () => {
                               step="0.5"
                               value={
                                 editedMarks[uniqueId] !== undefined
-                                  ? editedMarks[uniqueId]
+                                  ? typeof editedMarks[uniqueId] === "object"
+                                    ? editedMarks[uniqueId].marks
+                                    : editedMarks[uniqueId]
                                   : answer.earnedMarks || 0
                               }
                               onChange={(e) =>
                                 handleEditMarks(
                                   uniqueId,
                                   e.target.value,
-                                  answer.marks || 1
+                                  answer.marks || 1,
+                                  index
                                 )
                               }
                               className="w-16 px-2 py-1 bg-white/10 text-white rounded text-center font-bold focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -432,7 +463,8 @@ const SubmissionDetails = () => {
                                     handleEditCorrectAnswer(
                                       uniqueId,
                                       optIdx,
-                                      "option"
+                                      "option",
+                                      index
                                     )
                                   }
                                   style={{
@@ -507,7 +539,8 @@ const SubmissionDetails = () => {
                                 handleEditCorrectAnswer(
                                   uniqueId,
                                   e.target.value,
-                                  "answer"
+                                  "answer",
+                                  index
                                 )
                               }
                               className="w-full px-3 py-2 bg-white/10 text-green-300 rounded border border-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-400 min-h-[100px] resize-y"
