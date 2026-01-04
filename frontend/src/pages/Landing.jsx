@@ -28,7 +28,9 @@ const Landing = () => {
               animate={{ scale: 1, rotate: 0 }}
               transition={{ duration: 0.8, type: "spring" }}
             >
-              <span className="text-white font-bold text-4xl sm:text-5xl md:text-6xl">Q</span>
+              <span className="text-white font-bold text-4xl sm:text-5xl md:text-6xl">
+                Q
+              </span>
             </motion.div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 px-2">
@@ -86,7 +88,9 @@ const Landing = () => {
               <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <FiZap className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">AI-Powered</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-2">
+                AI-Powered
+              </h3>
               <p className="text-sm sm:text-base text-gray-400">
                 Generate quiz questions instantly using Google's Gemini AI
                 technology
