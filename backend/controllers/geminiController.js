@@ -350,6 +350,10 @@ const extractQuestionsFromImageController = async (req, res) => {
       image, // Single image (backward compatibility)
       images, // Multiple images array
       maxMarks,
+      numberOfQuestions,
+      topic,
+      questionTypes,
+      instructions,
       marksDistribution,
       additionalInstructions,
       language,
@@ -451,10 +455,13 @@ const extractQuestionsFromImageController = async (req, res) => {
       parsedImages,
       finalMaxMarks,
       marksDistribution || "Distribute marks based on question difficulty",
-      additionalInstructions || "",
+      additionalInstructions || instructions || "",
       finalLanguage,
       examFormat || "general",
-      difficulty || "medium"
+      difficulty || "medium",
+      numberOfQuestions,
+      topic,
+      questionTypes
     );
 
     res.status(200).json({

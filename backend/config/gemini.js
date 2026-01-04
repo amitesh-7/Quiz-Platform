@@ -3750,7 +3750,10 @@ const extractQuestionsFromImage = async (
   additionalInstructions = "",
   language = "english",
   examFormat = "general",
-  difficulty = "medium"
+  difficulty = "medium",
+  numberOfQuestions = null,
+  topic = "",
+  questionTypes = []
 ) => {
   return await executeWithFallback(async () => {
     const model = await getGeminiModel("gemini-3-flash-preview");
@@ -4981,27 +4984,44 @@ STRICT RULES:
 
 Return ONLY valid JSON array.`;
     } else {
-      prompt = `You are a quiz question processor. Convert the following content into quiz questions.${languageNote}
+      // General format - use provided parameters
+      const topicInstruction = topic
+        ? `\nTOPIC/SUBJECT: ${topic}\nGenerate questions specifically about this topic.`
+        : "";
+
+      const questionTypesInstruction =
+        questionTypes && questionTypes.length > 0
+          ? `\nQUESTION TYPES TO GENERATE: ${questionTypes
+              .join(", ")
+              .toUpperCase()}\nOnly generate questions of these types.`
+          : "\nGenerate mix of question types as appropriate.";
+
+      prompt = `You are extracting questions from image(s) to create a quiz.${languageNote}
 
 ${difficultyNote}
 
-INPUT CONTENT/TOPIC:
-"""
-${rawQuestions}
-"""
+IMPORTANT: Extract questions ONLY from what is VISIBLE in the images. 
+If the image contains questions, extract them as-is.
+If the image contains content/notes, generate questions from that content.${topicInstruction}${questionTypesInstruction}
 
 MAXIMUM TOTAL MARKS: ${maxMarks}
+
+${
+  numberOfQuestions
+    ? `GENERATE EXACTLY ${numberOfQuestions} QUESTIONS.`
+    : "Generate appropriate number of questions from the image content."
+}
+
+${
+  additionalInstructions
+    ? `\nADDITIONAL INSTRUCTIONS:\n${additionalInstructions}\n`
+    : ""
+}
 
 MARKS DISTRIBUTION:
 """
 ${marksDistribution || "Distribute marks based on question complexity"}
 """
-
-${
-  numberOfQuestions
-    ? `GENERATE EXACTLY ${numberOfQuestions} QUESTIONS.`
-    : "Generate appropriate number of questions from the content."
-}
 
 CRITICAL JSON FORMAT - USE EXACTLY THESE FIELD NAMES:
 {
