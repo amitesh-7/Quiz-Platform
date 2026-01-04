@@ -66,9 +66,6 @@ const ManageQuiz = () => {
   // Bulk process state
   const [bulkForm, setBulkForm] = useState({
     rawQuestions: "",
-    maxMarks: 50,
-    marksDistribution: "",
-    numberOfQuestions: "",
     language: "english",
     examFormat: "general",
     difficulty: "medium",
@@ -79,9 +76,6 @@ const ManageQuiz = () => {
   // Image extraction state
   const [imageForm, setImageForm] = useState({
     images: [], // Array of {data: base64, preview: url}
-    maxMarks: 50,
-    marksDistribution: "",
-    additionalInstructions: "",
     language: "english",
     examFormat: "general",
     difficulty: "medium",
@@ -600,11 +594,6 @@ ${answersHTML}
     try {
       const payload = {
         rawQuestions: bulkForm.rawQuestions,
-        maxMarks: bulkForm.maxMarks || 50,
-        marksDistribution: bulkForm.marksDistribution || "",
-        numberOfQuestions: bulkForm.numberOfQuestions
-          ? parseInt(bulkForm.numberOfQuestions)
-          : null,
         language: bulkForm.language || "english",
         examFormat: bulkForm.examFormat || "general",
         difficulty: bulkForm.difficulty || "medium",
@@ -639,9 +628,6 @@ ${answersHTML}
       setProcessedQuestions([]);
       setBulkForm({
         rawQuestions: "",
-        maxMarks: 50,
-        marksDistribution: "",
-        numberOfQuestions: "",
         language: "english",
         examFormat: "general",
         difficulty: "medium",
@@ -726,9 +712,6 @@ ${answersHTML}
     try {
       const response = await geminiAPI.extractQuestionsFromImage({
         images: imageForm.images.map((img) => img.data), // Send array of base64 images
-        maxMarks: imageForm.maxMarks,
-        marksDistribution: imageForm.marksDistribution,
-        additionalInstructions: imageForm.additionalInstructions,
         language: imageForm.language,
         examFormat: imageForm.examFormat,
         difficulty: imageForm.difficulty,
@@ -3607,102 +3590,35 @@ Example:
                     </div>
 
                     {/* Show these fields only for General format, not for UP Board */}
-                    {bulkForm.examFormat !== "upboard_science" &&
-                      bulkForm.examFormat !== "upboard_english" &&
-                      bulkForm.examFormat !== "upboard_hindi" &&
-                      bulkForm.examFormat !== "upboard_sanskrit" && (
-                        <>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="form-group">
-                              <label className="input-label">
-                                Maximum Total Marks
-                              </label>
-                              <input
-                                type="number"
-                                value={bulkForm.maxMarks}
-                                onChange={(e) =>
-                                  setBulkForm({
-                                    ...bulkForm,
-                                    maxMarks: parseInt(e.target.value) || 50,
-                                  })
-                                }
-                                className="glass-input"
-                                min={10}
-                                max={200}
-                              />
-                            </div>
-
-                            <div className="form-group">
-                              <label className="input-label">
-                                Questions to Pick{" "}
-                                <span className="text-gray-500">
-                                  (optional, leave empty for all)
-                                </span>
-                              </label>
-                              <input
-                                type="number"
-                                value={bulkForm.numberOfQuestions}
-                                onChange={(e) =>
-                                  setBulkForm({
-                                    ...bulkForm,
-                                    numberOfQuestions: e.target.value,
-                                  })
-                                }
-                                className="glass-input"
-                                min={1}
-                                placeholder="All questions"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="form-group">
-                            <label className="input-label">
-                              Marks Distribution Instructions{" "}
-                              <span className="text-gray-500">(optional)</span>
-                            </label>
-                            <textarea
-                              value={bulkForm.marksDistribution}
-                              onChange={(e) =>
-                                setBulkForm({
-                                  ...bulkForm,
-                                  marksDistribution: e.target.value,
-                                })
-                              }
-                              className="glass-input h-20 resize-none text-sm"
-                              placeholder={`Examples:
-- MCQs: 1 mark each, Written: 3-5 marks each
-- Easy questions: 1 mark, Medium: 2 marks, Hard: 3 marks
-- Distribute marks equally among all questions`}
-                            />
-                          </div>
-
-                          <div className="form-group">
-                            <label className="input-label">Language</label>
-                            <select
-                              value={bulkForm.language}
-                              onChange={(e) =>
-                                setBulkForm({
-                                  ...bulkForm,
-                                  language: e.target.value,
-                                })
-                              }
-                              className="glass-input"
-                            >
-                              <option value="english">English</option>
-                              <option value="hindi">हिंदी (Hindi)</option>
-                              <option value="bilingual">
-                                द्विभाषी (Bilingual)
-                              </option>
-                              <option value="spanish">Spanish</option>
-                              <option value="french">French</option>
-                              <option value="german">German</option>
-                              <option value="chinese">Chinese</option>
-                              <option value="japanese">Japanese</option>
-                              <option value="arabic">Arabic</option>
-                            </select>
-                          </div>
-                        </>
-                      )}
+                    {bulkForm.examFormat === "general" && (
+                      <>
+                        <div className="form-group">
+                          <label className="input-label">Language</label>
+                          <select
+                            value={bulkForm.language}
+                            onChange={(e) =>
+                              setBulkForm({
+                                ...bulkForm,
+                                language: e.target.value,
+                              })
+                            }
+                            className="glass-input"
+                          >
+                            <option value="english">English</option>
+                            <option value="hindi">हिंदी (Hindi)</option>
+                            <option value="bilingual">
+                              द्विभाषी (Bilingual)
+                            </option>
+                            <option value="spanish">Spanish</option>
+                            <option value="french">French</option>
+                            <option value="german">German</option>
+                            <option value="chinese">Chinese</option>
+                            <option value="japanese">Japanese</option>
+                            <option value="arabic">Arabic</option>
+                          </select>
+                        </div>
+                      </>
+                    )}
 
                     <motion.button
                       onClick={handleProcessBulk}
@@ -4388,7 +4304,7 @@ Example:
                       </div>
                     </div>
 
-                    {/* Language - Only for General format */}
+                    {/* Show language field only for General format, not for UP Board */}
                     {imageForm.examFormat === "general" && (
                       <div className="form-group">
                         <label className="input-label">Language</label>
@@ -4427,7 +4343,15 @@ Example:
                           Auto-converts to appropriate formats (MCQ, Written,
                           etc.)
                         </li>
-                        <li>Add instructions for marks distribution</li>
+                        {imageForm.examFormat !== "general" && (
+                          <li className="font-medium text-yellow-300">
+                            ✓ Total marks and pattern auto-detected for{" "}
+                            {imageForm.examFormat.replace(
+                              "upboard_",
+                              "UP Board "
+                            )}
+                          </li>
+                        )}
                       </ul>
                     </div>
 
@@ -4501,94 +4425,6 @@ Example:
                         </p>
                       )}
                     </div>
-
-                    {/* Show these fields only for General format, not for UP Board */}
-                    {imageForm.examFormat !== "upboard_science" &&
-                      imageForm.examFormat !== "upboard_english" &&
-                      imageForm.examFormat !== "upboard_hindi" &&
-                      imageForm.examFormat !== "upboard_sanskrit" && (
-                        <>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="form-group">
-                              <label className="input-label">
-                                Maximum Total Marks
-                              </label>
-                              <input
-                                type="number"
-                                value={imageForm.maxMarks}
-                                onChange={(e) =>
-                                  setImageForm({
-                                    ...imageForm,
-                                    maxMarks: parseInt(e.target.value) || 50,
-                                  })
-                                }
-                                className="glass-input"
-                                min={10}
-                                max={200}
-                              />
-                            </div>
-
-                            <div className="form-group">
-                              <label className="input-label">Language</label>
-                              <select
-                                value={imageForm.language}
-                                onChange={(e) =>
-                                  setImageForm({
-                                    ...imageForm,
-                                    language: e.target.value,
-                                  })
-                                }
-                                className="glass-input"
-                              >
-                                <option value="english">English</option>
-                                <option value="hindi">हिंदी (Hindi)</option>
-                                <option value="bilingual">
-                                  द्विभाषी (Bilingual)
-                                </option>
-                                <option value="spanish">Spanish</option>
-                                <option value="french">French</option>
-                                <option value="german">German</option>
-                              </select>
-                            </div>
-                          </div>
-
-                          <div className="form-group">
-                            <label className="input-label">
-                              Marks Distribution{" "}
-                              <span className="text-gray-500">(optional)</span>
-                            </label>
-                            <textarea
-                              value={imageForm.marksDistribution}
-                              onChange={(e) =>
-                                setImageForm({
-                                  ...imageForm,
-                                  marksDistribution: e.target.value,
-                                })
-                              }
-                              className="glass-input h-20 resize-none text-sm"
-                              placeholder="E.g., MCQs: 1 mark, Written: 3-5 marks, Easy: 1 mark, Hard: 3 marks"
-                            />
-                          </div>
-
-                          <div className="form-group">
-                            <label className="input-label">
-                              Additional Instructions{" "}
-                              <span className="text-gray-500">(optional)</span>
-                            </label>
-                            <textarea
-                              value={imageForm.additionalInstructions}
-                              onChange={(e) =>
-                                setImageForm({
-                                  ...imageForm,
-                                  additionalInstructions: e.target.value,
-                                })
-                              }
-                              className="glass-input h-20 resize-none text-sm"
-                              placeholder="E.g., Convert one-word answers to MCQ, Skip diagram questions, etc."
-                            />
-                          </div>
-                        </>
-                      )}
 
                     <motion.button
                       onClick={handleExtractFromImage}
