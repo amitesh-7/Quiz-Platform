@@ -69,6 +69,11 @@ const ManageQuiz = () => {
     language: "english",
     examFormat: "general",
     difficulty: "medium",
+    topic: "",
+    questionTypes: ["mcq"],
+    questionCount: 10,
+    totalMarks: 100,
+    instructions: "",
   });
   const [processingBulk, setProcessingBulk] = useState(false);
   const [processedQuestions, setProcessedQuestions] = useState([]);
@@ -79,6 +84,11 @@ const ManageQuiz = () => {
     language: "english",
     examFormat: "general",
     difficulty: "medium",
+    questionCount: 10,
+    totalMarks: 100,
+    instructions: "",
+    topic: "",
+    questionTypes: ["mcq"],
   });
   const [extracting, setExtracting] = useState(false);
   const [extractedQuestions, setExtractedQuestions] = useState([]);
@@ -598,6 +608,22 @@ ${answersHTML}
         examFormat: bulkForm.examFormat || "general",
         difficulty: bulkForm.difficulty || "medium",
       };
+
+      // Add fields for general format
+      if (bulkForm.examFormat === "general") {
+        payload.numberOfQuestions = bulkForm.questionCount;
+        payload.maxMarks = bulkForm.totalMarks;
+        if (bulkForm.topic) {
+          payload.topic = bulkForm.topic;
+        }
+        if (bulkForm.questionTypes && bulkForm.questionTypes.length > 0) {
+          payload.questionTypes = bulkForm.questionTypes;
+        }
+        if (bulkForm.instructions) {
+          payload.instructions = bulkForm.instructions;
+        }
+      }
+
       console.log("Bulk Process Payload:", payload);
       const response = await geminiAPI.processQuestions(payload);
       setProcessedQuestions(response.data.data.questions);
@@ -710,12 +736,29 @@ ${answersHTML}
 
     setExtracting(true);
     try {
-      const response = await geminiAPI.extractQuestionsFromImage({
+      const payload = {
         images: imageForm.images.map((img) => img.data), // Send array of base64 images
         language: imageForm.language,
         examFormat: imageForm.examFormat,
         difficulty: imageForm.difficulty,
-      });
+      };
+
+      // Add fields for general format
+      if (imageForm.examFormat === "general") {
+        payload.numberOfQuestions = imageForm.questionCount;
+        payload.maxMarks = imageForm.totalMarks;
+        if (imageForm.topic) {
+          payload.topic = imageForm.topic;
+        }
+        if (imageForm.questionTypes && imageForm.questionTypes.length > 0) {
+          payload.questionTypes = imageForm.questionTypes;
+        }
+        if (imageForm.instructions) {
+          payload.instructions = imageForm.instructions;
+        }
+      }
+
+      const response = await geminiAPI.extractQuestionsFromImage(payload);
       setExtractedQuestions(response.data.data.questions);
       toast.success(
         `Extracted ${response.data.data.questions.length} questions`
@@ -3592,6 +3635,28 @@ Example:
                     {/* Show these fields only for General format, not for UP Board */}
                     {bulkForm.examFormat === "general" && (
                       <>
+                        {/* Topic Input */}
+                        <div className="form-group">
+                          <label className="input-label">
+                            Topic (Optional)
+                          </label>
+                          <input
+                            type="text"
+                            value={bulkForm.topic || ""}
+                            onChange={(e) =>
+                              setBulkForm({
+                                ...bulkForm,
+                                topic: e.target.value,
+                              })
+                            }
+                            className="glass-input"
+                            placeholder="e.g., JavaScript Arrays, World War II, Photosynthesis"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Provide a topic to help AI understand the context
+                          </p>
+                        </div>
+
                         <div className="form-group">
                           <label className="input-label">Language</label>
                           <select
@@ -3616,6 +3681,137 @@ Example:
                             <option value="japanese">Japanese</option>
                             <option value="arabic">Arabic</option>
                           </select>
+                        </div>
+
+                        {/* Number of Questions and Max Marks */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="form-group">
+                            <label className="input-label">
+                              Number of Questions
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              max="100"
+                              value={bulkForm.questionCount || 10}
+                              onChange={(e) =>
+                                setBulkForm({
+                                  ...bulkForm,
+                                  questionCount: parseInt(e.target.value) || 10,
+                                })
+                              }
+                              className="glass-input"
+                              placeholder="Enter number of questions"
+                            />
+                          </div>
+
+                          <div className="form-group">
+                            <label className="input-label">Maximum Marks</label>
+                            <input
+                              type="number"
+                              min="1"
+                              max="1000"
+                              value={bulkForm.totalMarks || 100}
+                              onChange={(e) =>
+                                setBulkForm({
+                                  ...bulkForm,
+                                  totalMarks: parseInt(e.target.value) || 100,
+                                })
+                              }
+                              className="glass-input"
+                              placeholder="Enter maximum marks"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Question Types */}
+                        <div className="form-group">
+                          <label className="input-label mb-2">
+                            Question Types
+                          </label>
+                          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                            {[
+                              { value: "mcq", label: "MCQ", icon: "📝" },
+                              {
+                                value: "written",
+                                label: "Written",
+                                icon: "✍️",
+                              },
+                              {
+                                value: "fillblank",
+                                label: "Fill Blanks",
+                                icon: "📄",
+                              },
+                              {
+                                value: "matching",
+                                label: "Matching",
+                                icon: "🔗",
+                              },
+                              {
+                                value: "truefalse",
+                                label: "True/False",
+                                icon: "✓✗",
+                              },
+                            ].map((type) => (
+                              <label
+                                key={type.value}
+                                className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors text-sm ${
+                                  (bulkForm.questionTypes || ["mcq"]).includes(
+                                    type.value
+                                  )
+                                    ? "bg-yellow-500/30 border border-yellow-500"
+                                    : "bg-white/5 border border-white/10 hover:bg-white/10"
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={(
+                                    bulkForm.questionTypes || ["mcq"]
+                                  ).includes(type.value)}
+                                  onChange={() => {
+                                    const currentTypes =
+                                      bulkForm.questionTypes || ["mcq"];
+                                    const newTypes = currentTypes.includes(
+                                      type.value
+                                    )
+                                      ? currentTypes.filter(
+                                          (t) => t !== type.value
+                                        )
+                                      : [...currentTypes, type.value];
+                                    setBulkForm({
+                                      ...bulkForm,
+                                      questionTypes:
+                                        newTypes.length > 0
+                                          ? newTypes
+                                          : ["mcq"],
+                                    });
+                                  }}
+                                  className="hidden"
+                                />
+                                <span>{type.icon}</span>
+                                <span className="text-white">{type.label}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Additional Instructions */}
+                        <div className="form-group">
+                          <label className="input-label">
+                            Additional Instructions (Optional)
+                          </label>
+                          <textarea
+                            value={bulkForm.instructions || ""}
+                            onChange={(e) =>
+                              setBulkForm({
+                                ...bulkForm,
+                                instructions: e.target.value,
+                              })
+                            }
+                            className="glass-input min-h-[100px]"
+                            placeholder="E.g., Focus on conceptual questions, include diagrams, emphasize practical applications, use simple language, etc."
+                            rows="4"
+                          />
                         </div>
                       </>
                     )}
@@ -4306,29 +4502,189 @@ Example:
 
                     {/* Show language field only for General format, not for UP Board */}
                     {imageForm.examFormat === "general" && (
-                      <div className="form-group">
-                        <label className="input-label">Language</label>
-                        <select
-                          value={imageForm.language || "english"}
-                          onChange={(e) =>
-                            setImageForm({
-                              ...imageForm,
-                              language: e.target.value,
-                            })
-                          }
-                          className="glass-input"
-                        >
-                          <option value="english">English</option>
-                          <option value="hindi">हिंदी (Hindi)</option>
-                          <option value="bilingual">
-                            द्विभाषी (Bilingual)
-                          </option>
-                          <option value="sanskrit">संस्कृत (Sanskrit)</option>
-                          <option value="spanish">Español (Spanish)</option>
-                          <option value="french">Français (French)</option>
-                          <option value="german">Deutsch (German)</option>
-                        </select>
-                      </div>
+                      <>
+                        {/* Topic Input */}
+                        <div className="form-group">
+                          <label className="input-label">
+                            Topic (Optional)
+                          </label>
+                          <input
+                            type="text"
+                            value={imageForm.topic || ""}
+                            onChange={(e) =>
+                              setImageForm({
+                                ...imageForm,
+                                topic: e.target.value,
+                              })
+                            }
+                            className="glass-input"
+                            placeholder="e.g., JavaScript Arrays, World War II, Photosynthesis"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Provide a topic to help AI understand the context of
+                            extracted questions
+                          </p>
+                        </div>
+
+                        <div className="form-group">
+                          <label className="input-label">Language</label>
+                          <select
+                            value={imageForm.language || "english"}
+                            onChange={(e) =>
+                              setImageForm({
+                                ...imageForm,
+                                language: e.target.value,
+                              })
+                            }
+                            className="glass-input"
+                          >
+                            <option value="english">English</option>
+                            <option value="hindi">हिंदी (Hindi)</option>
+                            <option value="bilingual">
+                              द्विभाषी (Bilingual)
+                            </option>
+                            <option value="sanskrit">संस्कृत (Sanskrit)</option>
+                            <option value="spanish">Español (Spanish)</option>
+                            <option value="french">Français (French)</option>
+                            <option value="german">Deutsch (German)</option>
+                          </select>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="form-group">
+                            <label className="input-label">
+                              Number of Questions to Generate
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              max="100"
+                              value={imageForm.questionCount || 10}
+                              onChange={(e) =>
+                                setImageForm({
+                                  ...imageForm,
+                                  questionCount: parseInt(e.target.value) || 10,
+                                })
+                              }
+                              className="glass-input"
+                              placeholder="Enter number of questions"
+                            />
+                          </div>
+
+                          <div className="form-group">
+                            <label className="input-label">
+                              Maximum Marks for Paper
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              max="1000"
+                              value={imageForm.totalMarks || 100}
+                              onChange={(e) =>
+                                setImageForm({
+                                  ...imageForm,
+                                  totalMarks: parseInt(e.target.value) || 100,
+                                })
+                              }
+                              className="glass-input"
+                              placeholder="Enter maximum marks"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="form-group">
+                          <label className="input-label">
+                            Instructions for AI Question Generator
+                            <span className="text-gray-500 ml-2 text-xs">
+                              (Optional - Guide the AI on how to generate
+                              questions)
+                            </span>
+                          </label>
+                          <textarea
+                            value={imageForm.instructions || ""}
+                            onChange={(e) =>
+                              setImageForm({
+                                ...imageForm,
+                                instructions: e.target.value,
+                              })
+                            }
+                            className="glass-input min-h-[100px]"
+                            placeholder="E.g., Focus on conceptual questions, include diagrams, emphasize practical applications, use simple language, etc."
+                            rows="4"
+                          />
+                        </div>
+
+                        {/* Question Types */}
+                        <div className="form-group">
+                          <label className="input-label mb-2">
+                            Question Types
+                          </label>
+                          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                            {[
+                              { value: "mcq", label: "MCQ", icon: "📝" },
+                              {
+                                value: "written",
+                                label: "Written",
+                                icon: "✍️",
+                              },
+                              {
+                                value: "fillblank",
+                                label: "Fill Blanks",
+                                icon: "📄",
+                              },
+                              {
+                                value: "matching",
+                                label: "Matching",
+                                icon: "🔗",
+                              },
+                              {
+                                value: "truefalse",
+                                label: "True/False",
+                                icon: "✓✗",
+                              },
+                            ].map((type) => (
+                              <label
+                                key={type.value}
+                                className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors text-sm ${
+                                  (imageForm.questionTypes || ["mcq"]).includes(
+                                    type.value
+                                  )
+                                    ? "bg-yellow-500/30 border border-yellow-500"
+                                    : "bg-white/5 border border-white/10 hover:bg-white/10"
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={(
+                                    imageForm.questionTypes || ["mcq"]
+                                  ).includes(type.value)}
+                                  onChange={() => {
+                                    const currentTypes =
+                                      imageForm.questionTypes || ["mcq"];
+                                    const newTypes = currentTypes.includes(
+                                      type.value
+                                    )
+                                      ? currentTypes.filter(
+                                          (t) => t !== type.value
+                                        )
+                                      : [...currentTypes, type.value];
+                                    setImageForm({
+                                      ...imageForm,
+                                      questionTypes:
+                                        newTypes.length > 0
+                                          ? newTypes
+                                          : ["mcq"],
+                                    });
+                                  }}
+                                  className="hidden"
+                                />
+                                <span>{type.icon}</span>
+                                <span className="text-white">{type.label}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </>
                     )}
 
                     <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-blue-300 text-sm">

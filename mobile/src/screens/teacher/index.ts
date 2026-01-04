@@ -1,0 +1,9 @@
+export {default as DashboardScreen} from './DashboardScreen';
+export {default as QuizzesScreen} from './QuizzesScreen';
+export {default as StudentsScreen} from './StudentsScreen';
+export {default as ProfileScreen} from './ProfileScreen';
+export {default as CreateQuizScreen} from './CreateQuizScreen';
+export {default as ManageQuizScreen} from './ManageQuizScreen';
+export {default as QuizSubmissionsScreen} from './QuizSubmissionsScreen';
+export {default as SubmissionDetailsScreen} from './SubmissionDetailsScreen';
+export {default as StudentQuizzesScreen} from './StudentQuizzesScreen';

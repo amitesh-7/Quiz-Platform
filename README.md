@@ -85,6 +85,14 @@ Each format includes:
 - Smooth animations with Framer Motion
 - Fully responsive design
 
+### 📱 Mobile App (React Native)
+
+- **Cross-platform**: iOS and Android support
+- **Full feature parity**: Students can take quizzes, teachers can manage
+- **Native experience**: Smooth animations, native UI components
+- **Offline support**: View cached data offline
+- **Dark/Light theme**: Full theme support matching web app
+
 ## 🛠️ Tech Stack
 
 ### Frontend
@@ -188,6 +196,22 @@ quiz-platform/
 │   ├── tailwind.config.js
 │   ├── vercel.json
 │   └── vite.config.js
+│
+├── mobile/                       # React Native Mobile App
+│   ├── src/
+│   │   ├── api/                 # API client and endpoints
+│   │   ├── components/common/   # Reusable UI components
+│   │   ├── contexts/            # Auth and Theme contexts
+│   │   ├── hooks/               # Custom React hooks
+│   │   ├── navigation/          # React Navigation setup
+│   │   ├── screens/             # All screen components
+│   │   ├── services/            # Storage and other services
+│   │   ├── styles/              # Colors, typography, spacing
+│   │   ├── types/               # TypeScript types
+│   │   └── utils/               # Helpers and validators
+│   ├── App.tsx
+│   ├── package.json
+│   └── README.md
 │
 ├── .gitignore
 └── README.md
