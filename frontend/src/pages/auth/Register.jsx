@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiUser, FiMail, FiLock, FiUserPlus, FiKey } from "react-icons/fi";
@@ -87,13 +87,17 @@ const Register = () => {
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
             Teacher Registration
           </h1>
-          <p className="text-sm sm:text-base text-gray-400">Create your teacher account</p>
+          <p className="text-sm sm:text-base text-gray-400">
+            Create your teacher account
+          </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
           <div className="form-group">
-            <label className="input-label text-sm sm:text-base">Full Name</label>
+            <label className="input-label text-sm sm:text-base">
+              Full Name
+            </label>
             <div className="relative">
               <FiUser className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input
@@ -109,7 +113,9 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label className="input-label text-sm sm:text-base">Email Address</label>
+            <label className="input-label text-sm sm:text-base">
+              Email Address
+            </label>
             <div className="relative">
               <FiMail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input
@@ -141,7 +147,9 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label className="input-label text-sm sm:text-base">Confirm Password</label>
+            <label className="input-label text-sm sm:text-base">
+              Confirm Password
+            </label>
             <div className="relative">
               <FiLock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input
@@ -157,7 +165,9 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label className="input-label text-sm sm:text-base">Secret Key</label>
+            <label className="input-label text-sm sm:text-base">
+              Secret Key
+            </label>
             <div className="relative">
               <FiKey className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input

@@ -121,100 +121,176 @@ Each format includes:
 quiz-platform/
 ├── backend/
 │   ├── config/
-│   │   ├── db.js              # MongoDB connection
-│   │   └── gemini.js          # Gemini AI config & UP Board formats
+│   │   ├── db.js                    # MongoDB connection
+│   │   └── gemini.js                # Gemini AI config & UP Board formats
 │   ├── controllers/
-│   │   ├── authController.js
-│   │   ├── geminiController.js
-│   │   ├── questionController.js
-│   │   ├── quizController.js
-│   │   └── submissionController.js
+│   │   ├── authController.js        # Authentication logic
+│   │   ├── geminiController.js      # AI question generation
+│   │   ├── questionController.js    # Question CRUD operations
+│   │   ├── quizController.js        # Quiz management
+│   │   └── submissionController.js  # Submission handling
 │   ├── middleware/
-│   │   ├── auth.js            # JWT & role verification
-│   │   └── validate.js        # Input validation
+│   │   ├── auth.js                  # JWT & role verification
+│   │   └── validate.js              # Input validation
 │   ├── models/
-│   │   ├── Question.js
-│   │   ├── Quiz.js
-│   │   ├── Submission.js
-│   │   └── User.js
+│   │   ├── Question.js              # Question schema
+│   │   ├── Quiz.js                  # Quiz schema
+│   │   ├── Submission.js            # Submission schema
+│   │   └── User.js                  # User schema
 │   ├── routes/
-│   │   ├── auth.js
-│   │   ├── gemini.js
-│   │   ├── questions.js
-│   │   ├── quizzes.js
-│   │   ├── results.js
-│   │   └── submissions.js
+│   │   ├── auth.js                  # Auth endpoints
+│   │   ├── gemini.js                # AI endpoints
+│   │   ├── questions.js             # Question endpoints
+│   │   ├── quizzes.js               # Quiz endpoints
+│   │   ├── results.js               # Results endpoints
+│   │   └── submissions.js           # Submission endpoints
 │   ├── .env.example
 │   ├── .gitignore
-│   ├── app.js
+│   ├── app.js                       # Express app setup
 │   ├── package.json
-│   ├── server.js
-│   └── vercel.json
+│   ├── server.js                    # Server entry point
+│   └── vercel.json                  # Vercel deployment config
 │
 ├── frontend/
 │   ├── public/
-│   │   └── quiz-icon.svg
+│   │   └── quiz-icon.svg            # App icon
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Loading.jsx
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── ParticleBackground.jsx
-│   │   │   ├── PrivateRoute.jsx
-│   │   │   └── ThemeToggle.jsx
+│   │   │   ├── Loading.jsx          # Loading spinner
+│   │   │   ├── Navbar.jsx           # Navigation bar
+│   │   │   ├── ParticleBackground.jsx # Particle effects
+│   │   │   ├── PrivateRoute.jsx     # Route protection
+│   │   │   └── ThemeToggle.jsx      # Dark/Light mode toggle
 │   │   ├── context/
-│   │   │   └── AuthContext.jsx
+│   │   │   └── AuthContext.jsx      # Authentication context
 │   │   ├── pages/
 │   │   │   ├── auth/
-│   │   │   │   ├── Login.jsx
-│   │   │   │   ├── Register.jsx
-│   │   │   │   ├── StudentLogin.jsx
-│   │   │   │   └── TeacherLogin.jsx
+│   │   │   │   ├── Login.jsx        # Generic login
+│   │   │   │   ├── Register.jsx     # User registration
+│   │   │   │   ├── StudentLogin.jsx # Student login
+│   │   │   │   └── TeacherLogin.jsx # Teacher login
 │   │   │   ├── student/
-│   │   │   │   ├── AttemptQuiz.jsx
-│   │   │   │   ├── Dashboard.jsx
-│   │   │   │   ├── MyResults.jsx
-│   │   │   │   └── QuizResult.jsx
+│   │   │   │   ├── AttemptQuiz.jsx  # Quiz taking interface
+│   │   │   │   ├── Dashboard.jsx    # Student dashboard
+│   │   │   │   ├── MyResults.jsx    # Results history
+│   │   │   │   └── QuizResult.jsx   # Detailed result view
 │   │   │   ├── teacher/
-│   │   │   │   ├── CreateQuiz.jsx
-│   │   │   │   ├── Dashboard.jsx
-│   │   │   │   ├── ManageQuiz.jsx
-│   │   │   │   ├── ManageStudents.jsx
-│   │   │   │   ├── QuizSubmissions.jsx
-│   │   │   │   ├── StudentQuizzes.jsx
-│   │   │   │   └── SubmissionDetails.jsx
-│   │   │   └── Landing.jsx
+│   │   │   │   ├── CreateQuiz.jsx   # Quiz creation
+│   │   │   │   ├── Dashboard.jsx    # Teacher dashboard
+│   │   │   │   ├── ManageQuiz.jsx   # Quiz management
+│   │   │   │   ├── ManageStudents.jsx # Student management
+│   │   │   │   ├── QuizSubmissions.jsx # View submissions
+│   │   │   │   ├── StudentQuizzes.jsx # Student quiz history
+│   │   │   │   └── SubmissionDetails.jsx # Detailed submission
+│   │   │   └── Landing.jsx          # Landing page
 │   │   ├── services/
-│   │   │   └── api.js
-│   │   ├── App.jsx
-│   │   ├── index.css
-│   │   └── main.jsx
+│   │   │   └── api.js               # API client
+│   │   ├── App.jsx                  # Main app component
+│   │   ├── index.css                # Global styles
+│   │   └── main.jsx                 # React entry point
 │   ├── .env.example
 │   ├── .gitignore
-│   ├── index.html
+│   ├── index.html                   # HTML template
 │   ├── package.json
-│   ├── postcss.config.js
-│   ├── tailwind.config.js
-│   ├── vercel.json
-│   └── vite.config.js
+│   ├── postcss.config.js            # PostCSS config
+│   ├── tailwind.config.js           # Tailwind config
+│   ├── vercel.json                  # Vercel deployment config
+│   └── vite.config.js               # Vite config
 │
-├── mobile/                       # React Native Mobile App
+├── mobile/                          # React Native Mobile App
 │   ├── src/
-│   │   ├── api/                 # API client and endpoints
-│   │   ├── components/common/   # Reusable UI components
-│   │   ├── contexts/            # Auth and Theme contexts
-│   │   ├── hooks/               # Custom React hooks
-│   │   ├── navigation/          # React Navigation setup
-│   │   ├── screens/             # All screen components
-│   │   ├── services/            # Storage and other services
-│   │   ├── styles/              # Colors, typography, spacing
-│   │   ├── types/               # TypeScript types
-│   │   └── utils/               # Helpers and validators
-│   ├── App.tsx
+│   │   ├── api/
+│   │   │   ├── auth.ts              # Auth API calls
+│   │   │   ├── axios.ts             # Axios instance setup
+│   │   │   ├── index.ts             # API exports
+│   │   │   ├── quiz.ts              # Quiz API calls
+│   │   │   ├── student.ts           # Student API calls
+│   │   │   └── submission.ts        # Submission API calls
+│   │   ├── components/
+│   │   │   └── common/
+│   │   │       ├── Button.tsx       # Reusable button
+│   │   │       ├── Card.tsx         # Card component
+│   │   │       ├── EmptyState.tsx   # Empty state display
+│   │   │       ├── Input.tsx        # Form input
+│   │   │       ├── Loading.tsx      # Loading indicator
+│   │   │       ├── Modal.tsx        # Modal component
+│   │   │       └── index.ts         # Component exports
+│   │   ├── contexts/
+│   │   │   ├── AuthContext.tsx      # Auth state management
+│   │   │   ├── ThemeContext.tsx     # Theme state management
+│   │   │   └── index.ts             # Context exports
+│   │   ├── hooks/
+│   │   │   ├── index.ts             # Hook exports
+│   │   │   ├── useAuth.ts           # Auth hook
+│   │   │   ├── useForm.ts           # Form handling hook
+│   │   │   ├── useTheme.ts          # Theme hook
+│   │   │   └── useTimer.ts          # Timer hook
+│   │   ├── navigation/
+│   │   │   ├── AppNavigator.tsx     # Main navigator
+│   │   │   ├── AuthNavigator.tsx    # Auth flow navigator
+│   │   │   ├── StudentNavigator.tsx # Student tab navigator
+│   │   │   ├── TeacherNavigator.tsx # Teacher tab navigator
+│   │   │   └── index.ts             # Navigation exports
+│   │   ├── screens/
+│   │   │   ├── auth/
+│   │   │   │   ├── RegisterScreen.tsx
+│   │   │   │   ├── SplashScreen.tsx
+│   │   │   │   ├── StudentLoginScreen.tsx
+│   │   │   │   ├── TeacherLoginScreen.tsx
+│   │   │   │   ├── WelcomeScreen.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── student/
+│   │   │   │   ├── AttemptQuizScreen.tsx
+│   │   │   │   ├── DashboardScreen.tsx
+│   │   │   │   ├── MyQuizzesScreen.tsx
+│   │   │   │   ├── ProfileScreen.tsx
+│   │   │   │   ├── QuizResultScreen.tsx
+│   │   │   │   ├── ResultsScreen.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── teacher/
+│   │   │   │   ├── CreateQuizScreen.tsx
+│   │   │   │   ├── DashboardScreen.tsx
+│   │   │   │   ├── ManageQuizScreen.tsx
+│   │   │   │   ├── ProfileScreen.tsx
+│   │   │   │   ├── QuizSubmissionsScreen.tsx
+│   │   │   │   ├── QuizzesScreen.tsx
+│   │   │   │   ├── StudentQuizzesScreen.tsx
+│   │   │   │   ├── StudentsScreen.tsx
+│   │   │   │   ├── SubmissionDetailsScreen.tsx
+│   │   │   │   └── index.ts
+│   │   │   └── index.ts             # Screen exports
+│   │   ├── services/
+│   │   │   ├── index.ts             # Service exports
+│   │   │   └── storage.ts           # AsyncStorage helper
+│   │   ├── styles/
+│   │   │   ├── colors.ts            # Color palette
+│   │   │   ├── index.ts             # Style exports
+│   │   │   ├── spacing.ts           # Spacing constants
+│   │   │   └── typography.ts        # Font styles
+│   │   ├── types/
+│   │   │   ├── api.ts               # API types
+│   │   │   ├── index.ts             # Type exports
+│   │   │   ├── navigation.ts        # Navigation types
+│   │   │   ├── quiz.ts              # Quiz types
+│   │   │   └── user.ts              # User types
+│   │   └── utils/
+│   │       ├── constants.ts         # App constants
+│   │       ├── helpers.ts           # Helper functions
+│   │       ├── index.ts             # Util exports
+│   │       └── validators.ts        # Validation functions
+│   ├── .env.example
+│   ├── App.tsx                      # App entry component
+│   ├── app.json                     # Expo/RN config
+│   ├── babel.config.js              # Babel config
+│   ├── index.js                     # App entry point
+│   ├── metro.config.js              # Metro bundler config
 │   ├── package.json
-│   └── README.md
+│   ├── README.md                    # Mobile app docs
+│   └── tsconfig.json                # TypeScript config
 │
 ├── .gitignore
-└── README.md
+├── REACT_NATIVE_APP.md              # React Native documentation
+└── README.md                        # Main project README
 ```
 
 ## 🚀 Getting Started

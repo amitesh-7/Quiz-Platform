@@ -1,19 +1,63 @@
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import {
-  FiLogIn,
-  FiUserPlus,
-  FiBook,
-  FiUsers,
-  FiZap,
-  FiAward,
-} from "react-icons/fi";
+import { Home, GraduationCap, Users, UserPlus, Sun, Moon } from "lucide-react";
+import { NavBar } from "../components/ui/tubelight-navbar";
+import { FiZap, FiAward, FiUsers, FiBook } from "react-icons/fi";
 
 const Landing = () => {
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setIsDark(savedTheme === "dark");
+      document.documentElement.classList.toggle(
+        "light",
+        savedTheme === "light"
+      );
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = isDark ? "light" : "dark";
+    setIsDark(!isDark);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("light", newTheme === "light");
+  };
+
+  const navItems = [
+    { name: "Home", url: "/", icon: Home },
+    { name: "Student", url: "/login", icon: GraduationCap },
+    { name: "Teacher", url: "/teacher-login", icon: Users },
+    { name: "Register", url: "/register", icon: UserPlus },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col safe-area-top safe-area-bottom">
+      {/* Tubelight Navbar */}
+      <NavBar items={navItems} />
+
+      {/* Theme Toggle Button - Fixed position */}
+      <motion.button
+        onClick={toggleTheme}
+        className="fixed top-4 right-4 z-50 p-3 glass rounded-full hover:bg-white/20 transition-colors"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        aria-label="Toggle theme"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        {isDark ? (
+          <Sun className="w-5 h-5 text-yellow-400" />
+        ) : (
+          <Moon className="w-5 h-5 text-indigo-600" />
+        )}
+      </motion.button>
+
       {/* Hero Section */}
-      <div className="flex-1 flex items-center justify-center px-3 sm:px-4 py-8 sm:py-12">
+      <div className="flex-1 flex items-center justify-center px-3 sm:px-4 py-8 sm:py-12 pt-24 sm:pt-20">
         <div className="max-w-6xl w-full">
           <motion.div
             className="text-center mb-8 sm:mb-12"

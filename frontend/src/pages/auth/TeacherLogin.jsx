@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiMail, FiLock, FiLogIn, FiArrowLeft } from "react-icons/fi";
@@ -68,16 +68,24 @@ const TeacherLogin = () => {
             animate={{ rotate: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="text-white font-bold text-3xl sm:text-4xl">👨‍🏫</span>
+            <span className="text-white font-bold text-3xl sm:text-4xl">
+              👨‍🏫
+            </span>
           </motion.div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">Teacher Login</h1>
-          <p className="text-sm sm:text-base text-gray-400">Sign in to manage your quizzes</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
+            Teacher Login
+          </h1>
+          <p className="text-sm sm:text-base text-gray-400">
+            Sign in to manage your quizzes
+          </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div className="form-group">
-            <label className="input-label text-sm sm:text-base">Email Address</label>
+            <label className="input-label text-sm sm:text-base">
+              Email Address
+            </label>
             <div className="relative">
               <FiMail className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input

@@ -1,3 +1,4 @@
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,7 +9,6 @@ import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import ParticleBackground from "./components/ParticleBackground";
-import ThemeToggle from "./components/ThemeToggle";
 
 // Landing & Auth Pages
 import Landing from "./pages/Landing";
@@ -36,7 +36,6 @@ function App() {
     <AuthProvider>
       <Router>
         <ParticleBackground />
-        <ThemeToggle />
         <Toaster
           position="top-center"
           containerStyle={{

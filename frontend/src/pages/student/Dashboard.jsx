@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -54,7 +54,9 @@ const StudentDashboard = () => {
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
             Available Quizzes
           </h1>
-          <p className="text-sm sm:text-base text-gray-400">Select a quiz to start attempting</p>
+          <p className="text-sm sm:text-base text-gray-400">
+            Select a quiz to start attempting
+          </p>
         </motion.div>
 
         {/* Stats */}
@@ -138,7 +140,9 @@ const StudentDashboard = () => {
             <h2 className="text-lg sm:text-xl font-semibold text-white mb-2">
               No quizzes available
             </h2>
-            <p className="text-sm sm:text-base text-gray-400">Check back later for new quizzes</p>
+            <p className="text-sm sm:text-base text-gray-400">
+              Check back later for new quizzes
+            </p>
           </motion.div>
         ) : (
           <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">

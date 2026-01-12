@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -59,8 +59,12 @@ const TeacherDashboard = () => {
           transition={{ duration: 0.5 }}
         >
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">My Students</h1>
-            <p className="text-sm sm:text-base text-gray-400">Create quizzes for your students</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">
+              My Students
+            </h1>
+            <p className="text-sm sm:text-base text-gray-400">
+              Create quizzes for your students
+            </p>
           </div>
 
           <Link to="/teacher/students" className="w-full sm:w-auto">
@@ -88,7 +92,9 @@ const TeacherDashboard = () => {
             </div>
             <div>
               <p className="text-gray-400 text-xs sm:text-sm">Total Students</p>
-              <p className="text-2xl sm:text-3xl font-bold text-white">{students.length}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-white">
+                {students.length}
+              </p>
             </div>
           </div>
         </motion.div>
@@ -123,7 +129,9 @@ const TeacherDashboard = () => {
             transition={{ delay: 0.3 }}
           >
             <FiUsers className="w-12 h-12 sm:w-16 sm:h-16 text-gray-600 mx-auto mb-3 sm:mb-4" />
-            <p className="text-gray-400 text-base sm:text-lg mb-3 sm:mb-4">No students yet</p>
+            <p className="text-gray-400 text-base sm:text-lg mb-3 sm:mb-4">
+              No students yet
+            </p>
             <Link to="/teacher/students">
               <motion.button
                 className="btn-primary text-sm sm:text-base"
@@ -168,7 +176,9 @@ const TeacherDashboard = () => {
                       <h3 className="text-base sm:text-lg font-semibold text-white">
                         {student.name}
                       </h3>
-                      <p className="text-xs sm:text-sm text-gray-400">Student</p>
+                      <p className="text-xs sm:text-sm text-gray-400">
+                        Student
+                      </p>
                     </div>
                   </div>
                 </div>

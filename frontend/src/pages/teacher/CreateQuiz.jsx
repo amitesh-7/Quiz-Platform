@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -343,7 +343,9 @@ const CreateQuiz = () => {
                   {/* Questions, Difficulty Row */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="form-group">
-                      <label className="input-label text-sm">No. of Questions</label>
+                      <label className="input-label text-sm">
+                        No. of Questions
+                      </label>
                       <input
                         type="number"
                         name="numberOfQuestions"
