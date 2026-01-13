@@ -69,13 +69,13 @@ const StudentLogin = () => {
         {/* Logo */}
         <div className="text-center mb-6 sm:mb-8">
           <motion.div
-            className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl sm:rounded-2xl 
+            className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-gray-200 to-white rounded-xl sm:rounded-2xl 
                        flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg"
             initial={{ rotate: 10 }}
             animate={{ rotate: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="text-white font-bold text-3xl sm:text-4xl">
+            <span className="text-gray-900 font-bold text-3xl sm:text-4xl">
               🎓
             </span>
           </motion.div>
@@ -92,7 +92,7 @@ const StudentLogin = () => {
           <Link to="/teacher-login">
             <motion.button
               type="button"
-              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base"
+              className="w-full bg-white/10 border border-white/20 text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base backdrop-blur-sm"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -128,7 +128,7 @@ const StudentLogin = () => {
 
           <motion.button
             type="submit"
-            className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl w-full flex items-center justify-center gap-2 text-sm sm:text-base"
+            className="bg-gradient-to-r from-gray-100 to-white text-black px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold hover:from-white hover:to-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl w-full flex items-center justify-center gap-2 text-sm sm:text-base"
             disabled={loading}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}

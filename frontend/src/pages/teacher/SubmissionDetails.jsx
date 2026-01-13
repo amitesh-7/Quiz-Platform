@@ -195,7 +195,7 @@ const SubmissionDetails = () => {
                   <h1 className="text-2xl font-bold text-white">
                     {submission.student?.name}
                   </h1>
-                  <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm font-medium">
+                  <span className="px-2 py-1 bg-white/10 text-gray-300 rounded-full text-sm font-medium">
                     Attempt #{submission.attemptNumber || 1}
                   </span>
                 </div>
@@ -216,7 +216,7 @@ const SubmissionDetails = () => {
           transition={{ delay: 0.1 }}
         >
           <div className="glass-card text-center">
-            <FiAward className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+            <FiAward className="w-8 h-8 text-gray-300 mx-auto mb-2" />
             <p className="text-gray-400 text-sm">Score</p>
             <p className="text-2xl font-bold text-white">
               {submission.score} / {submission.totalMarks}
@@ -330,10 +330,10 @@ const SubmissionDetails = () => {
                     {/* Question Header */}
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                       <div className="flex items-center gap-2">
-                        <span className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 font-bold">
+                        <span className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center text-gray-300 font-bold">
                           {index + 1}
                         </span>
-                        <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
+                        <span className="text-xs px-2 py-1 bg-white/10 text-gray-300 rounded-full">
                           {answer.questionType === "mcq" && "📝 MCQ"}
                           {answer.questionType === "written" && "✍️ Written"}
                           {answer.questionType === "fillblank" &&
@@ -367,7 +367,7 @@ const SubmissionDetails = () => {
                           </span>
                         )}
                         {editMode ? (
-                          <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-500/20">
+                          <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10">
                             <input
                               type="number"
                               min="0"
@@ -390,7 +390,7 @@ const SubmissionDetails = () => {
                               }
                               className="w-16 px-2 py-1 bg-white/10 text-white rounded text-center font-bold focus:outline-none focus:ring-2 focus:ring-blue-400"
                             />
-                            <span className="text-blue-400 font-bold">
+                            <span className="text-gray-300 font-bold">
                               / {answer.marks || 1}
                             </span>
                           </div>
@@ -553,11 +553,11 @@ const SubmissionDetails = () => {
                           )}
                         </div>
                         {answer.feedback && (
-                          <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
-                            <p className="text-xs text-blue-400 mb-2 font-medium">
+                          <div className="p-4 bg-white/5 rounded-lg border border-white/20">
+                            <p className="text-xs text-gray-300 mb-2 font-medium">
                               AI Feedback:
                             </p>
-                            <div className="text-blue-300 whitespace-pre-wrap break-words max-h-[300px] overflow-y-auto leading-relaxed">
+                            <div className="text-gray-300 whitespace-pre-wrap break-words max-h-[300px] overflow-y-auto leading-relaxed">
                               {answer.feedback}
                             </div>
                           </div>
@@ -646,7 +646,7 @@ const SubmissionDetails = () => {
                                 key={idx}
                                 className="p-3 bg-white/5 rounded-lg flex items-center gap-2"
                               >
-                                <span className="text-blue-400 font-medium">
+                                <span className="text-gray-300 font-medium">
                                   {pair.left}
                                 </span>
                                 <span className="text-gray-500">→</span>
@@ -670,3 +670,4 @@ const SubmissionDetails = () => {
 };
 
 export default SubmissionDetails;
+

@@ -131,8 +131,8 @@ const StudentQuizzes = () => {
         >
           <div className="glass-card">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                <FiBook className="w-6 h-6 text-blue-400" />
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                <FiBook className="w-6 h-6 text-gray-300" />
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Total Quizzes</p>
@@ -159,8 +159,8 @@ const StudentQuizzes = () => {
 
           <div className="glass-card">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                <FiClock className="w-6 h-6 text-purple-400" />
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                <FiClock className="w-6 h-6 text-gray-300" />
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Total Duration</p>
@@ -225,7 +225,7 @@ const StudentQuizzes = () => {
                     </div>
 
                     {quiz.subject && (
-                      <p className="text-sm text-blue-400 mb-1">
+                      <p className="text-sm text-gray-300 mb-1">
                         📚 Subject: {quiz.subject}
                         {quiz.chapters && ` • Chapters: ${quiz.chapters}`}
                       </p>
@@ -276,8 +276,8 @@ const StudentQuizzes = () => {
 
                     <Link to={`/teacher/quiz/${quiz._id}/submissions`}>
                       <motion.button
-                        className="px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg 
-                                   flex items-center gap-2 hover:bg-purple-500/30 transition-colors"
+                        className="px-4 py-2 bg-white/10 text-gray-300 rounded-lg 
+                                   flex items-center gap-2 hover:bg-white/20 transition-colors"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
@@ -288,8 +288,8 @@ const StudentQuizzes = () => {
 
                     <Link to={`/teacher/quiz/${quiz._id}`}>
                       <motion.button
-                        className="px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg 
-                                   flex items-center gap-2 hover:bg-blue-500/30 transition-colors"
+                        className="px-4 py-2 bg-white/10 text-gray-300 rounded-lg 
+                                   flex items-center gap-2 hover:bg-white/20 transition-colors"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
@@ -326,3 +326,4 @@ const StudentQuizzes = () => {
 };
 
 export default StudentQuizzes;
+

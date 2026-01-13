@@ -62,13 +62,13 @@ const TeacherLogin = () => {
         {/* Logo */}
         <div className="text-center mb-6 sm:mb-8">
           <motion.div
-            className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl sm:rounded-2xl 
+            className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-gray-200 to-white rounded-xl sm:rounded-2xl 
                        flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg"
             initial={{ rotate: -10 }}
             animate={{ rotate: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="text-white font-bold text-3xl sm:text-4xl">
+            <span className="text-gray-900 font-bold text-3xl sm:text-4xl">
               👨‍🏫
             </span>
           </motion.div>

@@ -87,8 +87,8 @@ const TeacherDashboard = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <div className="flex items-center gap-3 sm:gap-4">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-500/20 rounded-lg sm:rounded-xl flex items-center justify-center">
-              <FiUsers className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/10 rounded-lg sm:rounded-xl flex items-center justify-center">
+              <FiUsers className="w-6 h-6 sm:w-8 sm:h-8 text-gray-300" />
             </div>
             <div>
               <p className="text-gray-400 text-xs sm:text-sm">Total Students</p>
@@ -162,14 +162,14 @@ const TeacherDashboard = () => {
             {filteredStudents.map((student, index) => (
               <motion.div
                 key={student._id}
-                className="glass-card hover:border-blue-500/50 transition-all duration-300"
+                className="glass-card hover:border-white/30 transition-all duration-300"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * index }}
               >
                 <div className="flex items-start justify-between mb-3 sm:mb-4">
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center">
                       <FiUser className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                     </div>
                     <div>

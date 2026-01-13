@@ -54,8 +54,10 @@ const Navbar = () => {
       <div className="container mx-auto px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           <Link to={dashboardPath} className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg sm:text-xl">Q</span>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-gray-300 to-white rounded-lg flex items-center justify-center">
+              <span className="text-gray-900 font-bold text-lg sm:text-xl">
+                Q
+              </span>
             </div>
             <span className="text-lg sm:text-xl font-bold text-white">
               Quiz Platform
@@ -73,9 +75,9 @@ const Navbar = () => {
             </Link>
 
             <div className="flex items-center gap-2 px-3 py-2 glass rounded-lg">
-              <FiUser className="w-5 h-5 text-blue-400" />
+              <FiUser className="w-5 h-5 text-gray-300" />
               <span className="text-gray-300">{user?.name}</span>
-              <span className="text-xs px-2 py-1 bg-blue-500/30 rounded-full text-blue-300 capitalize">
+              <span className="text-xs px-2 py-1 bg-white/20 rounded-full text-gray-300 capitalize">
                 {user?.role}
               </span>
             </div>
@@ -137,7 +139,7 @@ const Navbar = () => {
               </Link>
 
               <div className="flex items-center gap-3 p-3 glass rounded-lg">
-                <FiUser className="w-5 h-5 text-blue-400" />
+                <FiUser className="w-5 h-5 text-gray-300" />
                 <div className="flex-1">
                   <p className="text-white font-medium">{user?.name}</p>
                   <p className="text-xs text-gray-400 capitalize">

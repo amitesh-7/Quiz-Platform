@@ -118,8 +118,8 @@ const ManageStudents = () => {
           transition={{ delay: 0.1 }}
         >
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <FiUsers className="w-8 h-8 text-blue-400" />
+            <div className="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center">
+              <FiUsers className="w-8 h-8 text-gray-300" />
             </div>
             <div>
               <p className="text-gray-400 text-sm">Total Students</p>

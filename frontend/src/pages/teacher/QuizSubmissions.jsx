@@ -97,8 +97,8 @@ const QuizSubmissions = () => {
         >
           <div className="glass-card">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                <FiUser className="w-6 h-6 text-blue-400" />
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                <FiUser className="w-6 h-6 text-gray-300" />
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Total Submissions</p>
@@ -208,7 +208,7 @@ const QuizSubmissions = () => {
                           </div>
                         </td>
                         <td className="py-4 px-4 text-center">
-                          <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm font-medium">
+                          <span className="px-2 py-1 bg-white/10 text-gray-300 rounded-full text-sm font-medium">
                             #{submission.attemptNumber || 1}
                           </span>
                         </td>
@@ -234,7 +234,7 @@ const QuizSubmissions = () => {
                         <td className="py-4 px-4 text-center">
                           <Link to={`/teacher/submission/${submission.id}`}>
                             <motion.button
-                              className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg flex items-center gap-1 hover:bg-blue-500/30 transition-colors mx-auto"
+                              className="px-3 py-1.5 bg-white/10 text-gray-300 rounded-lg flex items-center gap-1 hover:bg-white/20 transition-colors mx-auto"
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                             >
@@ -269,7 +269,7 @@ const QuizSubmissions = () => {
                         <h3 className="text-white font-semibold">
                           {submission.student?.name}
                         </h3>
-                        <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded-full text-xs font-medium">
+                        <span className="px-2 py-0.5 bg-white/10 text-gray-300 rounded-full text-xs font-medium">
                           Attempt #{submission.attemptNumber || 1}
                         </span>
                       </div>
@@ -305,7 +305,7 @@ const QuizSubmissions = () => {
                     </p>
                     <Link to={`/teacher/submission/${submission.id}`}>
                       <motion.button
-                        className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg flex items-center gap-1 hover:bg-blue-500/30 transition-colors text-sm"
+                        className="px-3 py-1.5 bg-white/10 text-gray-300 rounded-lg flex items-center gap-1 hover:bg-white/20 transition-colors text-sm"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -325,3 +325,4 @@ const QuizSubmissions = () => {
 };
 
 export default QuizSubmissions;
+

@@ -137,7 +137,7 @@ const CreateQuiz = () => {
             </h1>
 
             {/* Student Info */}
-            <div className="mb-6 p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg">
+            <div className="mb-6 p-4 bg-gradient-to-r from-white/10 to-white/5 border border-white/20 rounded-lg">
               <p className="text-white flex items-center gap-2">
                 <FiUser className="w-5 h-5" />
                 <span className="font-semibold">Creating quiz for:</span>
@@ -146,7 +146,7 @@ const CreateQuiz = () => {
             </div>
 
             {/* Info Banner */}
-            <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+            <div className="mb-6 p-4 bg-blue-500/10 border border-white/20 rounded-lg">
               <p className="text-sm text-blue-300 flex items-center gap-2">
                 <FiCpu className="w-4 h-4" />
                 🎯 This student will receive unique questions for this quiz
@@ -163,13 +163,13 @@ const CreateQuiz = () => {
                     onClick={() => setCreationMode("manual")}
                     className={`p-3 rounded-xl border-2 transition-all ${
                       creationMode === "manual"
-                        ? "border-blue-500 bg-blue-500/20"
+                        ? "border-blue-500 bg-white/10"
                         : "border-white/20 bg-white/5 hover:border-white/40"
                     }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <FiEdit3 className="w-6 h-6 mx-auto mb-1 text-blue-400" />
+                    <FiEdit3 className="w-6 h-6 mx-auto mb-1 text-gray-300" />
                     <div className="font-medium text-white text-sm">Manual</div>
                   </motion.button>
 
@@ -178,13 +178,13 @@ const CreateQuiz = () => {
                     onClick={() => setCreationMode("ai")}
                     className={`p-3 rounded-xl border-2 transition-all ${
                       creationMode === "ai"
-                        ? "border-purple-500 bg-purple-500/20"
+                        ? "border-white/30 bg-white/10"
                         : "border-white/20 bg-white/5 hover:border-white/40"
                     }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <FiCpu className="w-6 h-6 mx-auto mb-1 text-purple-400" />
+                    <FiCpu className="w-6 h-6 mx-auto mb-1 text-gray-300" />
                     <div className="font-medium text-white text-sm">
                       AI Generate
                     </div>
@@ -297,7 +297,7 @@ const CreateQuiz = () => {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="space-y-3 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg"
+                  className="space-y-3 p-3 bg-purple-500/10 border border-white/30/30 rounded-lg"
                 >
                   <p className="text-xs text-purple-300 flex items-center gap-2">
                     <FiCpu className="w-3 h-3" />
@@ -397,7 +397,7 @@ const CreateQuiz = () => {
                           key={type.value}
                           className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors text-sm ${
                             aiData.questionTypes.includes(type.value)
-                              ? "bg-purple-500/30 border border-purple-500"
+                              ? "bg-purple-500/30 border border-white/30"
                               : "bg-white/5 border border-white/10 hover:bg-white/10"
                           }`}
                         >
@@ -479,3 +479,4 @@ const CreateQuiz = () => {
 };
 
 export default CreateQuiz;
+

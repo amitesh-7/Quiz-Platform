@@ -8,7 +8,7 @@ import {
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
-import ParticleBackground from "./components/ParticleBackground";
+import ShaderBackground from "./components/ui/shader-background";
 
 // Landing & Auth Pages
 import Landing from "./pages/Landing";
@@ -35,7 +35,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <ParticleBackground />
+        <ShaderBackground speed={0.8} />
         <Toaster
           position="top-center"
           containerStyle={{
