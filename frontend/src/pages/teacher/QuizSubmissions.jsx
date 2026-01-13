@@ -41,7 +41,7 @@ const QuizSubmissions = () => {
   }
 
   const getScoreColor = (percentage) => {
-    if (percentage >= 80) return "text-green-400";
+    if (percentage >= 80) return "text-gray-300";
     if (percentage >= 60) return "text-yellow-400";
     if (percentage >= 40) return "text-orange-400";
     return "text-red-400";
@@ -111,8 +111,8 @@ const QuizSubmissions = () => {
 
           <div className="glass-card">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
-                <FiCheckCircle className="w-6 h-6 text-green-400" />
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                <FiCheckCircle className="w-6 h-6 text-gray-300" />
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Average Score</p>

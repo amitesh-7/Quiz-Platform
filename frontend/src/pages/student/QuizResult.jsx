@@ -43,11 +43,11 @@ const QuizResult = () => {
 
   const getGrade = (percentage) => {
     if (percentage >= 90)
-      return { grade: "A+", color: "text-green-400", bg: "bg-green-500/20" };
+      return { grade: "A+", color: "text-gray-300", bg: "bg-white/10" };
     if (percentage >= 80)
-      return { grade: "A", color: "text-green-400", bg: "bg-green-500/20" };
+      return { grade: "A", color: "text-gray-300", bg: "bg-white/10" };
     if (percentage >= 70)
-      return { grade: "B", color: "text-blue-400", bg: "bg-blue-500/20" };
+      return { grade: "B", color: "text-gray-300", bg: "bg-white/10" };
     if (percentage >= 60)
       return { grade: "C", color: "text-yellow-400", bg: "bg-yellow-500/20" };
     if (percentage >= 50)
@@ -118,7 +118,7 @@ const QuizResult = () => {
               <p className="text-xs sm:text-sm text-gray-400">Marks</p>
             </div>
             <div className="glass p-2 sm:p-4 rounded-xl">
-              <p className="text-lg sm:text-2xl font-bold text-green-400">
+              <p className="text-lg sm:text-2xl font-bold text-gray-300">
                 {correctCount}
               </p>
               <p className="text-xs sm:text-sm text-gray-400">Correct</p>
@@ -178,7 +178,7 @@ const QuizResult = () => {
               const getIconBg = () => {
                 if (!item.isAttempted)
                   return "bg-yellow-500/20 text-yellow-400";
-                if (item.isCorrect) return "bg-green-500/20 text-green-400";
+                if (item.isCorrect) return "bg-white/10 text-gray-300";
                 if (item.isPartial) return "bg-orange-500/20 text-orange-400";
                 return "bg-red-500/20 text-red-400";
               };
@@ -215,7 +215,7 @@ const QuizResult = () => {
                         <span className="px-1.5 sm:px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded text-xs">
                           {item.earnedMarks || 0}/{item.marks} marks
                         </span>
-                        <span className="px-1.5 sm:px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs uppercase">
+                        <span className="px-1.5 sm:px-2 py-0.5 bg-white/10 text-gray-300 rounded text-xs uppercase">
                           {item.questionType === "mcq" && "MCQ"}
                           {item.questionType === "written" && "Written"}
                           {item.questionType === "fillblank" && "Fill Blank"}
@@ -254,7 +254,7 @@ const QuizResult = () => {
                             let bgClass = "bg-white/5 text-gray-400";
                             if (isCorrect) {
                               bgClass =
-                                "bg-green-500/20 text-green-300 border border-green-500/30";
+                                "bg-white/10 text-green-300 border border-green-500/30";
                             } else if (isSelected && !isCorrect) {
                               bgClass =
                                 "bg-red-500/20 text-red-300 border border-red-500/30";
@@ -275,7 +275,7 @@ const QuizResult = () => {
                                   {option}
                                 </span>
                                 {isCorrect && (
-                                  <FiCheckCircle className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
+                                  <FiCheckCircle className="w-4 h-4 text-gray-300 flex-shrink-0 mt-0.5" />
                                 )}
                                 {isSelected && !isCorrect && (
                                   <FiXCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
@@ -318,9 +318,9 @@ const QuizResult = () => {
 
                       {/* Image indicator if uploaded */}
                       {item.imageUrl && (
-                        <div className="bg-blue-500/10 p-3 rounded-lg border border-blue-500/30 flex items-center gap-2">
-                          <FiCheckCircle className="w-4 h-4 text-blue-400" />
-                          <span className="text-sm text-blue-300">
+                        <div className="bg-white/5 p-3 rounded-lg border border-white/20 flex items-center gap-2">
+                          <FiCheckCircle className="w-4 h-4 text-gray-300" />
+                          <span className="text-sm text-gray-300">
                             Answer extracted from uploaded image
                           </span>
                         </div>
@@ -328,8 +328,8 @@ const QuizResult = () => {
 
                       {/* Expected Answer */}
                       {item.expectedAnswer && (
-                        <div className="bg-green-500/10 p-4 rounded-lg border border-green-500/30">
-                          <p className="text-sm text-green-400 mb-2 font-medium">
+                        <div className="bg-white/5 p-4 rounded-lg border border-green-500/30">
+                          <p className="text-sm text-gray-300 mb-2 font-medium">
                             Expected Answer:
                           </p>
                           <p className="text-green-300 whitespace-pre-wrap leading-relaxed">
@@ -340,11 +340,11 @@ const QuizResult = () => {
 
                       {/* AI Feedback */}
                       {item.feedback && (
-                        <div className="bg-blue-500/10 p-4 rounded-lg border border-blue-500/30">
-                          <p className="text-sm text-blue-400 mb-2 font-medium">
+                        <div className="bg-white/5 p-4 rounded-lg border border-white/20">
+                          <p className="text-sm text-gray-300 mb-2 font-medium">
                             AI Feedback:
                           </p>
-                          <p className="text-blue-300 leading-relaxed">
+                          <p className="text-gray-300 leading-relaxed">
                             {item.feedback}
                           </p>
                         </div>
@@ -354,7 +354,7 @@ const QuizResult = () => {
                       <div
                         className={`p-3 rounded-lg ${
                           item.isCorrect
-                            ? "bg-green-500/10 border border-green-500/30"
+                            ? "bg-white/5 border border-green-500/30"
                             : item.isPartial
                             ? "bg-orange-500/10 border border-orange-500/30"
                             : "bg-red-500/10 border border-red-500/30"
@@ -363,7 +363,7 @@ const QuizResult = () => {
                         <p
                           className={`text-sm font-medium ${
                             item.isCorrect
-                              ? "text-green-400"
+                              ? "text-gray-300"
                               : item.isPartial
                               ? "text-orange-400"
                               : "text-red-400"
@@ -392,13 +392,13 @@ const QuizResult = () => {
                       <div
                         className={`p-4 rounded-lg border ${
                           item.isCorrect
-                            ? "bg-green-500/10 border-green-500/30"
+                            ? "bg-white/5 border-green-500/30"
                             : "bg-red-500/10 border-red-500/30"
                         }`}
                       >
                         <p
                           className={`text-sm mb-1 ${
-                            item.isCorrect ? "text-green-400" : "text-red-400"
+                            item.isCorrect ? "text-gray-300" : "text-red-400"
                           }`}
                         >
                           Correct Answer:
@@ -430,7 +430,7 @@ const QuizResult = () => {
                                   key={idx}
                                   className="text-sm bg-white/5 p-2 rounded"
                                 >
-                                  <span className="text-blue-400">
+                                  <span className="text-gray-300">
                                     {match.left}
                                   </span>
                                   <span className="text-gray-500 mx-2">→</span>
@@ -448,8 +448,8 @@ const QuizResult = () => {
                         </div>
 
                         {/* Correct Matches */}
-                        <div className="bg-green-500/10 p-4 rounded-lg border border-green-500/30">
-                          <p className="text-sm text-green-400 mb-3 font-medium">
+                        <div className="bg-white/5 p-4 rounded-lg border border-green-500/30">
+                          <p className="text-sm text-gray-300 mb-3 font-medium">
                             Correct Matches:
                           </p>
                           <div className="space-y-2">
@@ -457,7 +457,7 @@ const QuizResult = () => {
                               item.correctMatches.map((match, idx) => (
                                 <div
                                   key={idx}
-                                  className="text-sm bg-green-500/10 p-2 rounded"
+                                  className="text-sm bg-white/5 p-2 rounded"
                                 >
                                   <span className="text-green-300">
                                     {match.left}

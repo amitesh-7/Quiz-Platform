@@ -492,7 +492,7 @@ const Landing = () => {
       <footer className="py-8 px-4 border-t border-white/10 mb-16 sm:mb-0">
         <div className="max-w-6xl mx-auto text-center">
           <p className="text-gray-500 text-sm">
-            Quiz Platform — Built with React, Node.js, and Google Gemini AI
+            Made with ❤️ by Amitesh Vishwakarma
           </p>
         </div>
       </footer>

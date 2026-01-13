@@ -141,13 +141,13 @@ const CreateQuiz = () => {
               <p className="text-white flex items-center gap-2">
                 <FiUser className="w-5 h-5" />
                 <span className="font-semibold">Creating quiz for:</span>
-                <span className="text-blue-300">{studentName}</span>
+                <span className="text-gray-300">{studentName}</span>
               </p>
             </div>
 
             {/* Info Banner */}
-            <div className="mb-6 p-4 bg-blue-500/10 border border-white/20 rounded-lg">
-              <p className="text-sm text-blue-300 flex items-center gap-2">
+            <div className="mb-6 p-4 bg-white/5 border border-white/20 rounded-lg">
+              <p className="text-sm text-gray-300 flex items-center gap-2">
                 <FiCpu className="w-4 h-4" />
                 🎯 This student will receive unique questions for this quiz
               </p>

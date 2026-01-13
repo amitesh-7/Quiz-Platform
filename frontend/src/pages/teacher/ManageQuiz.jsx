@@ -1089,7 +1089,7 @@ ${answersHTML}
                 {questions.length > 0 && (
                   <motion.button
                     onClick={handleDownloadPDF}
-                    className="text-green-400 hover:text-green-300 text-sm flex items-center gap-1 transition-colors"
+                    className="text-gray-300 hover:text-gray-300 text-sm flex items-center gap-1 transition-colors"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -1107,7 +1107,7 @@ ${answersHTML}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <FiFileText className="w-5 h-5 text-blue-400" />
+                <FiFileText className="w-5 h-5 text-gray-300" />
                 Extract from Image
               </motion.button>
               <motion.button
@@ -1116,7 +1116,7 @@ ${answersHTML}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <FiFileText className="w-5 h-5 text-green-400" />
+                <FiFileText className="w-5 h-5 text-gray-300" />
                 Bulk Process
               </motion.button>
               <motion.button
@@ -1164,7 +1164,7 @@ ${answersHTML}
                 className="btn-secondary flex items-center gap-2"
                 whileHover={{ scale: 1.05 }}
               >
-                <FiFileText className="w-5 h-5 text-blue-400" />
+                <FiFileText className="w-5 h-5 text-gray-300" />
                 Extract from Image
               </motion.button>
               <motion.button
@@ -1172,7 +1172,7 @@ ${answersHTML}
                 className="btn-secondary flex items-center gap-2"
                 whileHover={{ scale: 1.05 }}
               >
-                <FiFileText className="w-5 h-5 text-green-400" />
+                <FiFileText className="w-5 h-5 text-gray-300" />
                 Bulk Process
               </motion.button>
               <motion.button
@@ -1240,14 +1240,14 @@ ${answersHTML}
                         <div className="flex justify-between items-start gap-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-3 flex-wrap">
-                              <span className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 font-bold">
+                              <span className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center text-gray-300 font-bold">
                                 {question.originalIndex + 1}
                               </span>
                               <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
                                 {question.marks} mark
                                 {question.marks > 1 ? "s" : ""}
                               </span>
-                              <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full">
+                              <span className="text-xs px-2 py-1 bg-white/10 text-gray-300 rounded-full">
                                 {question.questionType === "mcq" && "📝 MCQ"}
                                 {question.questionType === "written" &&
                                   "✍️ Written"}
@@ -1277,13 +1277,13 @@ ${answersHTML}
                                       key={idx}
                                       className="p-3 bg-white/5 border border-white/10 rounded-lg"
                                     >
-                                      <p className="text-blue-400 font-medium">
+                                      <p className="text-gray-300 font-medium">
                                         {part.part} ({part.marks} marks)
                                       </p>
                                       <p className="text-white text-sm mt-1">
                                         {part.question}
                                       </p>
-                                      <p className="text-green-400 text-sm mt-1">
+                                      <p className="text-gray-300 text-sm mt-1">
                                         Answer: {part.answer}
                                       </p>
                                     </div>
@@ -1301,7 +1301,7 @@ ${answersHTML}
                                       key={optIndex}
                                       className={`p-3 rounded-lg ${
                                         optIndex === question.correctOption
-                                          ? "bg-green-500/20 border border-green-500/30 text-green-300"
+                                          ? "bg-white/10 border border-white/20 text-gray-300"
                                           : "bg-white/5 border border-white/10 text-gray-400"
                                       }`}
                                     >
@@ -1320,7 +1320,7 @@ ${answersHTML}
                             {/* Written answer */}
                             {question.questionType === "written" &&
                               question.correctAnswer && (
-                                <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg text-green-300 text-sm">
+                                <div className="p-3 bg-white/5 border border-white/20 rounded-lg text-gray-300 text-sm">
                                   <span className="font-medium">
                                     Expected Answer:{" "}
                                   </span>
@@ -1341,7 +1341,7 @@ ${answersHTML}
                                     {question.alternativeQuestion}
                                   </p>
                                   {question.alternativeAnswer && (
-                                    <p className="text-green-400 text-sm mt-2">
+                                    <p className="text-gray-300 text-sm mt-2">
                                       <span className="font-medium">
                                         Answer:{" "}
                                       </span>
@@ -1360,7 +1360,7 @@ ${answersHTML}
                                   {question.blanks.map((blank, idx) => (
                                     <span
                                       key={idx}
-                                      className="px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-lg text-green-300 text-sm"
+                                      className="px-3 py-1.5 bg-white/10 border border-white/20 rounded-lg text-gray-300 text-sm"
                                     >
                                       Blank {idx + 1}: {blank}
                                     </span>
@@ -1377,11 +1377,11 @@ ${answersHTML}
                                       key={idx}
                                       className="p-2 bg-white/5 border border-white/10 rounded-lg text-sm flex items-center gap-2"
                                     >
-                                      <span className="text-blue-400">
+                                      <span className="text-gray-300">
                                         {pair.left}
                                       </span>
                                       <span className="text-gray-500">→</span>
-                                      <span className="text-green-400">
+                                      <span className="text-gray-300">
                                         {pair.right}
                                       </span>
                                     </div>
@@ -1393,7 +1393,7 @@ ${answersHTML}
                           <div className="flex gap-2">
                             <motion.button
                               onClick={() => handleEditQuestion(question)}
-                              className="p-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30"
+                              className="p-2 bg-white/10 text-gray-300 rounded-lg hover:bg-white/20"
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                             >
@@ -2025,7 +2025,7 @@ ${answersHTML}
                             Topics: Reproduction, Genetics, Evolution,
                             Biotechnology, Ecology
                           </p>
-                          <p className="text-xs mt-2 text-green-700 dark:text-green-300">
+                          <p className="text-xs mt-2 text-green-700 dark:text-gray-300">
                             💡 Enter "Biology" for variety or specific topic
                             like "DNA Replication"
                           </p>
@@ -2061,7 +2061,7 @@ ${answersHTML}
                             Topics: Flamingo (The Last Lesson, Lost Spring, Deep
                             Water) & Vistas (The Tiger King)
                           </p>
-                          <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
+                          <p className="text-xs mt-2 text-blue-700 dark:text-gray-300">
                             💡 Enter "English" for variety or specific "My
                             Mother at Sixty-six"
                           </p>
@@ -2125,7 +2125,7 @@ ${answersHTML}
                             Coordination Compounds, Haloalkanes, Aldehydes,
                             Amines, Biomolecules
                           </p>
-                          <p className="text-xs mt-2 text-green-700 dark:text-green-300">
+                          <p className="text-xs mt-2 text-green-700 dark:text-gray-300">
                             💡 Enter "Chemistry" for variety or specific
                             "Electrochemistry", "Coordination Compounds",
                             "Aldehydes and Ketones"
@@ -2167,7 +2167,7 @@ ${answersHTML}
                             Circuits, Ray Optics, Wave Optics, Atoms,
                             Semiconductors
                           </p>
-                          <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
+                          <p className="text-xs mt-2 text-blue-700 dark:text-gray-300">
                             💡 Enter "Physics" for variety or specific "Current
                             Electricity", "Ray Optics", "Semiconductors"
                           </p>
@@ -2206,8 +2206,8 @@ ${answersHTML}
                     )}
                     {/* UP Board Mathematics Info Box */}
                     {generateForm.examFormat === "upboard_maths" && (
-                      <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-lg p-4">
-                        <p className="text-blue-300 font-medium mb-3">
+                      <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-white/20 rounded-lg p-4">
+                        <p className="text-gray-300 font-medium mb-3">
                           📐 UP Board Mathematics Paper - 70 अंक (25 प्रश्न)
                         </p>
                         <p className="text-xs text-gray-400 mb-2">
@@ -2227,7 +2227,7 @@ ${answersHTML}
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">
+                            <p className="text-gray-300 font-medium mb-2">
                               खण्ड 'ब' - 50 अंक
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
@@ -2237,7 +2237,7 @@ ${answersHTML}
                             </ul>
                           </div>
                         </div>
-                        <p className="text-xs text-blue-400 mt-3">
+                        <p className="text-xs text-gray-300 mt-3">
                           📝 Note: Diagram questions include [चित्र आवश्यक] tag
                           - add diagrams manually
                         </p>
@@ -2266,7 +2266,7 @@ ${answersHTML}
                               </ul>
                             </div>
                             <div className="bg-white/5 rounded-lg p-3">
-                              <p className="text-green-400 font-medium mb-2">
+                              <p className="text-gray-300 font-medium mb-2">
                                 खण्ड 'ब' - 50 अंक
                               </p>
                               <ul className="text-xs text-gray-400 space-y-1">
@@ -2345,7 +2345,7 @@ ${answersHTML}
                               </ul>
                             </div>
                             <div className="bg-white/5 rounded-lg p-3">
-                              <p className="text-green-400 font-medium mb-2">
+                              <p className="text-gray-300 font-medium mb-2">
                                 खण्ड 'ब' - 50 अंक
                               </p>
                               <ul className="text-xs text-gray-400 space-y-1">
@@ -2404,8 +2404,8 @@ ${answersHTML}
                     ) : generateForm.examFormat === "upboard_science" ? (
                       <>
                         {/* UP Board Info Box */}
-                        <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-4">
-                          <p className="text-blue-300 font-medium mb-3">
+                        <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/20 rounded-lg p-4">
+                          <p className="text-gray-300 font-medium mb-3">
                             📋 UP Board Science Paper - 70 Marks (31 Questions)
                           </p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -2420,7 +2420,7 @@ ${answersHTML}
                               </ul>
                             </div>
                             <div className="bg-white/5 rounded-lg p-3">
-                              <p className="text-green-400 font-medium mb-2">
+                              <p className="text-gray-300 font-medium mb-2">
                                 खण्ड-ब (Part B) - 50 Marks
                               </p>
                               <ul className="text-xs text-gray-400 space-y-1">
@@ -2519,8 +2519,8 @@ ${answersHTML}
                     ) : generateForm.examFormat === "upboard_english" ? (
                       <>
                         {/* UP Board English Info Box */}
-                        <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
-                          <p className="text-green-300 font-medium mb-3">
+                        <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-white/20 rounded-lg p-4">
+                          <p className="text-gray-300 font-medium mb-3">
                             📋 UP Board English Paper - 70 Marks (31 Questions)
                           </p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -2533,7 +2533,7 @@ ${answersHTML}
                               </ul>
                             </div>
                             <div className="bg-white/5 rounded-lg p-3">
-                              <p className="text-green-400 font-medium mb-2">
+                              <p className="text-gray-300 font-medium mb-2">
                                 PART-B - 50 Marks
                               </p>
                               <ul className="text-xs text-gray-400 space-y-1">
@@ -2850,7 +2850,7 @@ ${answersHTML}
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 text-green-300">
+                    <div className="bg-white/5 border border-white/20 rounded-lg p-4 text-gray-300">
                       Generated {generatedQuestions.length} questions. Review
                       and add them to your quiz.
                     </div>
@@ -2884,7 +2884,7 @@ ${answersHTML}
                                   className="bg-white/5 rounded-lg p-4 mb-2"
                                 >
                                   <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                    <span className="text-blue-400 font-bold">
+                                    <span className="text-gray-300 font-bold">
                                       Q{question.originalIndex + 1}.
                                     </span>
                                     <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded-full">
@@ -2899,7 +2899,7 @@ ${answersHTML}
                                       {question.questionType === "truefalse" &&
                                         "✓✗ True/False"}
                                     </span>
-                                    <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full">
+                                    <span className="text-xs px-2 py-0.5 bg-white/10 text-gray-300 rounded-full">
                                       {question.marks} mark
                                       {question.marks > 1 ? "s" : ""}
                                     </span>
@@ -2918,7 +2918,7 @@ ${answersHTML}
                                             key={optIdx}
                                             className={`p-2 rounded ${
                                               optIdx === question.correctOption
-                                                ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                                                ? "bg-white/10 text-gray-300 border border-white/20"
                                                 : "bg-white/5 text-gray-400"
                                             }`}
                                           >
@@ -2932,7 +2932,7 @@ ${answersHTML}
                                   {/* Written Answer */}
                                   {question.questionType === "written" &&
                                     question.correctAnswer && (
-                                      <div className="p-2 bg-green-500/10 border border-green-500/30 rounded text-green-300 text-sm mt-2">
+                                      <div className="p-2 bg-white/5 border border-white/20 rounded text-gray-300 text-sm mt-2">
                                         <span className="font-medium">
                                           Expected:{" "}
                                         </span>
@@ -2949,7 +2949,7 @@ ${answersHTML}
                                         {question.blanks.map((blank, idx) => (
                                           <span
                                             key={idx}
-                                            className="px-2 py-1 bg-green-500/20 text-green-300 rounded text-sm"
+                                            className="px-2 py-1 bg-white/10 text-gray-300 rounded text-sm"
                                           >
                                             Blank {idx + 1}: {blank}
                                           </span>
@@ -2967,13 +2967,13 @@ ${answersHTML}
                                               key={idx}
                                               className="p-2 bg-white/5 rounded flex items-center gap-2"
                                             >
-                                              <span className="text-blue-400">
+                                              <span className="text-gray-300">
                                                 {pair.left}
                                               </span>
                                               <span className="text-gray-500">
                                                 →
                                               </span>
-                                              <span className="text-green-400">
+                                              <span className="text-gray-300">
                                                 {pair.right}
                                               </span>
                                             </div>
@@ -3041,7 +3041,7 @@ ${answersHTML}
               >
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <FiFileText className="w-6 h-6 text-green-400" />
+                    <FiFileText className="w-6 h-6 text-gray-300" />
                     Bulk Process Questions
                   </h2>
                   <button
@@ -3195,7 +3195,7 @@ ${answersHTML}
                           </p>
                           <p>✓ Q4-Q6: Short Answer Type II (12×3) = 36 marks</p>
                           <p>✓ Q7-Q9: Long Answer with OR (3×5) = 15 marks</p>
-                          <p className="text-xs mt-2 text-green-700 dark:text-green-300">
+                          <p className="text-xs mt-2 text-green-700 dark:text-gray-300">
                             💡 Enter questions with full context and details
                           </p>
                         </div>
@@ -3224,7 +3224,7 @@ ${answersHTML}
                             ✓ Section D: Literature (40 marks) - 7 questions
                             (Flamingo & Vistas with OR)
                           </p>
-                          <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
+                          <p className="text-xs mt-2 text-blue-700 dark:text-gray-300">
                             💡 Paste all questions from your paper with sections
                           </p>
                         </div>
@@ -3270,7 +3270,7 @@ ${answersHTML}
                           <p>✓ Q7-Q8: Short answers (8m each) = 16m</p>
                           <p>✓ Q9-Q10: Numerical & theory (12m each) = 24m</p>
                           <p>✓ Q11-Q12: Organic chemistry (12m each) = 24m</p>
-                          <p className="text-xs mt-2 text-green-700 dark:text-green-300">
+                          <p className="text-xs mt-2 text-green-700 dark:text-gray-300">
                             💡 Paste questions with chemical equations and
                             formulas
                           </p>
@@ -3293,7 +3293,7 @@ ${answersHTML}
                           </p>
                           <p>✓ Q4-Q5: Numerical & Theory = 24m</p>
                           <p>✓ Q6-Q9: Long Answers with OR = 20m</p>
-                          <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
+                          <p className="text-xs mt-2 text-blue-700 dark:text-gray-300">
                             💡 Paste questions with formulas, calculations, and
                             diagrams
                           </p>
@@ -3320,8 +3320,8 @@ ${answersHTML}
 
                     {/* UP Board Mathematics Info Box */}
                     {bulkForm.examFormat === "upboard_maths" && (
-                      <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-lg p-4">
-                        <p className="text-blue-300 font-medium mb-3">
+                      <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-white/20 rounded-lg p-4">
+                        <p className="text-gray-300 font-medium mb-3">
                           📐 UP Board Mathematics Paper - 70 अंक (25 प्रश्न)
                         </p>
                         <p className="text-xs text-gray-400 mb-2">
@@ -3337,7 +3337,7 @@ ${answersHTML}
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">
+                            <p className="text-gray-300 font-medium mb-2">
                               खण्ड 'ब' - 50 अंक
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
@@ -3368,7 +3368,7 @@ ${answersHTML}
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">
+                            <p className="text-gray-300 font-medium mb-2">
                               खण्ड 'ब' - 50 अंक
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
@@ -3401,7 +3401,7 @@ ${answersHTML}
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">
+                            <p className="text-gray-300 font-medium mb-2">
                               खण्ड 'ब' - 50 अंक
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
@@ -3423,8 +3423,8 @@ ${answersHTML}
 
                     {/* UP Board Info Box */}
                     {bulkForm.examFormat === "upboard_science" && (
-                      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-4">
-                        <p className="text-blue-300 font-medium mb-3">
+                      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/20 rounded-lg p-4">
+                        <p className="text-gray-300 font-medium mb-3">
                           📋 UP Board Science Paper - 70 Marks (31 Questions)
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -3439,7 +3439,7 @@ ${answersHTML}
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">
+                            <p className="text-gray-300 font-medium mb-2">
                               खण्ड-ब (Part B) - 50 Marks
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
@@ -3460,8 +3460,8 @@ ${answersHTML}
 
                     {/* UP Board English Info Box */}
                     {bulkForm.examFormat === "upboard_english" && (
-                      <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
-                        <p className="text-green-300 font-medium mb-3">
+                      <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-white/20 rounded-lg p-4">
+                        <p className="text-gray-300 font-medium mb-3">
                           📋 UP Board English Paper - 70 Marks (31 Questions)
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -3474,7 +3474,7 @@ ${answersHTML}
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">
+                            <p className="text-gray-300 font-medium mb-2">
                               PART-B - 50 Marks
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
@@ -3545,7 +3545,7 @@ ${answersHTML}
                     {/* Additional fields only for General format */}
                     {bulkForm.examFormat === "general" && (
                       <>
-                        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-blue-300 text-sm">
+                        <div className="bg-white/5 border border-white/20 rounded-lg p-4 text-gray-300 text-sm">
                           <p className="font-semibold mb-2">📋 How it works:</p>
                           <ul className="list-disc list-inside space-y-1">
                             <li>Paste your raw questions below (any format)</li>
@@ -3838,7 +3838,7 @@ Example:
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 text-green-300">
+                    <div className="bg-white/5 border border-white/20 rounded-lg p-4 text-gray-300">
                       <p className="font-semibold">
                         ✓ Processed {processedQuestions.length} questions (
                         {processedQuestions.reduce(
@@ -3847,7 +3847,7 @@ Example:
                         )}{" "}
                         total marks)
                       </p>
-                      <p className="text-sm mt-1 text-green-400">
+                      <p className="text-sm mt-1 text-gray-300">
                         Review the questions below and add them to your quiz.
                       </p>
                     </div>
@@ -3857,7 +3857,7 @@ Example:
                         <div key={index} className="bg-white/5 rounded-lg p-4">
                           <div className="flex justify-between items-start mb-2">
                             <p className="text-white flex-1">
-                              <span className="text-blue-400 font-bold">
+                              <span className="text-gray-300 font-bold">
                                 Q{index + 1}.
                               </span>{" "}
                               {question.questionText}
@@ -3867,7 +3867,7 @@ Example:
                                 {question.marks} mark
                                 {question.marks > 1 ? "s" : ""}
                               </span>
-                              <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full whitespace-nowrap">
+                              <span className="text-xs px-2 py-1 bg-white/10 text-gray-300 rounded-full whitespace-nowrap">
                                 {question.questionType}
                               </span>
                             </div>
@@ -3882,7 +3882,7 @@ Example:
                                   key={optIdx}
                                   className={`p-2 rounded ${
                                     optIdx === question.correctOption
-                                      ? "bg-green-500/20 text-green-300"
+                                      ? "bg-white/10 text-gray-300"
                                       : "bg-white/5 text-gray-400"
                                   }`}
                                 >
@@ -3895,7 +3895,7 @@ Example:
                           {/* Show answer for written */}
                           {question.questionType === "written" && (
                             <div className="text-sm text-gray-400 mt-2">
-                              <span className="text-green-400">Answer: </span>
+                              <span className="text-gray-300">Answer: </span>
                               {question.correctAnswer}
                             </div>
                           )}
@@ -3903,7 +3903,7 @@ Example:
                           {/* Show blanks for fill-in-blank */}
                           {question.questionType === "fillblank" && (
                             <div className="text-sm text-gray-400 mt-2">
-                              <span className="text-green-400">Blanks: </span>
+                              <span className="text-gray-300">Blanks: </span>
                               {question.blanks?.join(", ")}
                             </div>
                           )}
@@ -3916,11 +3916,11 @@ Example:
                                   key={pIdx}
                                   className="flex items-center gap-2 text-gray-400"
                                 >
-                                  <span className="text-blue-400">
+                                  <span className="text-gray-300">
                                     {pair.left}
                                   </span>
                                   <span>→</span>
-                                  <span className="text-green-400">
+                                  <span className="text-gray-300">
                                     {pair.right}
                                   </span>
                                 </div>
@@ -3983,7 +3983,7 @@ Example:
               >
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <FiFileText className="w-6 h-6 text-blue-400" />
+                    <FiFileText className="w-6 h-6 text-gray-300" />
                     Extract Questions from Image
                   </h2>
                   <button
@@ -4122,8 +4122,8 @@ Example:
 
                     {/* UP Board Biology Info Box */}
                     {imageForm.examFormat === "upboard_biology" && (
-                      <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
-                        <p className="text-green-300 font-medium mb-3">
+                      <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-white/20 rounded-lg p-4">
+                        <p className="text-gray-300 font-medium mb-3">
                           🧬 UP Board Biology (Class 12) - 70 अंक
                         </p>
                         <div className="text-xs text-gray-400 space-y-2">
@@ -4133,7 +4133,7 @@ Example:
                           <p>• Q3: Short Type I (5×2 = 10 marks)</p>
                           <p>• Q4-Q6: Short Type II (12×3 = 36 marks)</p>
                           <p>• Q7-Q9: Long Answer (3×5 = 15 marks) with OR</p>
-                          <p className="text-green-400 mt-2">
+                          <p className="text-gray-300 mt-2">
                             💡 Upload clear images of Biology question paper
                           </p>
                         </div>
@@ -4165,7 +4165,7 @@ Example:
                             ✓ Section D: Literature (40 marks) - 7 questions
                             (Flamingo & Vistas)
                           </p>
-                          <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
+                          <p className="text-xs mt-2 text-blue-700 dark:text-gray-300">
                             💡 Upload clear images of all sections including
                             passages
                           </p>
@@ -4199,8 +4199,8 @@ Example:
 
                     {/* UP Board Chemistry Class 12 Info Box */}
                     {imageForm.examFormat === "upboard_chemistryclass12" && (
-                      <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
-                        <p className="text-green-300 font-medium mb-3">
+                      <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-white/20 rounded-lg p-4">
+                        <p className="text-gray-300 font-medium mb-3">
                           🧪 UP Board Class 12 Chemistry - 70 Marks
                         </p>
                         <div className="text-xs text-gray-400 space-y-2">
@@ -4220,7 +4220,7 @@ Example:
                             ✓ Q11-Q12: Organic chemistry (12m each) - IUPAC
                             names, reactions, mechanisms
                           </p>
-                          <p className="text-xs mt-2 text-green-700 dark:text-green-300">
+                          <p className="text-xs mt-2 text-green-700 dark:text-gray-300">
                             💡 Upload clear images showing all chemical
                             equations and structural formulas
                           </p>
@@ -4230,8 +4230,8 @@ Example:
 
                     {/* UP Board Physics Class 12 Info Box */}
                     {imageForm.examFormat === "upboard_physicsclass12" && (
-                      <div className="bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-500/30 rounded-lg p-4">
-                        <p className="text-blue-300 font-medium mb-3">
+                      <div className="bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-white/20 rounded-lg p-4">
+                        <p className="text-gray-300 font-medium mb-3">
                           ⚡ UP Board Class 12 Physics - 70 Marks
                         </p>
                         <div className="text-xs text-gray-400 space-y-2">
@@ -4245,7 +4245,7 @@ Example:
                             ✓ Q4-Q5: Numerical & Theory (खण्ड-'द') = 24 marks
                           </p>
                           <p>✓ Q6-Q9: Long Answers with OR = 20 marks</p>
-                          <p className="text-xs mt-2 text-blue-700 dark:text-blue-300">
+                          <p className="text-xs mt-2 text-blue-700 dark:text-gray-300">
                             💡 Upload clear images showing all formulas, circuit
                             diagrams, and calculations
                           </p>
@@ -4272,8 +4272,8 @@ Example:
 
                     {/* UP Board Mathematics Info Box */}
                     {imageForm.examFormat === "upboard_maths" && (
-                      <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-lg p-4">
-                        <p className="text-blue-300 font-medium mb-3">
+                      <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-white/20 rounded-lg p-4">
+                        <p className="text-gray-300 font-medium mb-3">
                           📐 UP Board Mathematics Paper - 70 अंक (25 प्रश्न)
                         </p>
                         <p className="text-xs text-gray-400 mb-2">
@@ -4289,7 +4289,7 @@ Example:
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">
+                            <p className="text-gray-300 font-medium mb-2">
                               खण्ड 'ब' - 50 अंक
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
@@ -4320,7 +4320,7 @@ Example:
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">
+                            <p className="text-gray-300 font-medium mb-2">
                               खण्ड 'ब' - 50 अंक
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
@@ -4342,8 +4342,8 @@ Example:
 
                     {/* UP Board Info Box */}
                     {imageForm.examFormat === "upboard_science" && (
-                      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg p-4">
-                        <p className="text-blue-300 font-medium mb-3">
+                      <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/20 rounded-lg p-4">
+                        <p className="text-gray-300 font-medium mb-3">
                           📋 UP Board Science Paper - 70 Marks (31 Questions)
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -4358,7 +4358,7 @@ Example:
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">
+                            <p className="text-gray-300 font-medium mb-2">
                               खण्ड-ब (Part B) - 50 Marks
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
@@ -4379,8 +4379,8 @@ Example:
 
                     {/* UP Board English Info Box */}
                     {imageForm.examFormat === "upboard_english" && (
-                      <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-green-500/30 rounded-lg p-4">
-                        <p className="text-green-300 font-medium mb-3">
+                      <div className="bg-gradient-to-r from-green-500/20 to-teal-500/20 border border-white/20 rounded-lg p-4">
+                        <p className="text-gray-300 font-medium mb-3">
                           📋 UP Board English Paper - 70 Marks (31 Questions)
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -4393,7 +4393,7 @@ Example:
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">
+                            <p className="text-gray-300 font-medium mb-2">
                               PART-B - 50 Marks
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
@@ -4433,7 +4433,7 @@ Example:
                             </ul>
                           </div>
                           <div className="bg-white/5 rounded-lg p-3">
-                            <p className="text-green-400 font-medium mb-2">
+                            <p className="text-gray-300 font-medium mb-2">
                               खण्ड 'ब' - 50 अंक
                             </p>
                             <ul className="text-xs text-gray-400 space-y-1">
@@ -4687,7 +4687,7 @@ Example:
                       </>
                     )}
 
-                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-blue-300 text-sm">
+                    <div className="bg-white/5 border border-white/20 rounded-lg p-4 text-gray-300 text-sm">
                       <p className="font-semibold mb-2">📸 How it works:</p>
                       <ul className="list-disc list-inside space-y-1">
                         <li>
@@ -4808,7 +4808,7 @@ Example:
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 text-green-300 flex justify-between items-center">
+                    <div className="bg-white/5 border border-white/20 rounded-lg p-4 text-gray-300 flex justify-between items-center">
                       <p className="font-semibold">
                         ✓ Extracted {extractedQuestions.length} questions (
                         {extractedQuestions.reduce(
@@ -4819,7 +4819,7 @@ Example:
                       </p>
                       <motion.button
                         onClick={() => handleDownloadExtractedPDF()}
-                        className="text-green-400 hover:text-green-300 text-sm flex items-center gap-1"
+                        className="text-gray-300 hover:text-gray-300 text-sm flex items-center gap-1"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -4855,7 +4855,7 @@ Example:
                                 >
                                   <div className="flex justify-between items-start mb-2">
                                     <p className="text-white flex-1">
-                                      <span className="text-blue-400 font-bold">
+                                      <span className="text-gray-300 font-bold">
                                         Q{question.originalIndex + 1}.
                                       </span>{" "}
                                       {question.questionText}
@@ -4865,7 +4865,7 @@ Example:
                                         {question.marks} mark
                                         {question.marks > 1 ? "s" : ""}
                                       </span>
-                                      <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full whitespace-nowrap">
+                                      <span className="text-xs px-2 py-1 bg-white/10 text-gray-300 rounded-full whitespace-nowrap">
                                         {question.questionType}
                                       </span>
                                     </div>
@@ -4880,7 +4880,7 @@ Example:
                                           key={optIdx}
                                           className={`p-2 rounded ${
                                             optIdx === question.correctOption
-                                              ? "bg-green-500/20 text-green-300"
+                                              ? "bg-white/10 text-gray-300"
                                               : "bg-white/5 text-gray-400"
                                           }`}
                                         >
@@ -4894,7 +4894,7 @@ Example:
                                   {question.questionType === "written" &&
                                     question.correctAnswer && (
                                       <div className="text-sm text-gray-400 mt-2 max-h-24 overflow-y-auto">
-                                        <span className="text-green-400">
+                                        <span className="text-gray-300">
                                           Answer:{" "}
                                         </span>
                                         <span className="whitespace-pre-line">
@@ -4924,7 +4924,7 @@ Example:
 
                                   {question.questionType === "fillblank" && (
                                     <div className="text-sm text-gray-400 mt-2">
-                                      <span className="text-green-400">
+                                      <span className="text-gray-300">
                                         Blanks:{" "}
                                       </span>
                                       {question.blanks?.join(", ")}
@@ -4939,11 +4939,11 @@ Example:
                                             key={pIdx}
                                             className="flex items-center gap-2 text-gray-400"
                                           >
-                                            <span className="text-blue-400">
+                                            <span className="text-gray-300">
                                               {pair.left}
                                             </span>
                                             <span>→</span>
-                                            <span className="text-green-400">
+                                            <span className="text-gray-300">
                                               {pair.right}
                                             </span>
                                           </div>

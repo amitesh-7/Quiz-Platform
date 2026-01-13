@@ -44,7 +44,7 @@ const SubmissionDetails = () => {
   };
 
   const getScoreColor = (percentage) => {
-    if (percentage >= 80) return "text-green-400";
+    if (percentage >= 80) return "text-gray-300";
     if (percentage >= 60) return "text-yellow-400";
     if (percentage >= 40) return "text-orange-400";
     return "text-red-400";
@@ -235,7 +235,7 @@ const SubmissionDetails = () => {
           </div>
 
           <div className="glass-card text-center">
-            <FiCheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
+            <FiCheckCircle className="w-8 h-8 text-gray-300 mx-auto mb-2" />
             <p className="text-gray-400 text-sm">Correct</p>
             <p className="text-2xl font-bold text-white">{correctCount}</p>
           </div>
@@ -351,7 +351,7 @@ const SubmissionDetails = () => {
                             Not Attempted
                           </span>
                         ) : answer.isCorrect ? (
-                          <span className="flex items-center gap-1 text-green-400">
+                          <span className="flex items-center gap-1 text-gray-300">
                             <FiCheckCircle className="w-5 h-5" />
                             Correct
                           </span>
@@ -400,7 +400,7 @@ const SubmissionDetails = () => {
                               !answer.isAttempted
                                 ? "bg-gray-500/20 text-gray-400"
                                 : answer.isCorrect
-                                ? "bg-green-500/20 text-green-400"
+                                ? "bg-white/10 text-gray-300"
                                 : answer.earnedMarks > 0
                                 ? "bg-yellow-500/20 text-yellow-400"
                                 : "bg-red-500/20 text-red-400"
@@ -453,7 +453,7 @@ const SubmissionDetails = () => {
                                   key={optIdx}
                                   className={`p-3 rounded-lg flex items-start gap-2 ${
                                     isCorrect
-                                      ? "bg-green-500/20 border border-green-500/50 text-green-300"
+                                      ? "bg-white/10 border border-green-500/50 text-green-300"
                                       : isSelected
                                       ? "bg-red-500/20 border border-red-500/50 text-red-300"
                                       : "bg-white/5 border border-white/10 text-gray-400"
@@ -479,8 +479,8 @@ const SubmissionDetails = () => {
                                   </span>
                                   {isCorrect && (
                                     <span className="flex items-center gap-1">
-                                      <FiCheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                                      <span className="text-xs text-green-400">
+                                      <FiCheckCircle className="w-5 h-5 text-gray-300 flex-shrink-0" />
+                                      <span className="text-xs text-gray-300">
                                         Correct Answer
                                       </span>
                                     </span>
@@ -523,8 +523,8 @@ const SubmissionDetails = () => {
                             )}
                           </div>
                         </div>
-                        <div className="p-4 bg-green-500/10 rounded-lg border border-green-500/30">
-                          <p className="text-xs text-green-400 mb-2 font-medium">
+                        <div className="p-4 bg-white/5 rounded-lg border border-green-500/30">
+                          <p className="text-xs text-gray-300 mb-2 font-medium">
                             Expected Answer:
                           </p>
                           {editMode ? (
@@ -598,7 +598,7 @@ const SubmissionDetails = () => {
                                 className={`${
                                   studentAnswer
                                     ? isCorrect
-                                      ? "text-green-400"
+                                      ? "text-gray-300"
                                       : "text-red-400"
                                     : "text-gray-500 italic"
                                 }`}
@@ -608,14 +608,14 @@ const SubmissionDetails = () => {
                               {!isCorrect && (
                                 <>
                                   <span className="text-gray-500">→</span>
-                                  <span className="text-green-400">
+                                  <span className="text-gray-300">
                                     {blank}
                                   </span>
                                 </>
                               )}
                               {studentAnswer &&
                                 (isCorrect ? (
-                                  <FiCheckCircle className="w-4 h-4 text-green-400 ml-auto" />
+                                  <FiCheckCircle className="w-4 h-4 text-gray-300 ml-auto" />
                                 ) : (
                                   <FiXCircle className="w-4 h-4 text-red-400 ml-auto" />
                                 ))}
@@ -650,7 +650,7 @@ const SubmissionDetails = () => {
                                   {pair.left}
                                 </span>
                                 <span className="text-gray-500">→</span>
-                                <span className="text-green-400">
+                                <span className="text-gray-300">
                                   {pair.right}
                                 </span>
                               </div>

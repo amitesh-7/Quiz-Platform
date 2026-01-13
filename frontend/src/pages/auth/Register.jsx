@@ -214,7 +214,7 @@ const Register = () => {
             Already have an account?{" "}
             <Link
               to="/teacher-login"
-              className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
+              className="text-gray-300 hover:text-gray-300 font-medium transition-colors"
             >
               Sign in as Teacher
             </Link>

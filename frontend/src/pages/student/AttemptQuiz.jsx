@@ -712,7 +712,7 @@ const AttemptQuiz = () => {
               className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg ${
                 timeLeft <= 60
                   ? "bg-red-500/20 text-red-400"
-                  : "bg-blue-500/20 text-blue-400"
+                  : "bg-white/10 text-gray-300"
               }`}
             >
               <FiClock className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -756,7 +756,7 @@ const AttemptQuiz = () => {
                     currentQuestion === index
                       ? "bg-blue-500 text-white"
                       : answers[q._id] !== undefined
-                      ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                      ? "bg-white/10 text-gray-300 border border-green-500/30"
                       : "bg-white/10 text-gray-400 hover:bg-white/20"
                   }`}
                   whileHover={{ scale: 1.1 }}
@@ -925,7 +925,7 @@ const AttemptQuiz = () => {
 
                         {/* English Part */}
                         <div className="p-4 sm:p-5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl border-l-4 border-blue-400">
-                          <p className="text-xs text-blue-400 mb-3 font-medium uppercase tracking-wide">
+                          <p className="text-xs text-gray-300 mb-3 font-medium uppercase tracking-wide">
                             In English
                           </p>
                           <p className="text-base sm:text-lg text-white leading-loose whitespace-pre-line">
@@ -965,13 +965,13 @@ const AttemptQuiz = () => {
                     return (
                       <div
                         key={idx}
-                        className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl"
+                        className="p-4 bg-white/5 border border-blue-500/20 rounded-xl"
                       >
                         <div className="flex items-center gap-2 mb-3">
-                          <span className="w-8 h-8 bg-blue-500/30 rounded-lg flex items-center justify-center text-blue-300 font-bold text-sm">
+                          <span className="w-8 h-8 bg-blue-500/30 rounded-lg flex items-center justify-center text-gray-300 font-bold text-sm">
                             {part.part}
                           </span>
-                          <span className="text-blue-400 text-sm font-medium">
+                          <span className="text-gray-300 text-sm font-medium">
                             ({part.marks} अंक / marks)
                           </span>
                         </div>
@@ -1092,7 +1092,7 @@ const AttemptQuiz = () => {
                           )}
                         </div>
                         {answers[question._id] === index && (
-                          <FiCheck className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" />
+                          <FiCheck className="w-6 h-6 text-gray-300 flex-shrink-0 mt-1" />
                         )}
                       </motion.button>
                     );
@@ -1107,7 +1107,7 @@ const AttemptQuiz = () => {
                   {uploadingQuestionId === question._id && (
                     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-xl z-10 flex flex-col items-center justify-center">
                       <div className="w-16 h-16 sm:w-20 sm:h-20 relative mb-4">
-                        <div className="w-full h-full border-4 border-blue-500/30 rounded-full"></div>
+                        <div className="w-full h-full border-4 border-white/20 rounded-full"></div>
                         <div className="w-full h-full border-4 border-transparent border-t-blue-500 rounded-full absolute top-0 left-0 animate-spin"></div>
                       </div>
                       <p className="text-white font-medium text-base sm:text-lg">
@@ -1120,20 +1120,20 @@ const AttemptQuiz = () => {
                   )}
 
                   {/* Image Upload Section */}
-                  <div className="p-3 sm:p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg space-y-3">
+                  <div className="p-3 sm:p-4 bg-white/5 border border-white/20 rounded-lg space-y-3">
                     {/* Camera Capture Button */}
                     <button
                       type="button"
                       onClick={() => openCamera(question._id)}
-                      className={`w-full flex items-center justify-center gap-3 p-3 sm:p-4 bg-green-500/20 active:bg-green-500/40 border border-green-500/30 rounded-lg transition-all group touch-manipulation ${
+                      className={`w-full flex items-center justify-center gap-3 p-3 sm:p-4 bg-white/10 active:bg-green-500/40 border border-green-500/30 rounded-lg transition-all group touch-manipulation ${
                         uploadingQuestionId === question._id
                           ? "pointer-events-none opacity-50"
                           : ""
                       }`}
                       disabled={uploadingOCR}
                     >
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500/20 rounded-lg flex items-center justify-center group-active:bg-green-500/30 transition-colors flex-shrink-0">
-                        <FiCamera className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-lg flex items-center justify-center group-active:bg-green-500/30 transition-colors flex-shrink-0">
+                        <FiCamera className="w-5 h-5 sm:w-6 sm:h-6 text-gray-300" />
                       </div>
                       <div className="flex-1 text-left min-w-0">
                         <p className="text-white font-medium text-sm sm:text-base">
@@ -1148,7 +1148,7 @@ const AttemptQuiz = () => {
                     {/* Captured Images Preview */}
                     {questionImages[question._id] &&
                       questionImages[question._id].length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-blue-500/30">
+                        <div className="mt-3 pt-3 border-t border-white/20">
                           <p className="text-sm text-gray-300 mb-2">
                             Captured Images (
                             {questionImages[question._id].length})
@@ -1159,7 +1159,7 @@ const AttemptQuiz = () => {
                                 <img
                                   src={img}
                                   alt={`Capture ${idx + 1}`}
-                                  className="w-20 h-20 object-cover rounded-lg border border-blue-500/30"
+                                  className="w-20 h-20 object-cover rounded-lg border border-white/20"
                                 />
                                 <button
                                   onClick={() => removeImage(question._id, idx)}
@@ -1174,8 +1174,8 @@ const AttemptQuiz = () => {
                       )}
 
                     {answerImages[question._id] && !uploadingQuestionId && (
-                      <div className="mt-3 pt-3 border-t border-blue-500/30">
-                        <div className="flex items-center gap-2 text-green-400">
+                      <div className="mt-3 pt-3 border-t border-white/20">
+                        <div className="flex items-center gap-2 text-gray-300">
                           <FiCheck className="w-4 h-4" />
                           <span className="text-sm">
                             Images processed & text extracted
@@ -1210,8 +1210,8 @@ const AttemptQuiz = () => {
               {/* Fill in the Blanks */}
               {question.questionType === "fillblank" && (
                 <div className="space-y-4">
-                  <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg mb-4">
-                    <p className="text-sm text-blue-300">
+                  <div className="p-3 bg-white/5 border border-white/20 rounded-lg mb-4">
+                    <p className="text-sm text-gray-300">
                       💡 Tip: You can upload an image of your handwritten answer
                       for each blank
                     </p>
@@ -1250,7 +1250,7 @@ const AttemptQuiz = () => {
                           />
 
                           {(answers[question._id] || [])[index] && (
-                            <div className="mt-2 flex items-center gap-2 text-green-400 text-xs sm:text-sm">
+                            <div className="mt-2 flex items-center gap-2 text-gray-300 text-xs sm:text-sm">
                               <FiCheck className="w-4 h-4" />
                               <span>Answer filled</span>
                             </div>

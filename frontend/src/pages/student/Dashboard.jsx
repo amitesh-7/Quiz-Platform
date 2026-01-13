@@ -68,8 +68,8 @@ const StudentDashboard = () => {
         >
           <div className="glass-card p-3 sm:p-6">
             <div className="flex flex-col sm:flex-row items-center sm:gap-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500/20 rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-0">
-                <FiBook className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-0">
+                <FiBook className="w-5 h-5 sm:w-6 sm:h-6 text-gray-300" />
               </div>
               <div className="text-center sm:text-left">
                 <p className="text-gray-400 text-xs sm:text-sm">Total</p>
@@ -82,8 +82,8 @@ const StudentDashboard = () => {
 
           <div className="glass-card p-3 sm:p-6">
             <div className="flex flex-col sm:flex-row items-center sm:gap-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500/20 rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-0">
-                <FiCheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-0">
+                <FiCheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-gray-300" />
               </div>
               <div className="text-center sm:text-left">
                 <p className="text-gray-400 text-xs sm:text-sm">Done</p>
@@ -161,7 +161,7 @@ const StudentDashboard = () => {
                         {quiz.title}
                       </h3>
                       {quiz.hasSubmitted && (
-                        <span className="px-2 py-0.5 sm:py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium whitespace-nowrap">
+                        <span className="px-2 py-0.5 sm:py-1 bg-white/10 text-gray-300 rounded-full text-xs font-medium whitespace-nowrap">
                           Done
                         </span>
                       )}
