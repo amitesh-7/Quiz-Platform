@@ -80,18 +80,13 @@ Each format includes:
 
 ### 🎨 UI/UX
 
-- Glassmorphism design with dark theme
-- Particle background effects
-- Smooth animations with Framer Motion
-- Fully responsive design
-
-### 📱 Mobile App (React Native)
-
-- **Cross-platform**: iOS and Android support
-- **Full feature parity**: Students can take quizzes, teachers can manage
-- **Native experience**: Smooth animations, native UI components
-- **Offline support**: View cached data offline
-- **Dark/Light theme**: Full theme support matching web app
+- **Animated Shader Background**: MeshGradient with black/gray/white animated effect using `@paper-design/shaders-react`
+- **Monochrome Theme**: Consistent black/gray/white color scheme throughout
+- **Glassmorphism Design**: Dark glass cards (40% black opacity) with blur effects
+- **Tubelight Navbar**: Animated navigation with glowing indicator effect
+- **Text Shadow**: Global text shadow for visibility on all background areas
+- **Smooth Animations**: Framer Motion powered transitions and interactions
+- **Fully Responsive**: Mobile-first design with adaptive layouts
 
 ## 🛠️ Tech Stack
 
@@ -100,11 +95,12 @@ Each format includes:
 - **React 18** (Vite)
 - **Tailwind CSS** - Styling
 - **Framer Motion** - Animations
-- **react-tsparticles** - Particle background
+- **@paper-design/shaders-react** - Animated shader backgrounds
+- **three** / **@react-three/fiber** - 3D rendering for shaders
 - **Axios** - HTTP client
 - **React Router DOM** - Navigation
 - **React Hot Toast** - Notifications
-- **React Icons** - Icon library
+- **React Icons** / **Lucide React** - Icon libraries
 
 ### Backend
 
@@ -197,99 +193,7 @@ quiz-platform/
 │   ├── vercel.json                  # Vercel deployment config
 │   └── vite.config.js               # Vite config
 │
-├── mobile/                          # React Native Mobile App
-│   ├── src/
-│   │   ├── api/
-│   │   │   ├── auth.ts              # Auth API calls
-│   │   │   ├── axios.ts             # Axios instance setup
-│   │   │   ├── index.ts             # API exports
-│   │   │   ├── quiz.ts              # Quiz API calls
-│   │   │   ├── student.ts           # Student API calls
-│   │   │   └── submission.ts        # Submission API calls
-│   │   ├── components/
-│   │   │   └── common/
-│   │   │       ├── Button.tsx       # Reusable button
-│   │   │       ├── Card.tsx         # Card component
-│   │   │       ├── EmptyState.tsx   # Empty state display
-│   │   │       ├── Input.tsx        # Form input
-│   │   │       ├── Loading.tsx      # Loading indicator
-│   │   │       ├── Modal.tsx        # Modal component
-│   │   │       └── index.ts         # Component exports
-│   │   ├── contexts/
-│   │   │   ├── AuthContext.tsx      # Auth state management
-│   │   │   ├── ThemeContext.tsx     # Theme state management
-│   │   │   └── index.ts             # Context exports
-│   │   ├── hooks/
-│   │   │   ├── index.ts             # Hook exports
-│   │   │   ├── useAuth.ts           # Auth hook
-│   │   │   ├── useForm.ts           # Form handling hook
-│   │   │   ├── useTheme.ts          # Theme hook
-│   │   │   └── useTimer.ts          # Timer hook
-│   │   ├── navigation/
-│   │   │   ├── AppNavigator.tsx     # Main navigator
-│   │   │   ├── AuthNavigator.tsx    # Auth flow navigator
-│   │   │   ├── StudentNavigator.tsx # Student tab navigator
-│   │   │   ├── TeacherNavigator.tsx # Teacher tab navigator
-│   │   │   └── index.ts             # Navigation exports
-│   │   ├── screens/
-│   │   │   ├── auth/
-│   │   │   │   ├── RegisterScreen.tsx
-│   │   │   │   ├── SplashScreen.tsx
-│   │   │   │   ├── StudentLoginScreen.tsx
-│   │   │   │   ├── TeacherLoginScreen.tsx
-│   │   │   │   ├── WelcomeScreen.tsx
-│   │   │   │   └── index.ts
-│   │   │   ├── student/
-│   │   │   │   ├── AttemptQuizScreen.tsx
-│   │   │   │   ├── DashboardScreen.tsx
-│   │   │   │   ├── MyQuizzesScreen.tsx
-│   │   │   │   ├── ProfileScreen.tsx
-│   │   │   │   ├── QuizResultScreen.tsx
-│   │   │   │   ├── ResultsScreen.tsx
-│   │   │   │   └── index.ts
-│   │   │   ├── teacher/
-│   │   │   │   ├── CreateQuizScreen.tsx
-│   │   │   │   ├── DashboardScreen.tsx
-│   │   │   │   ├── ManageQuizScreen.tsx
-│   │   │   │   ├── ProfileScreen.tsx
-│   │   │   │   ├── QuizSubmissionsScreen.tsx
-│   │   │   │   ├── QuizzesScreen.tsx
-│   │   │   │   ├── StudentQuizzesScreen.tsx
-│   │   │   │   ├── StudentsScreen.tsx
-│   │   │   │   ├── SubmissionDetailsScreen.tsx
-│   │   │   │   └── index.ts
-│   │   │   └── index.ts             # Screen exports
-│   │   ├── services/
-│   │   │   ├── index.ts             # Service exports
-│   │   │   └── storage.ts           # AsyncStorage helper
-│   │   ├── styles/
-│   │   │   ├── colors.ts            # Color palette
-│   │   │   ├── index.ts             # Style exports
-│   │   │   ├── spacing.ts           # Spacing constants
-│   │   │   └── typography.ts        # Font styles
-│   │   ├── types/
-│   │   │   ├── api.ts               # API types
-│   │   │   ├── index.ts             # Type exports
-│   │   │   ├── navigation.ts        # Navigation types
-│   │   │   ├── quiz.ts              # Quiz types
-│   │   │   └── user.ts              # User types
-│   │   └── utils/
-│   │       ├── constants.ts         # App constants
-│   │       ├── helpers.ts           # Helper functions
-│   │       ├── index.ts             # Util exports
-│   │       └── validators.ts        # Validation functions
-│   ├── .env.example
-│   ├── App.tsx                      # App entry component
-│   ├── app.json                     # Expo/RN config
-│   ├── babel.config.js              # Babel config
-│   ├── index.js                     # App entry point
-│   ├── metro.config.js              # Metro bundler config
-│   ├── package.json
-│   ├── README.md                    # Mobile app docs
-│   └── tsconfig.json                # TypeScript config
-│
 ├── .gitignore
-├── REACT_NATIVE_APP.md              # React Native documentation
 └── README.md                        # Main project README
 ```
 
@@ -682,7 +586,17 @@ npm run dev
 
 ## 🔄 Recent Updates
 
-### Version 3.0 (Latest)
+### Version 4.1 (Latest - January 2026)
+
+- ✅ **Animated Shader Background**: MeshGradient effect with black/gray/white theme
+- ✅ **Monochrome Design System**: Consistent gray-scale color palette
+- ✅ **Tubelight Navbar**: Glowing navigation indicator with white effect
+- ✅ **Enhanced Glass Cards**: Darker 40% opacity for better visibility
+- ✅ **Global Text Shadow**: Readable text on all shader background areas
+- ✅ **Updated Favicon**: Monochrome "Q" icon
+- ✅ **Balanced Color Scheme**: Neutral grays with functional accent colors
+
+### Version 4.0 (January 2026)
 
 - ✅ UP Board Science format (70 marks, 31 questions)
 - ✅ UP Board English format (70 marks, 31 questions)
