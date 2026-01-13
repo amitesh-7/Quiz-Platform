@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@paper-design/shaders-react": "^0.0.69",
-    "@react-three/fiber": "^9.5.0",
+    "@react-three/fiber": "^8.15.0",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.7.1",
     "axios": "^1.6.2",
